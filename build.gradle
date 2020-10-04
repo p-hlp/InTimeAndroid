@@ -42,7 +42,10 @@ buildscript {
         test_deps = [
                 junit: "junit:junit:4.13",
                 androidx_junit: "androidx.test.ext:junit:1.1.2",
-                espresso_core: "androidx.test.espresso:espresso-core:3.3.0"
+                espresso_core: "androidx.test.espresso:espresso-core:3.3.0",
+                google_truth: "com.google.truth:truth:$truth_version",
+                arch_core_testing: "androidx.arch.core:core-testing:$arch_version",
+                coroutines_test: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version"
         ]
     }
     repositories {
