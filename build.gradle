@@ -23,7 +23,20 @@ buildscript {
                 appcompat: "androidx.appcompat:appcompat:$appcompat_version",
                 material: "com.google.android.material:material:$material_version",
                 constraint_layout: "androidx.constraintlayout:constraintlayout:$constraintlayout_version",
-                timber: "com.jakewharton.timber:timber:$timber_version"
+                timber: "com.jakewharton.timber:timber:$timber_version",
+                lifecycle_runtime: "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version",
+                activity: "androidx.activity:activity-ktx:$activity_version",
+                material_icons: "androidx.ui:ui-material-icons-extended:$materialIcons_version",
+                lifecycle_viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version",
+                lifecycle_livedata: "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version",
+                lifecycle_viewmodel_savedstate: "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version",
+                lifecycle_service: "androidx.lifecycle:lifecycle-service:$lifecycle_version",
+                lifecycle_compiler_kapt: "androidx.lifecycle:lifecycle-compiler:$lifecycle_version",
+                room_runtime: "androidx.room:room-runtime:$room_version",
+                room_ktx: "androidx.room:room-ktx:$room_version",
+                room_compiler_kapt: "androidx.room:room-compiler:$room_version",
+                coroutines_core: "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version",
+                coroutines_android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
         ]
 
         test_deps = [
