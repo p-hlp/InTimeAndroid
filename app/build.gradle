@@ -3,6 +3,8 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -42,8 +44,25 @@ dependencies {
     implementation deps.material
     implementation deps.constraint_layout
     implementation deps.timber
+    implementation deps.lifecycle_runtime
+    implementation deps.activity
+    implementation deps.material_icons
+    implementation deps.lifecycle_viewmodel
+    implementation deps.lifecycle_livedata
+    implementation deps.lifecycle_viewmodel_savedstate
+    implementation deps.lifecycle_service
+    kapt deps.lifecycle_compiler_kapt
+    implementation deps.room_runtime
+    implementation deps.room_ktx
+    kapt deps.room_compiler_kapt
+    implementation deps.coroutines_core
+    implementation deps.coroutines_android
+    implementation deps.navigation_fragment
+    implementation deps.navigation_ui
+    implementation deps.navigation_dynamic
 
     testImplementation test_deps.junit
     androidTestImplementation test_deps.androidx_junit
     androidTestImplementation test_deps.espresso_core
+    androidTestImplementation test_deps.navigation_testing
 }
