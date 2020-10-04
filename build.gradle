@@ -15,7 +15,10 @@ buildscript {
         truth_version = "1.0.1"
         materialIcons_version = "0.1.0-dev14"
         material_version = "1.2.1"
-        constraintlayout_version = "2.0."
+        constraintlayout_version = "2.0.1"
+        espresso_core_version = "3.3.0"
+        android_junit_version = "1.1.2"
+        junit_version = "4.13"
 
         deps = [
                 kotlin_stdlib: "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version",
@@ -40,9 +43,9 @@ buildscript {
         ]
 
         test_deps = [
-                junit: "junit:junit:4.13",
-                androidx_junit: "androidx.test.ext:junit:1.1.2",
-                espresso_core: "androidx.test.espresso:espresso-core:3.3.0",
+                junit: "junit:junit:$junit_version",
+                androidx_junit: "androidx.test.ext:junit:$android_junit_version",
+                espresso_core: "androidx.test.espresso:espresso-core:$espresso_core_version",
                 google_truth: "com.google.truth:truth:$truth_version",
                 arch_core_testing: "androidx.arch.core:core-testing:$arch_version",
                 coroutines_test: "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutine_version"
