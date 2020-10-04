@@ -1,13 +1,9 @@
 package com.example.intimesimple.data.local
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 abstract class WorkoutDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertWorkout(workout: Workout)
 
@@ -16,6 +12,9 @@ abstract class WorkoutDao {
             createdAt = System.currentTimeMillis()
         })
     }
+
+    @Update
+    abstract suspend fun updateWorkout(workout: Workout)
 
     @Delete
     abstract suspend fun deleteWorkout(workout: Workout)
