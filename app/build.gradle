@@ -60,6 +60,12 @@ dependencies {
     implementation deps.navigation_fragment
     implementation deps.navigation_ui
     implementation deps.navigation_dynamic
+    implementation deps.hilt_android
+    kapt deps.hilt_androidcompiler_kapt
+    kapt deps.hilt_compiler_kapt
+    implementation deps.legacy_support
+    implementation deps.preference
+
 
     testImplementation test_deps.junit
     androidTestImplementation test_deps.androidx_junit

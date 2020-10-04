@@ -12,6 +12,7 @@ buildscript {
         coroutine_version = "1.3.9"
         activity_version = "1.1.0"
         hilt_version = "2.28-alpha"
+        hilt_compiler_version = "1.0.0-alpha02"
         navigation_version = "2.3.0"
         truth_version = "1.0.1"
         materialIcons_version = "0.1.0-dev14"
@@ -20,6 +21,8 @@ buildscript {
         espresso_core_version = "3.3.0"
         android_junit_version = "1.1.2"
         junit_version = "4.13"
+        legacy_support_version = "1.0.0"
+        preference_version = "1.1.1"
 
         deps = [
                 kotlin_stdlib: "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version",
@@ -43,7 +46,12 @@ buildscript {
                 coroutines_android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version",
                 navigation_fragment: "androidx.navigation:navigation-fragment-ktx:$navigation_version",
                 navigation_ui: "androidx.navigation:navigation-ui-ktx:$navigation_version",
-                navigation_dynamic: "androidx.navigation:navigation-dynamic-features-fragment:$navigation_version"
+                navigation_dynamic: "androidx.navigation:navigation-dynamic-features-fragment:$navigation_version",
+                hilt_android: "com.google.dagger:hilt-android:$hilt_version",
+                hilt_androidcompiler_kapt: "com.google.dagger:hilt-android-compiler:$hilt_version",
+                hilt_compiler_kapt: "androidx.hilt:hilt-compiler:$hilt_compiler_version",
+                legacy_support: "androidx.legacy:legacy-support-v4:$legacy_support_version",
+                preference: "androidx.preference:preference:$preference_version"
         ]
 
         test_deps = [
