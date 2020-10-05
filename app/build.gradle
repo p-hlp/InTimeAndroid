@@ -43,6 +43,14 @@ android {
         kotlinCompilerExtensionVersion compose_version
         kotlinCompilerVersion '1.4.0'
     }
+
+    packagingOptions {
+        exclude "META-INF/ui-util_release.kotlin_module"
+        exclude "META-INF/ui-text-android_release.kotlin_module"
+        exclude "META-INF/ui-graphics_release.kotlin_module"
+        exclude "META-INF/ui-unit_release.kotlin_module"
+        exclude "META-INF/ui-geometry_release.kotlin_module"
+    }
 }
 
 dependencies {
@@ -89,4 +97,11 @@ dependencies {
     androidTestImplementation test_deps.androidx_junit
     androidTestImplementation test_deps.espresso_core
     androidTestImplementation test_deps.navigation_testing
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+    }
 }
