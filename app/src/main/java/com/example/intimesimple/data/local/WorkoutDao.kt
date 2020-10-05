@@ -3,6 +3,7 @@ package com.example.intimesimple.data.local
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 abstract class WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertWorkout(workout: Workout)
