@@ -2,8 +2,9 @@ package com.example.intimesimple.repositories
 
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutDao
+import javax.inject.Inject
 
-class WorkoutRepository constructor(
+class WorkoutRepository @Inject constructor(
     private val workoutDao: WorkoutDao
 ){
     suspend fun insertWorkout(workout: Workout) = workoutDao.insertWithTimestamp(workout)
