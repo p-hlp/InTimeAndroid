@@ -74,6 +74,15 @@ dependencies {
     kapt deps.hilt_compiler_kapt
     implementation deps.legacy_support
     implementation deps.preference
+    implementation deps.compose_compiler
+    implementation deps.compose_ui
+    implementation deps.compose_material
+    implementation deps.compose_material_icons
+    implementation deps.compose_ui_tooling
+    implementation deps.compose_livedata_runtime
+    implementation deps.compose_animation
+    implementation deps.compose_foundation
+    implementation deps.compose_foundation_layout
 
 
     testImplementation test_deps.junit
