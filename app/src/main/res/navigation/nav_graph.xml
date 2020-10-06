@@ -22,6 +22,8 @@
             app:argType="long" />
         <action
             android:id="@+id/action_workoutDetailFragment_to_workoutListFragment"
-            app:destination="@id/workoutListFragment" />
+            app:destination="@id/workoutListFragment"
+            app:popUpTo="@id/workoutListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

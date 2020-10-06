@@ -1,19 +1,19 @@
 package com.example.intimesimple.ui.composables
 
 import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumnFor
-import androidx.compose.material.FabPosition
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.data.local.getRandomWorkout
@@ -32,7 +32,13 @@ fun WorkoutListScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopBar(title = "INTime")
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.app_name).toUpperCase()
+                    )
+                }
+            )
         },
         bodyContent = {
             if (showDialog) {
