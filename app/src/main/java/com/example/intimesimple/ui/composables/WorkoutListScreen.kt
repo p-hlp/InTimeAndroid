@@ -22,10 +22,10 @@ import java.util.*
 
 @Composable
 fun WorkoutListScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Long) -> Unit
 ){
     // get workout list as observable state
-    val workoutListViewModel: WorkoutListViewModel = viewModel()
     var showDialog by remember { mutableStateOf(false) }
     val alertMessage = "This is a placeholder for alert dialog"
 
@@ -52,7 +52,10 @@ fun WorkoutListScreen(
 
                 )
             }
-            WorkoutBodyContent(items = defaultWorkouts, navigateTo = {})
+            WorkoutBodyContent(
+                items = defaultWorkouts,
+                navigateToDetail = navigateToDetail
+            )
         },
         floatingActionButton = {
             AddWorkoutFab(onAddItem = {
@@ -66,14 +69,15 @@ fun WorkoutListScreen(
 @Composable
 private fun WorkoutBodyContent(
     items: List<Workout>,
-    navigateTo: () -> Unit
+    navigateToDetail: (Long) -> Unit
 ) {
     LazyColumnFor(
         items = items,
         contentPadding = PaddingValues(top = 4.dp)
     ) { item ->
         WorkoutItem(
-            workout = item
+            workout = item,
+            navigateToDetail = navigateToDetail
         )
     }
 }
@@ -82,7 +86,7 @@ private fun WorkoutBodyContent(
 @Composable
 fun WorkoutBodyContentPreview(){
     MaterialTheme {
-        WorkoutBodyContent(items = defaultWorkouts, navigateTo = {})
+        WorkoutBodyContent(items = defaultWorkouts, navigateToDetail = {})
     }
 }
 

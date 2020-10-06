@@ -20,5 +20,8 @@
         <argument
             android:name="wId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_workoutDetailFragment_to_workoutListFragment"
+            app:destination="@id/workoutListFragment" />
     </fragment>
 </navigation>

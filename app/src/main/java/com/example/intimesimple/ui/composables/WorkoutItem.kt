@@ -18,11 +18,15 @@ import com.example.intimesimple.utils.convertLongToTime
 import com.example.intimesimple.utils.getFormattedCompletionTime
 
 @Composable
-fun WorkoutItem(workout: Workout, modifier: Modifier = Modifier){
+fun WorkoutItem(
+    workout: Workout,
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Long) -> Unit
+){
     Card(
             modifier = modifier
-                    .clickable(onClick = {/* navigate to detailscreen with workoutId*/})
                     .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .clickable(onClick = {navigateToDetail(workout.id)})
     ) {
         Row(
                 modifier = modifier
@@ -53,7 +57,10 @@ fun WorkoutItemPreview(){
     val testWorkout =
         Workout(1,"Morning Yoga", 30000L, 15000L, 12)
     MaterialTheme {
-        WorkoutItem(testWorkout)
+        WorkoutItem(
+            testWorkout,
+            navigateToDetail = {}
+        )
     }
 }
 
