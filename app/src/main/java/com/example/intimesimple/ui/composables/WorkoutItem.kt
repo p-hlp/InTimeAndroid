@@ -51,7 +51,7 @@ fun WorkoutItem(workout: Workout, modifier: Modifier = Modifier){
 @Composable
 fun WorkoutItemPreview(){
     val testWorkout =
-            Workout(0,"15min Posture", 35000L, 15000L, 18)
+        Workout(1,"Morning Yoga", 30000L, 15000L, 12)
     MaterialTheme {
         WorkoutItem(testWorkout)
     }

@@ -59,6 +59,7 @@ buildscript {
                 navigation_dynamic: "androidx.navigation:navigation-dynamic-features-fragment:$navigation_version",
                 hilt_android: "com.google.dagger:hilt-android:$hilt_version",
                 hilt_androidcompiler_kapt: "com.google.dagger:hilt-android-compiler:$hilt_version",
+                hilt_lifecycle_viewmodel: "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_compiler_version",
                 hilt_compiler_kapt: "androidx.hilt:hilt-compiler:$hilt_compiler_version",
                 legacy_support: "androidx.legacy:legacy-support-v4:$legacy_support_version",
                 preference: "androidx.preference:preference:$preference_version"

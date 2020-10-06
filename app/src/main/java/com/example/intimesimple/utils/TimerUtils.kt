@@ -35,8 +35,8 @@ fun getFormattedCompletionTime(ms: Long): String{
     // Convert to seconds
     val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
 
-    return (if(hours < 10) "" else "$hours:") +
-            (if(minutes < 10) "" else "$minutes:") +
-            (if(seconds < 10) "" else "$seconds") +
+    return (if(hours <= 0) "" else if(hours < 10) "0$hours:" else "$hours:") +
+            (if(minutes <= 0) "" else if(minutes < 10) "0$minutes:" else "$minutes:" ) +
+            "${if(seconds < 10) "0" else ""}$seconds" +
             if(hours > 0) " h" else if(minutes > 0) " min" else "sec"
 }

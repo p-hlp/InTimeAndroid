@@ -79,6 +79,7 @@ dependencies {
     implementation deps.navigation_dynamic
     implementation deps.hilt_android
     kapt deps.hilt_androidcompiler_kapt
+    implementation deps.hilt_lifecycle_viewmodel
     kapt deps.hilt_compiler_kapt
     implementation deps.legacy_support
     implementation deps.preference

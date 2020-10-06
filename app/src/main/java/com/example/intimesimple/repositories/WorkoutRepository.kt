@@ -5,7 +5,7 @@ import com.example.intimesimple.data.local.WorkoutDao
 import javax.inject.Inject
 
 class WorkoutRepository @Inject constructor(
-    private val workoutDao: WorkoutDao
+    val workoutDao: WorkoutDao
 ){
     suspend fun insertWorkout(workout: Workout) = workoutDao.insertWithTimestamp(workout)
     suspend fun deleteWorkout(workout: Workout) = workoutDao.deleteWorkout(workout)
