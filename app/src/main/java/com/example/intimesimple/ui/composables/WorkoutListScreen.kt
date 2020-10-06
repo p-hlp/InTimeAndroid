@@ -2,6 +2,7 @@ package com.example.intimesimple.ui.composables
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
@@ -12,12 +13,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.data.local.getRandomWorkout
-import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import java.util.*
 
 @Composable
@@ -52,7 +51,8 @@ fun WorkoutListScreen(
 
                 )
             }
-            WorkoutBodyContent(
+            WorkoutListBodyContent(
+                Modifier.fillMaxSize(),
                 items = defaultWorkouts,
                 navigateToDetail = navigateToDetail
             )
@@ -67,7 +67,8 @@ fun WorkoutListScreen(
 }
 
 @Composable
-private fun WorkoutBodyContent(
+private fun WorkoutListBodyContent(
+    modifier: Modifier = Modifier,
     items: List<Workout>,
     navigateToDetail: (Long) -> Unit
 ) {
@@ -86,7 +87,7 @@ private fun WorkoutBodyContent(
 @Composable
 fun WorkoutBodyContentPreview(){
     MaterialTheme {
-        WorkoutBodyContent(items = defaultWorkouts, navigateToDetail = {})
+        WorkoutListBodyContent(items = defaultWorkouts, navigateToDetail = {})
     }
 }
 
