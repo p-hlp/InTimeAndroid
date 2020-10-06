@@ -3,6 +3,7 @@ package com.example.intimesimple.di
 import android.content.Context
 import androidx.room.Room
 import com.example.intimesimple.data.local.AppDatabase
+import com.example.intimesimple.utils.Constants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +22,7 @@ object AppModule {
     ) = Room.databaseBuilder(
         app,
         AppDatabase::class.java,
-        "app_db"
+            DATABASE_NAME
     ).build()
 
     @Singleton
