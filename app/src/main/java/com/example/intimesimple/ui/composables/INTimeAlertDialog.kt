@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.example.intimesimple.ui.theme.INTimeDialogThemeOverlay
 
 
 @Composable
@@ -21,16 +22,16 @@ fun INTimeAlertDialog(
     buttonAcceptText: String,
     buttonDismissText: String
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = { Text(bodyText) },
-        buttons = {
-            Column {
-                Divider(
-                    Modifier.padding(horizontal = 12.dp),
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
-                )
-                Row {
+    INTimeDialogThemeOverlay {
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            text = { Text(bodyText) },
+            buttons = {
+                Column {
+                    Divider(
+                        Modifier.padding(horizontal = 12.dp),
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+                    )
                     TextButton(
                         onClick = onAccept,
                         shape = RectangleShape,
@@ -49,8 +50,8 @@ fun INTimeAlertDialog(
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 

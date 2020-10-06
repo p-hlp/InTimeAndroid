@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.fragment.app.viewModels
 import com.example.intimesimple.ui.composables.WorkoutListScreen
+import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -19,10 +20,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         
         setContent { 
-            MaterialTheme {
-                WorkoutListScreen(
-                    modifier = Modifier
-                )
+            INTimeTheme {
+                WorkoutListScreen()
             }
         }
     }

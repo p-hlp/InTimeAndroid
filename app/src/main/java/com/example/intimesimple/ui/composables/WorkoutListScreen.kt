@@ -9,7 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.viewModel
@@ -18,6 +18,7 @@ import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.data.local.getRandomWorkout
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
+import java.util.*
 
 @Composable
 fun WorkoutListScreen(
@@ -25,6 +26,8 @@ fun WorkoutListScreen(
 ){
     // get workout list as observable state
     val workoutListViewModel: WorkoutListViewModel = viewModel()
+    var showDialog by remember { mutableStateOf(false) }
+    val alertMessage = "This is a placeholder for alert dialog"
 
     // build screen layout with scaffold
     Scaffold(
@@ -33,10 +36,28 @@ fun WorkoutListScreen(
             TopBar(title = "INTime")
         },
         bodyContent = {
+            if (showDialog) {
+                INTimeAlertDialog(
+                    onAccept = {
+                        // add workout
+                        // dismiss dialog
+                        showDialog = false
+                    },
+                    onDismiss = {
+                        showDialog = false
+                    },
+                    bodyText = alertMessage,
+                    buttonAcceptText = "add".toUpperCase(Locale.ROOT),
+                    buttonDismissText = "cancel".toUpperCase(Locale.ROOT)
+
+                )
+            }
             WorkoutBodyContent(items = defaultWorkouts, navigateTo = {})
         },
         floatingActionButton = {
-            AddWorkoutFab(onAddItem = {})
+            AddWorkoutFab(onAddItem = {
+                showDialog = true
+            })
         },
         floatingActionButtonPosition = FabPosition.End
     )
