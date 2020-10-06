@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/workoutListFragment">
+
+    <fragment
+        android:id="@+id/workoutListFragment"
+        android:name="com.example.intimesimple.ui.fragments.WorkoutListFragment"
+        android:label="WorkoutListFragment">
+        <action
+            android:id="@+id/action_workoutListFragment_to_workoutDetailFragment"
+            app:destination="@id/workoutDetailFragment"
+            app:popUpTo="@id/workoutListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/workoutDetailFragment"
+        android:name="com.example.intimesimple.ui.fragments.WorkoutDetailFragment"
+        android:label="WorkoutDetailFragment">
+        <argument
+            android:name="wId"
+            app:argType="long" />
+    </fragment>
+</navigation>
