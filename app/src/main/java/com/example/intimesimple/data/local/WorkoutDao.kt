@@ -17,6 +17,12 @@ abstract class WorkoutDao {
     @Update
     abstract suspend fun updateWorkout(workout: Workout)
 
+    suspend fun updateWithLastCompletion(workout: Workout){
+        updateWorkout(workout.apply {
+            lastCompletion = System.currentTimeMillis()
+        })
+    }
+
     @Delete
     abstract suspend fun deleteWorkout(workout: Workout)
 

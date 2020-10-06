@@ -10,5 +10,7 @@ class WorkoutRepository @Inject constructor(
     suspend fun insertWorkout(workout: Workout) = workoutDao.insertWithTimestamp(workout)
     suspend fun deleteWorkout(workout: Workout) = workoutDao.deleteWorkout(workout)
     suspend fun updateWorkout(workout: Workout) = workoutDao.updateWorkout(workout)
+    suspend fun updateWorkoutLastCompletion(workout: Workout)
+            = workoutDao.updateWithLastCompletion(workout)
     fun getAllWorkouts() = workoutDao.getAllWorkouts()
 }
