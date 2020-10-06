@@ -3,14 +3,13 @@ package com.example.intimesimple.utils
 import java.text.DateFormat.getDateTimeInstance
 import java.util.*
 
-fun convertLongToTime(time: Long): String {
-    val date = Date(time)
-    val format = getDateTimeInstance()
-    return format.format(date)
-}
-
-fun currentTimeToLong(): Long {
-    return System.currentTimeMillis()
+fun convertLongToTime(time: Long?): String {
+    time?.let {
+        val date = Date(time)
+        val format = getDateTimeInstance()
+        return format.format(date)
+    }
+    return "No time found!"
 }
 
 fun convertDateToLong(date: String): Long {

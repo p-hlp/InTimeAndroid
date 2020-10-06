@@ -21,7 +21,7 @@ import com.example.intimesimple.utils.getFormattedCompletionTime
 fun WorkoutItem(workout: Workout, modifier: Modifier = Modifier){
     Card(
             modifier = modifier
-                    .clickable(onClick = {/* navigate to detailscreen */})
+                    .clickable(onClick = {/* navigate to detailscreen with workoutId*/})
                     .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Row(

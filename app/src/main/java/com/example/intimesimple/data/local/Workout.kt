@@ -11,6 +11,6 @@ data class Workout(
     @ColumnInfo(name = "exercise_time") var exerciseTime: Long = 45000, // default 45s
     @ColumnInfo(name = "pause_time") var pauseTime: Long = 15000L,      // default 15s
     @ColumnInfo(name = "repetitions") var repetitions: Int,
-    @ColumnInfo(name = "last_completion") var lastCompletion: Long = 0L,     // Test values
+    @ColumnInfo(name = "last_completion") var lastCompletion: Long? = null,     // Test values
     @ColumnInfo(name = "created_at") var createdAt: Long = 0L
 )
