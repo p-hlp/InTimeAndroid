@@ -61,7 +61,7 @@ fun WorkoutItemPreview(){
 @Composable
 fun WorkoutCardInfoColumn(workout: Workout){
     // Name, last completion
-    Text(workout.name, style = typography.subtitle1, maxLines = 2, fontWeight = FontWeight.SemiBold)
+    Text(workout.name, style = typography.h3, maxLines = 2)
     ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
         Text("${workout.repetitions} Exercises", style = typography.body2)
     }
@@ -72,8 +72,7 @@ fun WorkoutCardInfoColumn(workout: Workout){
     ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
         Text(
                 convertLongToTime(workout.lastCompletion),
-                style = typography.body2,
-                fontWeight = FontWeight.SemiBold
+                style = typography.body2
         )
     }
 }
@@ -87,7 +86,7 @@ fun WorkoutCardTimeColumn(workout: Workout){
     ){
         Text(
                 getFormattedCompletionTime(workout.repetitions * workout.exerciseTime),
-                style = typography.subtitle1,
+                style = typography.h3,
                 modifier = Modifier.padding(8.dp)
         )
     }

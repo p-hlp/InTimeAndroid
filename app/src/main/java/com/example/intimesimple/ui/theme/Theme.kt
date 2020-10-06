@@ -68,7 +68,8 @@ fun INTimeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
         ),
         h3 = TextStyle(
             fontWeight = FontWeight.W400,
-            fontSize = 14.sp
+            fontSize = 18.sp,
+            letterSpacing = 1.sp
         ),
         h4 = TextStyle(
             fontWeight = FontWeight.W700,

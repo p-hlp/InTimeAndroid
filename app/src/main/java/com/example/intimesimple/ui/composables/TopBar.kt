@@ -6,6 +6,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.ui.tooling.preview.Preview
+import com.example.intimesimple.ui.theme.INTimeTheme
 
 @Composable
 fun TopBar(
@@ -14,7 +15,9 @@ fun TopBar(
 ){
     TopAppBar(
         title = {
-            Text(title)
+            Text(
+                text = title.toUpperCase()
+            )
         }
     )
 }
@@ -23,7 +26,7 @@ fun TopBar(
 @Preview
 @Composable
 fun TopBarPreview(){
-    MaterialTheme {
+    INTimeTheme {
         TopBar(
             title = "TestTitle"
         )
