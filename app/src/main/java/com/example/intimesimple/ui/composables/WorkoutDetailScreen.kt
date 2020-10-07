@@ -18,52 +18,65 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
+import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.ui.theme.INTimeTheme
-import com.example.intimesimple.utils.State
+import com.example.intimesimple.utils.Constants.ACTION_CANCEL
+import com.example.intimesimple.utils.Constants.ACTION_PAUSE
+import com.example.intimesimple.utils.Constants.ACTION_RESUME
+import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 
 @Composable
 fun WorkoutDetailScreen(
-    modifier: Modifier = Modifier,
-    navigateHome: () -> Unit,
-    wId: Long
-){
+        modifier: Modifier = Modifier,
+        wId: Long,
+        navigateHome: () -> Unit,
+        onServiceCommand: (String) -> Unit
+) {
     // Get specific workout via viewmodel or whatever
-   val workout = defaultWorkouts[wId.toInt()]
+    val workout = defaultWorkouts[wId.toInt()]
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = workout.name.toUpperCase()
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = navigateHome) {
-                        Icon(Icons.Filled.ArrowBack)
-                    }
-                }
-            )
-        },
-        bodyContent = {
-            WorkoutDetailBodyContent(
-                Modifier.fillMaxSize(),
-                workout
-            )
-        }
+            topBar = {
+                TopAppBar(
+                        title = {
+                            Text(
+                                    text = workout.name.toUpperCase()
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = {
+                                onServiceCommand(ACTION_CANCEL)
+                                navigateHome()
+                            }) {
+                                Icon(Icons.Filled.ArrowBack)
+                            }
+                        }
+                )
+            },
+            bodyContent = {
+                WorkoutDetailBodyContent(
+                        Modifier.fillMaxSize(),
+                        workout,
+                        onServiceCommand
+                )
+            }
     )
 
 }
 
 @Composable
-fun WorkoutDetailBodyContent(modifier: Modifier = Modifier, workout: Workout){
+fun WorkoutDetailBodyContent(
+        modifier: Modifier = Modifier,
+        workout: Workout,
+        onServiceCommand: (String) -> Unit
+) {
     val configuration = ConfigurationAmbient.current
     val screenWidth = configuration.screenWidthDp
     val buttonWidth = 0.3f * screenWidth
-    val timerState = remember { mutableStateOf(State.EXPIRED) }
+    val timerState = remember { mutableStateOf(TimerState.EXPIRED) }
     ConstraintLayout(modifier) {
 
         val (buttonSurface, timerText) = createRefs()
@@ -78,77 +91,78 @@ fun WorkoutDetailBodyContent(modifier: Modifier = Modifier, workout: Workout){
         )
 
         Box(
-                modifier = Modifier.constrainAs(buttonSurface){
+                modifier = Modifier.constrainAs(buttonSurface) {
                     bottom.linkTo(parent.bottom, 32.dp)
                 }
         ) {
-           Row(
-                   modifier = Modifier.fillMaxWidth(),
-                   horizontalArrangement = Arrangement.SpaceEvenly
-           ) {
-               val buttonModifier = Modifier
-                       .width(buttonWidth.dp)
-                       .padding(8.dp)
+            Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                val buttonModifier = Modifier
+                        .width(buttonWidth.dp)
+                        .padding(8.dp)
 
-               when(timerState.value){
-                   State.EXPIRED -> {
-                       Button(
-                               onClick = {timerState.value = State.RUNNING},
-                               shape = RoundedCornerShape(50),
-                               modifier = buttonModifier,
-                       ) {
-                           Text("Start")
-                       }
-                   }
-                   State.RUNNING -> {
-                       Button(
-                               onClick = { timerState.value = State.PAUSED},
-                               shape = RoundedCornerShape(50),
-                               modifier = buttonModifier
-                       ) {
-                           Text("Pause")
-                       }
+                when (timerState.value) {
+                    TimerState.EXPIRED -> {
+                        Button(
+                                onClick = { onServiceCommand(ACTION_START) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier,
+                        ) {
+                            Text("Start")
+                        }
+                    }
+                    TimerState.RUNNING -> {
+                        Button(
+                                onClick = { onServiceCommand(ACTION_PAUSE) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
+                        ) {
+                            Text("Pause")
+                        }
 
-                       Button(
-                               onClick = { timerState.value = State.EXPIRED },
-                               shape = RoundedCornerShape(50),
-                               modifier = buttonModifier
-                       ) {
-                           Text("Cancel")
-                       }
-                   }
-                   State.PAUSED -> {
-                       Button(
-                               onClick = { timerState.value = State.RUNNING },
-                               shape = RoundedCornerShape(50),
-                               modifier = buttonModifier
-                       ) {
-                           Text("Resume")
-                       }
+                        Button(
+                                onClick = { onServiceCommand(ACTION_CANCEL) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                    TimerState.PAUSED -> {
+                        Button(
+                                onClick = { onServiceCommand(ACTION_RESUME) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
+                        ) {
+                            Text("Resume")
+                        }
 
-                       Button(
-                               onClick = { timerState.value = State.EXPIRED },
-                               shape = RoundedCornerShape(50),
-                               modifier = buttonModifier
-                       ) {
-                           Text("Cancel")
-                       }
-                   }
-               }
+                        Button(
+                                onClick = { onServiceCommand(ACTION_CANCEL) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
+                        ) {
+                            Text("Cancel")
+                        }
+                    }
+                }
 
-           }
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun WorkoutDetailBodyContentPreview(){
+fun WorkoutDetailBodyContentPreview() {
     val workout = defaultWorkouts[0]
     INTimeTheme {
         WorkoutDetailBodyContent(
                 modifier = Modifier.fillMaxSize(),
-                workout = workout
+                workout = workout,
+                onServiceCommand = {}
         )
     }
 }

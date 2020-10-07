@@ -41,7 +41,7 @@ object ServiceModule {
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_alarm)
-        .setContentTitle("TimerApp")
+        .setContentTitle("INTime")
         .setContentText("00:00:00")
         .setContentIntent(pendingIntent)
 }
