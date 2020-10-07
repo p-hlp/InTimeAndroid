@@ -31,7 +31,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class TimerService: LifecycleService(){
+class TimerService : LifecycleService() {
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
@@ -63,42 +63,36 @@ class TimerService: LifecycleService(){
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // handle actions
         intent?.let { it ->
-            when(it.action){
-                ACTION_START    -> {
+            when (it.action) {
+                ACTION_START -> {
                     Timber.d("ACTION_START")
-                    if(isFirstRun){
+                    if (isFirstRun) {
                         // if first run get info from bundle, start service & timer
-                        it.extras?.let {bundle ->
+                        it.extras?.let { bundle ->
                             currentWorkoutTimer.repetitions = bundle.getInt(EXTRA_REPETITION)
                             currentWorkoutTimer.exerciseTime = bundle.getLong(EXTRA_EXERCISETIME)
                             currentWorkoutTimer.pauseTime = bundle.getLong(EXTRA_PAUSETIME)
                         }
                         startForegroundService()
-                    }else{
-                        // service already running, start timer only
-                        startTimer(false)
-                    }
-
-                    timerState.postValue(TimerState.RUNNING)
+                    } else startTimer(false)
                 }
 
-                ACTION_RESUME   -> {
+                ACTION_RESUME -> {
                     Timber.d("ACTION_RESUME")
-                    timerState.postValue(TimerState.RUNNING)
+                    resumeTimer()
                 }
 
-                ACTION_PAUSE    -> {
+                ACTION_PAUSE -> {
                     Timber.d("ACTION_PAUSE")
-                    timerState.postValue(TimerState.PAUSED)
+                    pauseTimer()
                 }
 
-                ACTION_CANCEL   -> {
+                ACTION_CANCEL -> {
                     Timber.d("ACTION_CANCEL")
-                    timerState.postValue(TimerState.EXPIRED)
                     stopForegroundService()
                 }
 
-                ACTION_NEXT     -> {
+                ACTION_NEXT -> {
                     Timber.d("ACTION_NEXT")
                 }
 
@@ -111,15 +105,16 @@ class TimerService: LifecycleService(){
     }
 
 
-    private fun startTimer(wasPaused: Boolean){
-        val time = if(wasPaused) millisToCompletion else currentWorkoutTimer.exerciseTime
+    private fun startTimer(wasPaused: Boolean) {
+        timerState.postValue(TimerState.RUNNING)
+        val time = if (wasPaused) millisToCompletion else currentWorkoutTimer.exerciseTime
         lastSecondTimestamp = time
         Timber.d("Starting Timer with $time ms countdown on repIndex $repetitionIndex")
         timeLeftInMillis.postValue(time)
-        timeLeftInSeconds.postValue((lastSecondTimestamp/ ONE_SECOND).toInt())
-        timer = object : CountDownTimer(time, ONE_SECOND){
+        timeLeftInSeconds.postValue((lastSecondTimestamp / ONE_SECOND).toInt())
+        timer = object : CountDownTimer(time, ONE_SECOND) {
             override fun onTick(millisUntilFinished: Long) {
-                if(millisUntilFinished <= lastSecondTimestamp - 1000L){
+                if (millisUntilFinished <= lastSecondTimestamp - 1000L) {
                     timeLeftInSeconds.postValue(timeLeftInSeconds.value!! - 1)
                 }
                 timeLeftInMillis.postValue(millisUntilFinished)
@@ -128,47 +123,56 @@ class TimerService: LifecycleService(){
             }
 
             override fun onFinish() {
-                if(repetitionIndex < currentWorkoutTimer.repetitions){
+                if (repetitionIndex < currentWorkoutTimer.repetitions) {
                     repetitionIndex += 1
                     startTimer(false)
-                }
+                } else stopForegroundService()
             }
         }.start()
     }
 
-    private fun resumeTimer(){
+    private fun resumeTimer() {
         startTimer(true)
         timerState.postValue(TimerState.RUNNING)
     }
 
-    private fun pauseTimer(){
+    private fun pauseTimer() {
         timer.cancel()
         timerState.postValue(TimerState.PAUSED)
     }
-    private fun startForegroundService(){
+
+    private fun startForegroundService() {
         Timber.d("Starting ForegroundService")
         startTimer(false)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
                 as NotificationManager
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager = notificationManager)
         }
 
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
     }
 
-    private fun stopForegroundService(){
+    private fun resetTimer() {
         timer.cancel()
+        timerState.postValue(TimerState.EXPIRED)
+        millisToCompletion = currentWorkoutTimer.exerciseTime
+        timeLeftInSeconds.postValue((currentWorkoutTimer.exerciseTime / 1000L).toInt())
+        timeLeftInMillis.postValue(currentWorkoutTimer.exerciseTime)
+    }
+
+    private fun stopForegroundService() {
+        resetTimer()
         isKilled = true
         isFirstRun = true
         stopForeground(true)
         stopSelf()
     }
 
-        @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(notificationManager: NotificationManager){
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             NOTIFICATION_CHANNEL_NAME,

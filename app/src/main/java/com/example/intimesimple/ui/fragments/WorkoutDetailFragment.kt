@@ -22,7 +22,7 @@ import timber.log.Timber
 class WorkoutDetailFragment : Fragment() {
 
     private val args: WorkoutDetailFragmentArgs by navArgs()
-
+    // TODO: Init UI with current exercise time when entering this fragment
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -51,7 +51,7 @@ class WorkoutDetailFragment : Fragment() {
             it.action = action
             // If starting service pass needed information in extra
             if(action == ACTION_START){
-                it.putExtra(EXTRA_REPETITION, 8)
+                it.putExtra(EXTRA_REPETITION, 3)
                 it.putExtra(EXTRA_EXERCISETIME, 15000L)
                 it.putExtra(EXTRA_PAUSETIME, 5000L)
             }
