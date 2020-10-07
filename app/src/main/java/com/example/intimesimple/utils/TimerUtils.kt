@@ -1,7 +1,6 @@
 package com.example.intimesimple.utils
 
 import java.util.concurrent.TimeUnit
-import kotlin.reflect.KProperty
 
 fun getFormattedStopWatchTime(ms: Long): String{
     var milliseconds = ms

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -12,7 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.composables.WorkoutDetailScreen
-import com.example.intimesimple.ui.theme.INTimeTheme
+import com.example.intimesimple.utils.Constants.ACTION_START
+import com.example.intimesimple.utils.Constants.EXTRA_EXERCISETIME
+import com.example.intimesimple.utils.Constants.EXTRA_PAUSETIME
+import com.example.intimesimple.utils.Constants.EXTRA_REPETITION
 import timber.log.Timber
 
 class WorkoutDetailFragment : Fragment() {
@@ -26,13 +30,12 @@ class WorkoutDetailFragment : Fragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                INTimeTheme {
-                    // Display WorkoutDetailScreen
+                MaterialTheme {
                     WorkoutDetailScreen(
-                            modifier = Modifier,
-                            wId = args.wId,
-                            navigateHome = ::navigateHome,
-                            onServiceCommand = ::sendCommandToService
+                        modifier = Modifier,
+                        wId = args.wId,
+                        navigateHome = ::navigateHome,
+                        onServiceCommand = ::sendCommandToService
                     )
                 }
             }
@@ -46,8 +49,13 @@ class WorkoutDetailFragment : Fragment() {
     private fun sendCommandToService(action: String) {
         Intent(context, TimerService::class.java).also {
             it.action = action
+            // If starting service pass needed information in extra
+            if(action == ACTION_START){
+                it.putExtra(EXTRA_REPETITION, 8)
+                it.putExtra(EXTRA_EXERCISETIME, 15000L)
+                it.putExtra(EXTRA_PAUSETIME, 5000L)
+            }
             context?.startService(it)
-            Timber.d("Command to service: ${it.action}")
         }
     }
 }

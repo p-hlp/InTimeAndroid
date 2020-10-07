@@ -2,7 +2,6 @@ package com.example.intimesimple.ui.composables
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -10,23 +9,19 @@ import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
-import com.example.intimesimple.data.local.defaultWorkouts
-import com.example.intimesimple.ui.theme.INTimeTheme
+import com.example.intimesimple.services.TimerService
+import com.example.intimesimple.utils.*
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
-import com.example.intimesimple.utils.getFormattedStopWatchTime
 
 @Composable
 fun WorkoutDetailScreen(
@@ -36,7 +31,7 @@ fun WorkoutDetailScreen(
         onServiceCommand: (String) -> Unit
 ) {
     // Get specific workout via viewmodel or whatever
-    val workout = defaultWorkouts[wId.toInt()]
+    val workout = Workout(0,"15min Posture", 35000L, 15000L, 18)
 
     Scaffold(
             topBar = {
@@ -69,14 +64,15 @@ fun WorkoutDetailScreen(
 
 @Composable
 fun WorkoutDetailBodyContent(
-        modifier: Modifier = Modifier,
-        workout: Workout,
-        onServiceCommand: (String) -> Unit
+    modifier: Modifier = Modifier,
+    workout: Workout,
+    onServiceCommand: (String) -> Unit
 ) {
     val configuration = ConfigurationAmbient.current
     val screenWidth = configuration.screenWidthDp
     val buttonWidth = 0.3f * screenWidth
-    val timerState = remember { mutableStateOf(TimerState.EXPIRED) }
+    val timerState = TimerService.timerState.observeAsState(TimerState.EXPIRED)
+
     ConstraintLayout(modifier) {
 
         val (buttonSurface, timerText) = createRefs()
@@ -103,51 +99,54 @@ fun WorkoutDetailBodyContent(
                         .width(buttonWidth.dp)
                         .padding(8.dp)
 
-                when (timerState.value) {
-                    TimerState.EXPIRED -> {
-                        Button(
+                timerState.value?.let {
+                    when (it) {
+                        TimerState.EXPIRED -> {
+                            Button(
                                 onClick = { onServiceCommand(ACTION_START) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier,
-                        ) {
-                            Text("Start")
+                            ) {
+                                Text("Start")
+                            }
                         }
-                    }
-                    TimerState.RUNNING -> {
-                        Button(
+                        TimerState.RUNNING -> {
+                            Button(
                                 onClick = { onServiceCommand(ACTION_PAUSE) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
-                        ) {
-                            Text("Pause")
-                        }
+                            ) {
+                                Text("Pause")
+                            }
 
-                        Button(
+                            Button(
                                 onClick = { onServiceCommand(ACTION_CANCEL) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
-                        ) {
-                            Text("Cancel")
+                            ) {
+                                Text("Cancel")
+                            }
                         }
-                    }
-                    TimerState.PAUSED -> {
-                        Button(
+                        TimerState.PAUSED -> {
+                            Button(
                                 onClick = { onServiceCommand(ACTION_RESUME) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
-                        ) {
-                            Text("Resume")
-                        }
+                            ) {
+                                Text("Resume")
+                            }
 
-                        Button(
+                            Button(
                                 onClick = { onServiceCommand(ACTION_CANCEL) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
-                        ) {
-                            Text("Cancel")
+                            ) {
+                                Text("Cancel")
+                            }
                         }
                     }
                 }
+
 
             }
         }
@@ -157,12 +156,10 @@ fun WorkoutDetailBodyContent(
 @Preview
 @Composable
 fun WorkoutDetailBodyContentPreview() {
-    val workout = defaultWorkouts[0]
-    INTimeTheme {
-        WorkoutDetailBodyContent(
-                modifier = Modifier.fillMaxSize(),
-                workout = workout,
-                onServiceCommand = {}
-        )
-    }
+    val workout = Workout(0,"15min Posture", 35000L, 15000L, 18)
+    WorkoutDetailBodyContent(
+        modifier = Modifier.fillMaxSize(),
+        workout = workout,
+        onServiceCommand = {}
+    )
 }

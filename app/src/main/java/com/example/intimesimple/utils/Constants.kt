@@ -12,6 +12,10 @@ object Constants {
     const val ACTION_PREVIOUS           = "ACTION_PREVIOUS"
     const val ACTION_SHOW_MAIN_ACTIVITY = "ACTION_SHOW_MAIN_ACTIVITY"
 
+    const val EXTRA_REPETITION          = "EXTRA_REPETITION"
+    const val EXTRA_EXERCISETIME        = "EXTRA_EXERCISETIME"
+    const val EXTRA_PAUSETIME           = "EXTRA_PAUSETIME"
+
     const val NOTIFICATION_CHANNEL_ID   = "timer_channel"
     const val NOTIFICATION_CHANNEL_NAME = "Timer"
     const val NOTIFICATION_ID           = 1
