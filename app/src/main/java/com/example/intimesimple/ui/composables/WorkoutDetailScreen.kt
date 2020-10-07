@@ -72,13 +72,16 @@ fun WorkoutDetailBodyContent(
     val screenWidth = configuration.screenWidthDp
     val buttonWidth = 0.3f * screenWidth
     val timerState = TimerService.timerState.observeAsState(TimerState.EXPIRED)
+    val timerMillis = TimerService.timeLeftInMillis.observeAsState(workout.exerciseTime)
+    val timeLeftInSeconds
+            = TimerService.timeLeftInSeconds.observeAsState((workout.exerciseTime / 1000L).toInt())
 
     ConstraintLayout(modifier) {
 
         val (buttonSurface, timerText) = createRefs()
 
         Text(
-                getFormattedStopWatchTime(workout.exerciseTime),
+                (timeLeftInSeconds.value!!* 1000L).toString(),
                 Modifier.constrainAs(timerText) {
                     centerHorizontallyTo(parent)
                     centerVerticallyTo(parent)
