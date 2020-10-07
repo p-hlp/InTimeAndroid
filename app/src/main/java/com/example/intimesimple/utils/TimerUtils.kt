@@ -41,18 +41,3 @@ fun getFormattedCompletionTime(ms: Long): String{
             "${if(seconds < 10) "0" else ""}$seconds" +
             if(hours > 0) " h" else if(minutes > 0) " min" else "sec"
 }
-
-// Timer state
-enum class State(val value: Int) {
-    RUNNING(1), PAUSED(2), EXPIRED(3);
-    companion object {
-        fun fromValue(value: Int): State? {
-            for (state in values()) {
-                if (state.value == value) {
-                    return state
-                }
-            }
-            return null
-        }
-    }
-}
