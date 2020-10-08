@@ -21,6 +21,9 @@
         </activity>
         <service android:name=".services.TimerService"
             android:foregroundServiceType="mediaPlayback"/>
+
+        <service android:name=".services.TestService"
+            android:foregroundServiceType="mediaPlayback"/>
     </application>
 
 </manifest>
