@@ -17,47 +17,48 @@ import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.services.TimerService
-import com.example.intimesimple.utils.*
+import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
 
+
 @Composable
 fun WorkoutDetailScreen(
-        modifier: Modifier = Modifier,
-        wId: Long,
-        navigateHome: () -> Unit,
-        onServiceCommand: (String) -> Unit
+    modifier: Modifier = Modifier,
+    navigateHome: () -> Unit,
+    onServiceCommand: (String) -> Unit,
+    workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     // Get specific workout via viewmodel or whatever
-    val workout = Workout(0,"15min Posture", 35000L, 15000L, 18)
+    val workout = Workout(0, "15min Posture", 35000L, 15000L, 18)
 
     Scaffold(
-            topBar = {
-                TopAppBar(
-                        title = {
-                            Text(
-                                    text = workout.name.toUpperCase()
-                            )
-                        },
-                        navigationIcon = {
-                            IconButton(onClick = {
-                                onServiceCommand(ACTION_CANCEL)
-                                navigateHome()
-                            }) {
-                                Icon(Icons.Filled.ArrowBack)
-                            }
-                        }
-                )
-            },
-            bodyContent = {
-                WorkoutDetailBodyContent(
-                        Modifier.fillMaxSize(),
-                        workout,
-                        onServiceCommand
-                )
-            }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = workout.name.toUpperCase()
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        onServiceCommand(ACTION_CANCEL)
+                        navigateHome()
+                    }) {
+                        Icon(Icons.Filled.ArrowBack)
+                    }
+                }
+            )
+        },
+        bodyContent = {
+            WorkoutDetailBodyContent(
+                Modifier.fillMaxSize(),
+                workout,
+                onServiceCommand
+            )
+        }
     )
 
 }
@@ -73,34 +74,34 @@ fun WorkoutDetailBodyContent(
     val buttonWidth = 0.3f * screenWidth
     val timerState = TimerService.timerState.observeAsState(TimerState.EXPIRED)
     val timerMillis = TimerService.timeLeftInMillis.observeAsState(workout.exerciseTime)
-    val timeLeftInSeconds
-            = TimerService.timeLeftInSeconds.observeAsState((workout.exerciseTime / 1000L).toInt())
+    val timeLeftInSeconds =
+        TimerService.timeLeftInSeconds.observeAsState((workout.exerciseTime / 1000L).toInt())
 
     ConstraintLayout(modifier) {
 
         val (buttonSurface, timerText) = createRefs()
 
         Text(
-                (timeLeftInSeconds.value!!* 1000L).toString(),
-                Modifier.constrainAs(timerText) {
-                    centerHorizontallyTo(parent)
-                    centerVerticallyTo(parent)
-                },
-                style = typography.h4
+            (timeLeftInSeconds.value!! * 1000L).toString(),
+            Modifier.constrainAs(timerText) {
+                centerHorizontallyTo(parent)
+                centerVerticallyTo(parent)
+            },
+            style = typography.h4
         )
 
         Box(
-                modifier = Modifier.constrainAs(buttonSurface) {
-                    bottom.linkTo(parent.bottom, 32.dp)
-                }
+            modifier = Modifier.constrainAs(buttonSurface) {
+                bottom.linkTo(parent.bottom, 32.dp)
+            }
         ) {
             Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 val buttonModifier = Modifier
-                        .width(buttonWidth.dp)
-                        .padding(8.dp)
+                    .width(buttonWidth.dp)
+                    .padding(8.dp)
 
                 timerState.value?.let {
                     when (it) {
@@ -149,8 +150,6 @@ fun WorkoutDetailBodyContent(
                         }
                     }
                 }
-
-
             }
         }
     }
@@ -159,7 +158,7 @@ fun WorkoutDetailBodyContent(
 @Preview
 @Composable
 fun WorkoutDetailBodyContentPreview() {
-    val workout = Workout(0,"15min Posture", 35000L, 15000L, 18)
+    val workout = Workout(0, "15min Posture", 35000L, 15000L, 18)
     WorkoutDetailBodyContent(
         modifier = Modifier.fillMaxSize(),
         workout = workout,

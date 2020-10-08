@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -17,16 +18,19 @@ import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.data.local.getRandomWorkout
+import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import java.util.*
 
 @Composable
 fun WorkoutListScreen(
     modifier: Modifier = Modifier,
-    navigateToDetail: (Long) -> Unit
+    navigateToDetail: (Long) -> Unit,
+    workoutListViewModel: WorkoutListViewModel
 ){
     // get workout list as observable state
     var showDialog by remember { mutableStateOf(false) }
     val alertMessage = "This is a placeholder for alert dialog"
+    val workouts by workoutListViewModel.workouts.observeAsState(listOf())
 
     // build screen layout with scaffold
     Scaffold(
@@ -59,7 +63,7 @@ fun WorkoutListScreen(
             }
             WorkoutListBodyContent(
                 Modifier.fillMaxSize(),
-                items = defaultWorkouts,
+                items = workouts,
                 navigateToDetail = navigateToDetail
             )
         },

@@ -6,12 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.intimesimple.ui.composables.WorkoutListScreen
 import com.example.intimesimple.ui.theme.INTimeTheme
+import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class WorkoutListFragment : Fragment(){
+
+    private val workoutListViewModel: WorkoutListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -22,7 +28,8 @@ class WorkoutListFragment : Fragment(){
             setContent {
                 INTimeTheme {
                     WorkoutListScreen(
-                        navigateToDetail = ::navigateToDetail
+                        navigateToDetail = ::navigateToDetail,
+                            workoutListViewModel = workoutListViewModel
                     )
                 }
             }
