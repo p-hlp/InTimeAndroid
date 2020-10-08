@@ -26,15 +26,7 @@ class WorkoutDetailFragment : Fragment() {
 
     private val args: WorkoutDetailFragmentArgs by navArgs()
 
-    @Inject
-    lateinit var workoutDetailViewModelFactory: WorkoutDetailViewModel.AssistedFactory
-
-    private val workoutDetailViewModel: WorkoutDetailViewModel by viewModels {
-        WorkoutDetailViewModel.provideFactory(
-            workoutDetailViewModelFactory,
-            args.wId
-        )
-    }
+    private val workoutDetailViewModel: WorkoutDetailViewModel by viewModels()
 
     // TODO: Init UI with current exercise time when entering this fragment
     override fun onCreateView(

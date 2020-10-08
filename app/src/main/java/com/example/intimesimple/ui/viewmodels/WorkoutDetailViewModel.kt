@@ -1,33 +1,18 @@
 package com.example.intimesimple.ui.viewmodels
 
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.example.intimesimple.repositories.WorkoutRepository
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 
 
-class WorkoutDetailViewModel @AssistedInject constructor(
+class WorkoutDetailViewModel @ViewModelInject constructor(
     workoutRepository: WorkoutRepository,
-    @Assisted private val workoutId: Long
+    @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val workout = workoutRepository.getWorkout(workoutId)
+    // Uses savedStateHandle to access safeargs, until we have proper support for AssistedInject
+    val workout = workoutRepository.getWorkout(savedStateHandle.get<Long>("wId")!!)
 
-    @AssistedInject.Factory
-    interface AssistedFactory {
-        fun create(workoutId: Long): WorkoutDetailViewModel
-    }
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: AssistedFactory,
-            workoutId: Long
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return assistedFactory.create(workoutId) as T
-            }
-        }
-    }
 }

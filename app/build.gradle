@@ -58,13 +58,11 @@ android {
 
 dependencies {
 
-    compileOnly deps.assisted_inject_annotations
 
     kapt deps.room_compiler_kapt
     kapt deps.hilt_androidcompiler_kapt
     kapt deps.hilt_compiler_kapt
     kapt deps.lifecycle_compiler_kapt
-    kapt deps.assisted_inject_processor_kapt
 
     implementation deps.kotlin_stdlib
     implementation deps.androidx_core
