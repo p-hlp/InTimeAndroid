@@ -28,10 +28,10 @@ abstract class WorkoutDao {
     abstract suspend fun deleteWorkout(workout: Workout)
 
     @Query("SELECT * from workout_table")
-    abstract  fun getAllWorkouts(): Flow<List<Workout>>
+    abstract fun getAllWorkouts(): Flow<List<Workout>>
 
     @Query("SELECT * FROM workout_table WHERE id = :wId")
-    abstract  fun getWorkoutWithId(wId: Long): Flow<Workout>
+    abstract fun getWorkoutWithId(wId: Long): Flow<Workout>
 
     fun getWorkoutDistinctUntilChanged(wId: Long) =
         getWorkoutWithId(wId = wId).distinctUntilChanged()

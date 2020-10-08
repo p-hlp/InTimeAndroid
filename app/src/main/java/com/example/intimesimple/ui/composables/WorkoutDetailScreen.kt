@@ -9,10 +9,12 @@ import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asLiveData
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
@@ -28,22 +30,26 @@ import com.example.intimesimple.utils.Constants.ACTION_START
 fun WorkoutDetailScreen(
     modifier: Modifier = Modifier,
     navigateHome: () -> Unit,
-    onServiceCommand: (String) -> Unit
+    onServiceCommand: (String, Workout?) -> Unit,
+    workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     // Get specific workout via viewmodel or whatever
-    val workout = Workout(0, "15min Posture", 35000L, 15000L, 18)
+    val workout = Workout(0, "15min Posture", 25000L, 15000L, 18)
+    val workoutNew = workoutDetailViewModel.workout.observeAsState(workout)
+
+    //TODO: It"s always displaying default workout values first, noticeable flick when changing
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = workout.name.toUpperCase()
+                        text = workoutNew.value.name.toUpperCase()
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        onServiceCommand(ACTION_CANCEL)
+                        onServiceCommand(ACTION_CANCEL, null)
                         navigateHome()
                     }) {
                         Icon(Icons.Filled.ArrowBack)
@@ -54,7 +60,7 @@ fun WorkoutDetailScreen(
         bodyContent = {
             WorkoutDetailBodyContent(
                 Modifier.fillMaxSize(),
-                workout,
+                workoutNew.value,
                 onServiceCommand
             )
         }
@@ -66,7 +72,7 @@ fun WorkoutDetailScreen(
 fun WorkoutDetailBodyContent(
     modifier: Modifier = Modifier,
     workout: Workout,
-    onServiceCommand: (String) -> Unit
+    onServiceCommand: (String, Workout?) -> Unit
 ) {
     val configuration = ConfigurationAmbient.current
     val screenWidth = configuration.screenWidthDp
@@ -79,9 +85,11 @@ fun WorkoutDetailBodyContent(
     ConstraintLayout(modifier) {
 
         val (buttonSurface, timerText) = createRefs()
-
+        val time = if(timerState.value == TimerState.EXPIRED)
+            workout.exerciseTime else (timeLeftInSeconds.value!! * 1000L)
+        // TODO: Noticeable flick when state != EXPIRED and text changes
         Text(
-            (timeLeftInSeconds.value!! * 1000L).toString(),
+            (time).toString(),
             Modifier.constrainAs(timerText) {
                 centerHorizontallyTo(parent)
                 centerVerticallyTo(parent)
@@ -106,7 +114,7 @@ fun WorkoutDetailBodyContent(
                     when (it) {
                         TimerState.EXPIRED -> {
                             Button(
-                                onClick = { onServiceCommand(ACTION_START) },
+                                onClick = { onServiceCommand(ACTION_START, workout) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier,
                             ) {
@@ -115,7 +123,7 @@ fun WorkoutDetailBodyContent(
                         }
                         TimerState.RUNNING -> {
                             Button(
-                                onClick = { onServiceCommand(ACTION_PAUSE) },
+                                onClick = { onServiceCommand(ACTION_PAUSE, null) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
                             ) {
@@ -123,7 +131,7 @@ fun WorkoutDetailBodyContent(
                             }
 
                             Button(
-                                onClick = { onServiceCommand(ACTION_CANCEL) },
+                                onClick = { onServiceCommand(ACTION_CANCEL, null) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
                             ) {
@@ -132,7 +140,7 @@ fun WorkoutDetailBodyContent(
                         }
                         TimerState.PAUSED -> {
                             Button(
-                                onClick = { onServiceCommand(ACTION_RESUME) },
+                                onClick = { onServiceCommand(ACTION_RESUME, null) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
                             ) {
@@ -140,7 +148,7 @@ fun WorkoutDetailBodyContent(
                             }
 
                             Button(
-                                onClick = { onServiceCommand(ACTION_CANCEL) },
+                                onClick = { onServiceCommand(ACTION_CANCEL, null) },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
                             ) {
@@ -158,9 +166,10 @@ fun WorkoutDetailBodyContent(
 @Composable
 fun WorkoutDetailBodyContentPreview() {
     val workout = Workout(0, "15min Posture", 35000L, 15000L, 18)
+    fun dummy(n: String, w: Workout?){}
     WorkoutDetailBodyContent(
         modifier = Modifier.fillMaxSize(),
         workout = workout,
-        onServiceCommand = {}
+        onServiceCommand = ::dummy
     )
 }
