@@ -28,8 +28,7 @@ import com.example.intimesimple.utils.Constants.ACTION_START
 fun WorkoutDetailScreen(
     modifier: Modifier = Modifier,
     navigateHome: () -> Unit,
-    onServiceCommand: (String) -> Unit,
-    workoutDetailViewModel: WorkoutDetailViewModel
+    onServiceCommand: (String) -> Unit
 ) {
     // Get specific workout via viewmodel or whatever
     val workout = Workout(0, "15min Posture", 35000L, 15000L, 18)

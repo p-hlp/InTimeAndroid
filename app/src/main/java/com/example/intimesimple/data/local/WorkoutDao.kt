@@ -26,6 +26,9 @@ abstract class WorkoutDao {
     @Delete
     abstract suspend fun deleteWorkout(workout: Workout)
 
-    @Query("SELECT * from WORKOUT_TABLE")
+    @Query("SELECT * from workout_table")
     abstract  fun getAllWorkouts(): Flow<List<Workout>>
+
+    @Query("SELECT * FROM workout_table WHERE id = :wId")
+    abstract fun getWorkoutWithId(wId: Long): Flow<Workout>
 }

@@ -34,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
         useIR = true
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
     }
 
     buildFeatures {
@@ -55,6 +58,14 @@ android {
 
 dependencies {
 
+    compileOnly deps.assisted_inject_annotations
+
+    kapt deps.room_compiler_kapt
+    kapt deps.hilt_androidcompiler_kapt
+    kapt deps.hilt_compiler_kapt
+    kapt deps.lifecycle_compiler_kapt
+    kapt deps.assisted_inject_processor_kapt
+
     implementation deps.kotlin_stdlib
     implementation deps.androidx_core
     implementation deps.appcompat
@@ -68,19 +79,15 @@ dependencies {
     implementation deps.lifecycle_livedata
     implementation deps.lifecycle_viewmodel_savedstate
     implementation deps.lifecycle_service
-    kapt deps.lifecycle_compiler_kapt
     implementation deps.room_runtime
     implementation deps.room_ktx
-    kapt deps.room_compiler_kapt
     implementation deps.coroutines_core
     implementation deps.coroutines_android
     implementation deps.navigation_fragment
     implementation deps.navigation_ui
     implementation deps.navigation_dynamic
     implementation deps.hilt_android
-    kapt deps.hilt_androidcompiler_kapt
     implementation deps.hilt_lifecycle_viewmodel
-    kapt deps.hilt_compiler_kapt
     implementation deps.legacy_support
     implementation deps.preference
     implementation deps.compose_compiler
@@ -92,7 +99,6 @@ dependencies {
     implementation deps.compose_animation
     implementation deps.compose_foundation
     implementation deps.compose_foundation_layout
-
 
     testImplementation test_deps.junit
     androidTestImplementation test_deps.androidx_junit
