@@ -20,8 +20,10 @@ import com.example.intimesimple.utils.Constants.EXTRA_PAUSETIME
 import com.example.intimesimple.utils.Constants.EXTRA_REPETITION
 import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class WorkoutDetailFragment : Fragment() {
 
     private val args: WorkoutDetailFragmentArgs by navArgs()
@@ -30,18 +32,19 @@ class WorkoutDetailFragment : Fragment() {
 
     // TODO: Init UI with current exercise time when entering this fragment
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // TODO: Get current workout with args.wId
+        workoutDetailViewModel.test()
         return ComposeView(requireContext()).apply {
             setContent {
                 INTimeTheme {
                     WorkoutDetailScreen(
-                            modifier = Modifier,
-                            navigateHome = ::navigateHome,
-                            onServiceCommand = ::sendCommandToService
+                        modifier = Modifier,
+                        navigateHome = ::navigateHome,
+                        onServiceCommand = ::sendCommandToService
                     )
                 }
             }

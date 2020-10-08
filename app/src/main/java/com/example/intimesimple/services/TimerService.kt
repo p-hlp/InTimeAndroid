@@ -35,7 +35,7 @@ class TimerService : LifecycleService() {
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
-    private lateinit var timer: CountDownTimer
+    private var timer: CountDownTimer? = null
 
     private var currentWorkoutTimer = Timer()
     private var isFirstRun = true
@@ -137,7 +137,7 @@ class TimerService : LifecycleService() {
     }
 
     private fun pauseTimer() {
-        timer.cancel()
+        timer?.cancel()
         timerState.postValue(TimerState.PAUSED)
     }
 
@@ -156,7 +156,7 @@ class TimerService : LifecycleService() {
     }
 
     private fun resetTimer() {
-        timer.cancel()
+        timer?.cancel()
         timerState.postValue(TimerState.EXPIRED)
         millisToCompletion = currentWorkoutTimer.exerciseTime
         timeLeftInSeconds.postValue((currentWorkoutTimer.exerciseTime / 1000L).toInt())

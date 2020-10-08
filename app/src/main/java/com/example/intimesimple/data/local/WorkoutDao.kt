@@ -2,6 +2,7 @@ package com.example.intimesimple.data.local
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 abstract class WorkoutDao {
@@ -30,5 +31,8 @@ abstract class WorkoutDao {
     abstract  fun getAllWorkouts(): Flow<List<Workout>>
 
     @Query("SELECT * FROM workout_table WHERE id = :wId")
-    abstract fun getWorkoutWithId(wId: Long): Flow<Workout>
+    abstract  fun getWorkoutWithId(wId: Long): Flow<Workout>
+
+    fun getWorkoutDistinctUntilChanged(wId: Long) =
+        getWorkoutWithId(wId = wId).distinctUntilChanged()
 }

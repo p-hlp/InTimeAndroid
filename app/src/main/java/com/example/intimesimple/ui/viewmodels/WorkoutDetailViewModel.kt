@@ -5,14 +5,15 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.intimesimple.repositories.WorkoutRepository
+import timber.log.Timber
 
 
 class WorkoutDetailViewModel @ViewModelInject constructor(
-    workoutRepository: WorkoutRepository,
+    private val workoutRepository: WorkoutRepository,
     @Assisted private val savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ViewModel(){
 
-    // Uses savedStateHandle to access safeargs, until we have proper support for AssistedInject
-    val workout = workoutRepository.getWorkout(savedStateHandle.get<Long>("wId")!!)
-
+    fun test(){
+        Timber.d("wID: ${savedStateHandle.get<Long>("wId")!!}")
+    }
 }
