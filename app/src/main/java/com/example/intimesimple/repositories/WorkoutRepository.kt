@@ -13,4 +13,5 @@ class WorkoutRepository @Inject constructor(
     suspend fun updateWorkoutLastCompletion(workout: Workout)
             = workoutDao.updateWithLastCompletion(workout)
     fun getAllWorkouts() = workoutDao.getAllWorkouts()
+    fun getWorkout(wId: Long) = workoutDao.getWorkoutWithId(wId)
 }
