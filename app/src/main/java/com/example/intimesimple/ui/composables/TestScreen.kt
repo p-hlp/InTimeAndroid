@@ -40,11 +40,11 @@ fun TestScreen(
         Text(
                 text = "${
                     if (timerState.value == TimerState.EXPIRED)
-                        exTimeInMillis
+                        exTimeInMillis ?: ""
                     else timeInMillis.value
                 }",
                 modifier = Modifier.constrainAs(timerText){
-                    centerVerticallyTo(parent)
+                    bottom.linkTo(stateText.top, 8.dp)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
@@ -54,7 +54,7 @@ fun TestScreen(
         Text(
                 text = timerState.value?.stateName!!,
                 modifier = Modifier.constrainAs(stateText){
-                    top.linkTo(timerText.bottom, 8.dp)
+                    centerVerticallyTo(parent)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,

@@ -22,7 +22,11 @@ import javax.inject.Singleton
 object AppModule {
 
     lateinit var database: AppDatabase
-    val PREPOPULATE_DATA = Workout(0, "ExampleWorkout", 35000L, 10000L, 4)
+    val PREPOPULATE_DATA = listOf(
+            Workout(0, "ExampleWorkout1", 35000L, 10000L, 4),
+            Workout(0, "ExampleWorkout2", 45000L, 15000L, 3),
+            Workout(0, "ExampleWorkout3", 20000L, 5000L, 6)
+    )
 
     @Singleton
     @Provides
@@ -37,7 +41,9 @@ object AppModule {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
                 GlobalScope.launch {
-                    database.workoutDao().insertWithTimestamp(PREPOPULATE_DATA)
+                    for (workout in PREPOPULATE_DATA){
+                        database.workoutDao().insertWithTimestamp(workout)
+                    }
                 }
             }
         }).build()

@@ -2,6 +2,7 @@ package com.example.intimesimple.services
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.CountDownTimer
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -28,6 +29,8 @@ class TestService : LifecycleService(){
 
     private var firstRun = true
     private var isInitialized = false
+    private var timer: CountDownTimer? = null
+    private var millisToCompletion = 0L
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -35,11 +38,11 @@ class TestService : LifecycleService(){
         val repetitionCount = MutableLiveData<Int>()
     }
 
+
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
     }
-
 
 
     @SuppressLint("BinaryOperationInTimber")
@@ -104,5 +107,22 @@ class TestService : LifecycleService(){
 
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+
+    private fun startTimer(wasPaused: Boolean){
+
+    }
+
+    private fun stopTimer(){
+
+    }
+
+    private fun startForegroundService(){
+
+    }
+
+    private fun stopForegroundService(){
+
     }
 }
