@@ -33,6 +33,9 @@ abstract class WorkoutDao {
     @Query("SELECT * FROM workout_table WHERE id = :wId")
     abstract fun getWorkoutWithId(wId: Long): Flow<Workout>
 
+    @Query("SELECT * FROM workout_table WHERE id = :wId")
+    abstract fun getWorkoutWithIdSingleshot(wId: Long): Workout
+
     fun getWorkoutDistinctUntilChanged(wId: Long) =
         getWorkoutWithId(wId = wId).distinctUntilChanged()
 }

@@ -15,5 +15,5 @@ class WorkoutRepository @Inject constructor(
             = workoutDao.updateWithLastCompletion(workout)
     fun getAllWorkouts() = workoutDao.getAllWorkouts()
     fun getWorkout(wId: Long) = workoutDao.getWorkoutDistinctUntilChanged(wId)
-
+    fun getWorkoutSingle(wId: Long) = workoutDao.getWorkoutWithIdSingleshot(wId)
 }

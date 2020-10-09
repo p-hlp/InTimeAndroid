@@ -18,12 +18,12 @@ import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.services.TestService
 import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.composables.TestScreen
-import com.example.intimesimple.ui.composables.WorkoutDetailScreen
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_EXERCISETIME
 import com.example.intimesimple.utils.Constants.EXTRA_PAUSETIME
 import com.example.intimesimple.utils.Constants.EXTRA_REPETITION
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
+import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -43,7 +43,8 @@ class WorkoutDetailFragment : Fragment() {
                 MaterialTheme {
                     TestScreen(
                             Modifier.fillMaxSize(),
-                            ::sendCommandToTestService
+                            ::sendCommandToTestService,
+                            workoutDetailViewModel
                     )
                 }
             }
@@ -57,6 +58,9 @@ class WorkoutDetailFragment : Fragment() {
     private fun sendCommandToTestService(action: String){
         Intent(context, TestService::class.java).also {
             it.action = action
+            if (action == ACTION_START) {
+                it.putExtra(EXTRA_WORKOUT_ID, args.wId)
+            }
             context?.startService(it)
         }
     }
