@@ -50,8 +50,6 @@ object AppModule {
         return database
     }
 
-
-
     @Singleton
     @Provides
     fun provideWorkoutDao(db: AppDatabase) = db.workoutDao()
