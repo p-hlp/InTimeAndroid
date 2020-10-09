@@ -1,8 +1,14 @@
 package com.example.intimesimple.services
 
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.CountDownTimer
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -22,6 +28,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class TestService : LifecycleService(){
+
+    @Inject
+    lateinit var baseNotificationBuilder: NotificationCompat.Builder
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
@@ -62,18 +71,18 @@ class TestService : LifecycleService(){
                             // Get workout from DB
                             workoutRepository.getWorkout(id).asLiveData()
                                     .observe(this, Observer {wo ->
+                                        Timber.d("Workout data changed")
                                         workout = wo
                                         if(!isInitialized){
                                             // Post new timerState
                                             timerState.postValue(TimerState.RUNNING)
                                             // Post new timeInMillis -> workout.exerciseTime
                                             timeInMillis.postValue(workout?.exerciseTime)
+                                            // start foreground service + timer
+                                            startForegroundService()
                                             isInitialized = true
                                         }
                                     })
-                            // start foreground service + timer
-                            startForegroundService()
-
                         }
                         firstRun = false
                     }else{
@@ -105,11 +114,6 @@ class TestService : LifecycleService(){
 
                 ACTION_CANCEL -> {
                     Timber.d("ACTION_CANCEL")
-                    timerState.postValue(TimerState.EXPIRED)
-                    workout?.let {wo ->
-                        // Reset timeInMillis -> workout.exerciseTime
-                        timeInMillis.postValue(wo.exerciseTime)
-                    }
                     stopForegroundService()
                 }
                 else -> {}
@@ -122,24 +126,25 @@ class TestService : LifecycleService(){
 
     private fun startTimer(wasPaused: Boolean){
         // Only start timer if workout is not null
+        Timber.d("Timer Workout - ${workout.hashCode()}")
         workout?.let {
             val time = if (wasPaused) millisToCompletion else it.exerciseTime
             lastSecondTimestamp = time
-
+            Timber.d("Starting timer... with $time countdown")
             timer = object : CountDownTimer(time, Constants.ONE_SECOND) {
                 override fun onTick(millisUntilFinished: Long) {
-                    if (millisUntilFinished <= lastSecondTimestamp - 1000L) {
-                        timeInMillis.postValue(lastSecondTimestamp - 1000L)
-                    }
                     millisToCompletion = millisUntilFinished
-                    Timber.d("timeInMillis ${timeInMillis.value!!}")
+                    Timber.d("timeInMillis $millisToCompletion")
+                    if(millisUntilFinished <= lastSecondTimestamp - 1000L){
+                        timeInMillis.postValue(lastSecondTimestamp - 1000L)
+                        lastSecondTimestamp -= 1000L
+                    }
+
                 }
 
                 override fun onFinish() {
-                    if (repetitionIndex < it.repetitions) {
-                        repetitionIndex += 1
-                        startTimer(false)
-                    } else stopForegroundService()
+                    Timber.d("Timer finished")
+                    stopForegroundService()
                 }
             }.start()
         }
@@ -150,10 +155,38 @@ class TestService : LifecycleService(){
     }
 
     private fun startForegroundService(){
+        startTimer(false)
 
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
+                as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(notificationManager = notificationManager)
+        }
+
+        Timber.d("Starting foregroundService")
+        startForeground(Constants.NOTIFICATION_ID, baseNotificationBuilder.build())
     }
 
     private fun stopForegroundService(){
+        Timber.d("Stopping foregroundService")
+        timerState.postValue(TimerState.EXPIRED)
+        workout?.let {
+            // Reset timeInMillis -> workout.exerciseTime
+            timeInMillis.postValue(it.exerciseTime)
+        }
+        firstRun = true
+        stopForeground(true)
+        stopSelf()
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel(notificationManager: NotificationManager) {
+        val channel = NotificationChannel(
+                Constants.NOTIFICATION_CHANNEL_ID,
+                Constants.NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(channel)
     }
 }
