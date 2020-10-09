@@ -15,6 +15,7 @@ object Constants {
     const val EXTRA_REPETITION          = "EXTRA_REPETITION"
     const val EXTRA_EXERCISETIME        = "EXTRA_EXERCISETIME"
     const val EXTRA_PAUSETIME           = "EXTRA_PAUSETIME"
+    const val EXTRA_WORKOUT_ID          = "EXTRA_WORKOUT_ID"
 
     const val NOTIFICATION_CHANNEL_ID   = "timer_channel"
     const val NOTIFICATION_CHANNEL_NAME = "Timer"

@@ -2,6 +2,7 @@ package com.example.intimesimple.repositories
 
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutDao
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class WorkoutRepository @Inject constructor(
@@ -14,4 +15,5 @@ class WorkoutRepository @Inject constructor(
             = workoutDao.updateWithLastCompletion(workout)
     fun getAllWorkouts() = workoutDao.getAllWorkouts()
     fun getWorkout(wId: Long) = workoutDao.getWorkoutDistinctUntilChanged(wId)
+
 }
