@@ -22,7 +22,9 @@ import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
+import com.example.intimesimple.utils.Constants.ONE_SECOND
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -68,7 +70,7 @@ class TestService : LifecycleService(){
                        // First run, fetch workout from db, start service
                         it.extras?.let {bundle ->
                             val id = bundle.getLong(EXTRA_WORKOUT_ID)
-                            // Get workout from DB
+                            // Get workout from DB, maybe oneShot with runBlocking
                             workoutRepository.getWorkout(id).asLiveData()
                                     .observe(this, Observer {wo ->
                                         Timber.d("Workout data changed")
@@ -78,6 +80,7 @@ class TestService : LifecycleService(){
                                             timerState.postValue(TimerState.RUNNING)
                                             // Post new timeInMillis -> workout.exerciseTime
                                             timeInMillis.postValue(workout?.exerciseTime)
+                                            repetitionCount.postValue(workout?.repetitions)
                                             // start foreground service + timer
                                             startForegroundService()
                                             isInitialized = true
@@ -129,9 +132,10 @@ class TestService : LifecycleService(){
         Timber.d("Timer Workout - ${workout.hashCode()}")
         workout?.let {
             val time = if (wasPaused) millisToCompletion else it.exerciseTime
+            timeInMillis.postValue(time)
             lastSecondTimestamp = time
             Timber.d("Starting timer... with $time countdown")
-            timer = object : CountDownTimer(time, Constants.ONE_SECOND) {
+            timer = object : CountDownTimer(time, ONE_SECOND) {
                 override fun onTick(millisUntilFinished: Long) {
                     millisToCompletion = millisUntilFinished
                     Timber.d("timeInMillis $millisToCompletion")
@@ -144,7 +148,11 @@ class TestService : LifecycleService(){
 
                 override fun onFinish() {
                     Timber.d("Timer finished")
-                    stopForegroundService()
+                    if(it.repetitions - repetitionIndex > 0){
+                        repetitionIndex += 1
+                        repetitionCount.postValue(repetitionCount.value?.minus(1))
+                        startTimer(false)
+                    }else stopForegroundService()
                 }
             }.start()
         }
@@ -170,11 +178,13 @@ class TestService : LifecycleService(){
 
     private fun stopForegroundService(){
         Timber.d("Stopping foregroundService")
+        timer?.cancel()
         timerState.postValue(TimerState.EXPIRED)
         workout?.let {
             // Reset timeInMillis -> workout.exerciseTime
             timeInMillis.postValue(it.exerciseTime)
         }
+        repetitionIndex = 0
         firstRun = true
         stopForeground(true)
         stopSelf()
