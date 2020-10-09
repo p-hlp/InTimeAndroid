@@ -10,6 +10,7 @@ import androidx.lifecycle.asLiveData
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.repositories.WorkoutRepository
+import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
@@ -29,8 +30,11 @@ class TestService : LifecycleService(){
 
     private var firstRun = true
     private var isInitialized = false
+
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
+    private var lastSecondTimestamp = 0L
+    private var repetitionIndex = 0
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -67,18 +71,21 @@ class TestService : LifecycleService(){
                                             isInitialized = true
                                         }
                                     })
-                            // TODO: start foreground service + timer
+                            // start foreground service + timer
+                            startForegroundService()
 
                         }
                         firstRun = false
                     }else{
-                        // TODO: start Timer, service already running
                         // Reset timerState
                         timerState.postValue(TimerState.RUNNING)
                         workout?.let {wo ->
                             // Reset timeInMillis -> workout.exerciseTime
                             timeInMillis.postValue(wo.exerciseTime)
                         }
+
+                        // start Timer, service already running
+                        startTimer(false)
                     }
                 }
 
@@ -86,12 +93,14 @@ class TestService : LifecycleService(){
                     Timber.d("ACTION_PAUSE")
                     // Post new timerState
                     timerState.postValue(TimerState.PAUSED)
+                    stopTimer()
                 }
 
                 ACTION_RESUME -> {
                     Timber.d("ACTION_RESUME")
                     // Post new timerState
                     timerState.postValue(TimerState.RUNNING)
+                    startTimer(true)
                 }
 
                 ACTION_CANCEL -> {
@@ -101,6 +110,7 @@ class TestService : LifecycleService(){
                         // Reset timeInMillis -> workout.exerciseTime
                         timeInMillis.postValue(wo.exerciseTime)
                     }
+                    stopForegroundService()
                 }
                 else -> {}
             }
@@ -111,11 +121,32 @@ class TestService : LifecycleService(){
 
 
     private fun startTimer(wasPaused: Boolean){
+        // Only start timer if workout is not null
+        workout?.let {
+            val time = if (wasPaused) millisToCompletion else it.exerciseTime
+            lastSecondTimestamp = time
 
+            timer = object : CountDownTimer(time, Constants.ONE_SECOND) {
+                override fun onTick(millisUntilFinished: Long) {
+                    if (millisUntilFinished <= lastSecondTimestamp - 1000L) {
+                        timeInMillis.postValue(lastSecondTimestamp - 1000L)
+                    }
+                    millisToCompletion = millisUntilFinished
+                    Timber.d("timeInMillis ${timeInMillis.value!!}")
+                }
+
+                override fun onFinish() {
+                    if (repetitionIndex < it.repetitions) {
+                        repetitionIndex += 1
+                        startTimer(false)
+                    } else stopForegroundService()
+                }
+            }.start()
+        }
     }
 
     private fun stopTimer(){
-
+        timer?.cancel()
     }
 
     private fun startForegroundService(){
