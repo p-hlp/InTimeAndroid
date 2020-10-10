@@ -54,6 +54,7 @@ class TestService : LifecycleService(){
     companion object{
         val timerState = MutableLiveData<TimerState>()
         val timeInMillis = MutableLiveData<Long>()
+        val progressTimeInMillis = MutableLiveData<Long>()
         val repetitionCount = MutableLiveData<Int>()
     }
 
@@ -157,15 +158,15 @@ class TestService : LifecycleService(){
             timeInMillis.postValue(time)
             lastSecondTimestamp = time
             //Timber.d("Starting timer... with $time countdown")
-            timer = object : CountDownTimer(time, ONE_SECOND) {
+            timer = object : CountDownTimer(time, 5L) {
                 override fun onTick(millisUntilFinished: Long) {
                     millisToCompletion = millisUntilFinished
+                    progressTimeInMillis.postValue(millisUntilFinished)
                     //Timber.d("timeInMillis $millisToCompletion")
                     if(millisUntilFinished <= lastSecondTimestamp - 1000L){
                         timeInMillis.postValue(lastSecondTimestamp - 1000L)
                         lastSecondTimestamp -= 1000L
                     }
-
                 }
 
                 override fun onFinish() {
@@ -205,6 +206,7 @@ class TestService : LifecycleService(){
         workout?.let {
             // Reset timeInMillis -> workout.exerciseTime
             timeInMillis.postValue(it.exerciseTime)
+            progressTimeInMillis.postValue(it.exerciseTime)
         }
         repetitionIndex = 0
         firstRun = true

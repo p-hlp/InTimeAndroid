@@ -20,6 +20,7 @@ import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ConfigurationAmbient
 import com.example.intimesimple.data.local.Workout
 
 @Composable
@@ -74,30 +75,43 @@ fun TestScreenContent(
     val timerRepCount by TestService.repetitionCount.observeAsState()
     val exTimeInMillis: Long = workout.exerciseTime
     val repCount: Int = workout.repetitions
-
+    val progressTime by TestService.progressTimeInMillis.observeAsState(exTimeInMillis)
+    val configuration = ConfigurationAmbient.current
+    val screenWidth = configuration.screenWidthDp
+    val buttonWidth = 0.3f * screenWidth
 
     ConstraintLayout(modifier = modifier) {
         val buttonRow = createRef()
         val timerText = createRef()
         val stateText = createRef()
         val repText = createRef()
+        val progCircle = createRef()
 
+        val buttonModifier = Modifier.width(buttonWidth.dp)
         Text(
                 text = (if (timerState == TimerState.EXPIRED)
                     getFormattedStopWatchTime(exTimeInMillis)
                 else getFormattedStopWatchTime(timeInMillis)),
                 modifier = Modifier.constrainAs(timerText){
-                    bottom.linkTo(stateText.top, 8.dp)
+                    top.linkTo(parent.top, 172.dp)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
                 style = typography.h2
         )
 
+        TimerCircle(
+                modifier = Modifier.constrainAs(progCircle){
+                    top.linkTo(parent.top, 8.dp)
+                },
+                timerState = timerState,
+                elapsedTime = if(timerState == TimerState.EXPIRED) exTimeInMillis else progressTime,
+                totalTime = exTimeInMillis
+        )
         Text(
                 text = timerState.stateName,
                 modifier = Modifier.constrainAs(stateText){
-                    centerVerticallyTo(parent)
+                    top.linkTo(timerText.bottom,8.dp)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
@@ -131,7 +145,8 @@ fun TestScreenContent(
                     TimerState.EXPIRED -> {
                         Button(
                                 onClick = { sendCommand(Constants.ACTION_START) },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                         ) {
                             Text("Start")
                         }
@@ -139,14 +154,16 @@ fun TestScreenContent(
                     TimerState.RUNNING -> {
                         Button(
                                 onClick = { sendCommand(Constants.ACTION_PAUSE) },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                         ) {
                             Text("Pause")
                         }
 
                         Button(
                                 onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                         ) {
                             Text("Cancel")
                         }
@@ -154,14 +171,16 @@ fun TestScreenContent(
                     TimerState.PAUSED -> {
                         Button(
                                 onClick = { sendCommand(Constants.ACTION_RESUME) },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                         ) {
                             Text("Resume")
                         }
 
                         Button(
                                 onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                shape = RoundedCornerShape(50)
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                         ) {
                             Text("Cancel")
                         }
