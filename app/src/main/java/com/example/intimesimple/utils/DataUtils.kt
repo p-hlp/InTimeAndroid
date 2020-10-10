@@ -1,4 +1,6 @@
-package com.example.intimesimple.data.local
+package com.example.intimesimple.utils
+
+import com.example.intimesimple.data.local.Workout
 
 val defaultWorkouts = listOf(
         Workout(0,"15min Posture", 35000L, 15000L, 18),

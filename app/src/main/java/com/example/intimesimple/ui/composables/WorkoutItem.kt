@@ -9,11 +9,9 @@ import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.Workout
-import com.example.intimesimple.data.local.defaultWorkouts
 import com.example.intimesimple.utils.convertLongToTime
 import com.example.intimesimple.utils.getFormattedCompletionTime
 
@@ -47,20 +45,6 @@ fun WorkoutItem(
                 WorkoutCardTimeColumn(workout)
             }
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun WorkoutItemPreview(){
-    val testWorkout =
-        Workout(1,"Morning Yoga", 30000L, 15000L, 12)
-    MaterialTheme {
-        WorkoutItem(
-            testWorkout,
-            navigateToDetail = {}
-        )
     }
 }
 

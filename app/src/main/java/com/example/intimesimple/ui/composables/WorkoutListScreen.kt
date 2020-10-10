@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
-import com.example.intimesimple.data.local.defaultWorkouts
-import com.example.intimesimple.data.local.getRandomWorkout
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
+import com.example.intimesimple.utils.defaultWorkouts
+import com.example.intimesimple.utils.getRandomWorkout
 import java.util.*
 
 @Composable
@@ -29,50 +29,56 @@ fun WorkoutListScreen(
 ){
     // get workout list as observable state
     var showDialog by remember { mutableStateOf(false) }
-    val alertMessage = "This is a placeholder for alert dialog"
     val workouts by workoutListViewModel.workouts.observeAsState(listOf())
 
     // build screen layout with scaffold
     Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name).toUpperCase()
+            modifier = modifier,
+            topBar = {
+                TopAppBar(
+                        title = {
+                            Text(
+                                    text = stringResource(id = R.string.app_name).toUpperCase()
+                            )
+                        }
+                )
+            },
+            bodyContent = {
+                if (showDialog) {
+                    val hours = (0..99).toList()
+                    val minutesAndSeconds = (0..60).toList()
+
+                    INTimeAlertDialog(
+                            onAccept = {
+                                // add workout
+                                // dismiss dialog
+                                showDialog = false
+                            },
+                            onDismiss = {
+                                showDialog = false
+                            },
+                            bodyContent = {
+                                TimerInputField(
+                                        hourSlot = {timerInput(items = hours)}
+                                )
+                            },
+                            buttonAcceptText = "add".toUpperCase(Locale.ROOT),
+                            buttonDismissText = "cancel".toUpperCase(Locale.ROOT)
+
                     )
                 }
-            )
-        },
-        bodyContent = {
-            if (showDialog) {
-                INTimeAlertDialog(
-                    onAccept = {
-                        // add workout
-                        // dismiss dialog
-                        showDialog = false
-                    },
-                    onDismiss = {
-                        showDialog = false
-                    },
-                    bodyText = alertMessage,
-                    buttonAcceptText = "add".toUpperCase(Locale.ROOT),
-                    buttonDismissText = "cancel".toUpperCase(Locale.ROOT)
-
+                WorkoutListBodyContent(
+                        Modifier.fillMaxSize(),
+                        items = workouts,
+                        navigateToDetail = navigateToDetail
                 )
-            }
-            WorkoutListBodyContent(
-                Modifier.fillMaxSize(),
-                items = workouts,
-                navigateToDetail = navigateToDetail
-            )
-        },
-        floatingActionButton = {
-            AddWorkoutFab(onAddItem = {
-                showDialog = true
-            })
-        },
-        floatingActionButtonPosition = FabPosition.End
+            },
+            floatingActionButton = {
+                AddWorkoutFab(onAddItem = {
+                    showDialog = true
+                })
+            },
+            floatingActionButtonPosition = FabPosition.End
     )
 }
 
