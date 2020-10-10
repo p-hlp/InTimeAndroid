@@ -58,9 +58,7 @@ fun WorkoutListScreen(
                                 showDialog = false
                             },
                             bodyContent = {
-                                TimerInputField(
-                                        hourSlot = {timerInput(items = hours)}
-                                )
+
                             },
                             buttonAcceptText = "add".toUpperCase(Locale.ROOT),
                             buttonDismissText = "cancel".toUpperCase(Locale.ROOT)

@@ -24,6 +24,8 @@ import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 
 
 @Composable
@@ -35,7 +37,7 @@ fun WorkoutDetailScreen(
 ) {
     // Get specific workout via viewmodel or whatever
     val workout = Workout(0, "15min Posture", 25000L, 15000L, 18)
-    val workoutNew = workoutDetailViewModel.workout.observeAsState(workout)
+    val workoutNew by workoutDetailViewModel.workout.observeAsState(workout)
 
     //TODO: It"s always displaying default workout values first, noticeable flick when changing
 
@@ -44,7 +46,7 @@ fun WorkoutDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = workoutNew.value.name.toUpperCase()
+                        text = workoutNew.name.toUpperCase()
                     )
                 },
                 navigationIcon = {
@@ -60,7 +62,7 @@ fun WorkoutDetailScreen(
         bodyContent = {
             WorkoutDetailBodyContent(
                 Modifier.fillMaxSize(),
-                workoutNew.value,
+                workoutNew,
                 onServiceCommand
             )
         }

@@ -1,10 +1,13 @@
 package com.example.intimesimple.ui.composables
 
+import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -15,22 +18,63 @@ import com.example.intimesimple.services.TestService
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.getFormattedStopWatchTime
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import com.example.intimesimple.data.local.Workout
 
 @Composable
 fun TestScreen(
         modifier: Modifier = Modifier,
         sendCommand: (String) -> Unit,
+        navigateHome: () -> Unit,
         workoutDetailViewModel: WorkoutDetailViewModel
 ) {
-    val timerState = TestService.timerState.observeAsState(TimerState.EXPIRED)
-    val timeInMillis = TestService.timeInMillis.observeAsState()
-    val timerRepCount = TestService.repetitionCount.observeAsState()
-    var exTimeInMillis: Long? = null
-    var repCount: Int? = null
-    val workout = workoutDetailViewModel.workout.observeAsState().also {
-        exTimeInMillis = it.value?.exerciseTime
-        repCount = it.value?.repetitions
-    }
+    val workout by workoutDetailViewModel.workout.observeAsState()
+
+   Scaffold(
+           modifier.fillMaxSize(),
+           topBar = {
+               TopAppBar(
+                       title = {
+                           workout?.name?.toUpperCase()?.let {
+                               Text(
+                                       text = it
+                               )
+                           }
+                       },
+                       navigationIcon = {
+                           IconButton(onClick = {
+                               navigateHome()
+                           }) {
+                               Icon(Icons.Filled.ArrowBack)
+                           }
+                       }
+               )
+           },
+           bodyContent = {
+               workout?.let { it1 ->
+                   TestScreenContent(
+                           modifier = modifier,
+                           sendCommand,
+                           it1
+                   )
+               }
+           }
+   )
+}
+
+@Composable
+fun TestScreenContent(
+        modifier: Modifier = Modifier,
+        sendCommand: (String) -> Unit,
+        workout: Workout
+){
+    val timerState by TestService.timerState.observeAsState(TimerState.EXPIRED)
+    val timeInMillis by TestService.timeInMillis.observeAsState()
+    val timerRepCount by TestService.repetitionCount.observeAsState()
+    val exTimeInMillis: Long = workout.exerciseTime
+    val repCount: Int = workout.repetitions
+
 
     ConstraintLayout(modifier = modifier) {
         val buttonRow = createRef()
@@ -39,49 +83,51 @@ fun TestScreen(
         val repText = createRef()
 
         Text(
-                text = (if (timerState.value == TimerState.EXPIRED)
+                text = (if (timerState == TimerState.EXPIRED)
                     getFormattedStopWatchTime(exTimeInMillis)
-                else getFormattedStopWatchTime(timeInMillis.value)),
+                else getFormattedStopWatchTime(timeInMillis)),
                 modifier = Modifier.constrainAs(timerText){
                     bottom.linkTo(stateText.top, 8.dp)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
-                style = typography.h3
+                style = typography.h2
         )
 
         Text(
-                text = timerState.value?.stateName!!,
+                text = timerState.stateName,
                 modifier = Modifier.constrainAs(stateText){
                     centerVerticallyTo(parent)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
-                style = typography.h3
+                style = typography.h5
         )
 
         Text(
                 text = "${
-                    if (timerState.value == TimerState.EXPIRED)
+                    if (timerState == TimerState.EXPIRED)
                         repCount ?: ""
-                    else timerRepCount.value
+                    else timerRepCount
                 }",
                 modifier = Modifier.constrainAs(repText){
-                    top.linkTo(stateText.bottom, 8.dp)
+                    top.linkTo(stateText.bottom, 4.dp)
                     centerHorizontallyTo(parent)
                 },
                 color = Color.White,
-                style = typography.h3
+                style = typography.h5
         )
+
+
 
         Row(
                 modifier = Modifier.fillMaxWidth()
                         .constrainAs(buttonRow){
-                            bottom.linkTo(parent.bottom, 32.dp)
+                            bottom.linkTo(parent.bottom, 64.dp)
                         },
                 horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            timerState.value?.let {
+            timerState.let {
                 when (it) {
                     TimerState.EXPIRED -> {
                         Button(
