@@ -24,9 +24,8 @@ import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.ONE_SECOND
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,6 +37,9 @@ class TestService : LifecycleService(){
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
+
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private var workout: Workout? = null
 
@@ -61,6 +63,10 @@ class TestService : LifecycleService(){
         Timber.d("onCreate")
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceJob.cancel()
+    }
 
     @SuppressLint("BinaryOperationInTimber")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -89,7 +95,7 @@ class TestService : LifecycleService(){
 //                                        }
 //                                    }
                             // Should always block short, cause workout entry is present
-                            runBlocking {
+                            serviceScope.launch {
                                 workout = workoutRepository.getWorkout(id).first()
                                 if(!isInitialized){
                                             // Post new timerState

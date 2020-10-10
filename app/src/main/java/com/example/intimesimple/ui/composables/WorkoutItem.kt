@@ -54,7 +54,7 @@ fun WorkoutCardInfoColumn(workout: Workout){
     // Name, last completion
     Text(workout.name, style = typography.h3, maxLines = 2)
     ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
-        Text("${workout.repetitions} Exercises", style = typography.body2)
+        Text("${workout.repetitions} Repetitions", style = typography.body2)
     }
     Spacer(modifier = Modifier.padding(4.dp))
     ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
