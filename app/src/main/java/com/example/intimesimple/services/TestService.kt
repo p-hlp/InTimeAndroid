@@ -22,7 +22,9 @@ import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
+import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.ONE_SECOND
+import com.example.intimesimple.utils.getFormattedStopWatchTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -34,6 +36,7 @@ class TestService : LifecycleService(){
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
+    lateinit var currentNotificationBuilder: NotificationCompat.Builder
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
@@ -62,6 +65,7 @@ class TestService : LifecycleService(){
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
+        currentNotificationBuilder = baseNotificationBuilder
     }
 
     override fun onDestroy() {
@@ -79,23 +83,7 @@ class TestService : LifecycleService(){
                        // First run, fetch workout from db, start service
                         it.extras?.let {bundle ->
                             val id = bundle.getLong(EXTRA_WORKOUT_ID)
-                            // Get workout from DB, maybe oneShot with runBlocking
-//                            workoutRepository.getWorkout(id).asLiveData()
-//                                    .observe(this, Observer {wo ->
-//                                        Timber.d("Workout data changed")
-//                                        workout = wo
-//                                        if(!isInitialized){
-//                                            // Post new timerState
-//                                            timerState.postValue(TimerState.RUNNING)
-//                                            // Post new timeInMillis -> workout.exerciseTime
-//                                            timeInMillis.postValue(workout?.exerciseTime)
-//                                            repetitionCount.postValue(workout?.repetitions)
-//                                            // start foreground service + timer
-//                                            startForegroundService()
-//                                            isInitialized = true
-//                                        }
-//                                    }
-                            // Should always block short, cause workout entry is present
+
                             serviceScope.launch {
                                 workout = workoutRepository.getWorkout(id).first()
                                 if(!isInitialized){
@@ -197,6 +185,16 @@ class TestService : LifecycleService(){
 
         Timber.d("Starting foregroundService")
         startForeground(Constants.NOTIFICATION_ID, baseNotificationBuilder.build())
+
+        // Observe timeInMillis and update notification
+        timeInMillis.observe(this, Observer {
+            workout?.let {wo ->
+                val notification = currentNotificationBuilder
+                        .setContentTitle(wo.name)
+                        .setContentText(getFormattedStopWatchTime(it))
+                notificationManager.notify(NOTIFICATION_ID, notification.build())
+            }
+        })
     }
 
     private fun stopForegroundService(){
