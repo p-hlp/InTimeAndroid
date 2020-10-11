@@ -23,14 +23,11 @@ import kotlin.math.min
 @Composable
 fun TimerCircle(
         modifier: Modifier = Modifier,
-        timerState: TimerState,
         elapsedTime: Long,
         totalTime: Long
 ){
     Canvas(
             modifier = modifier.padding(16.dp).fillMaxSize(), onDraw = {
-
-        Timber.d("TimerCircle called")
 
         val dotDiameter = 12.dp
         val dotRadius = dotDiameter / 2f
@@ -91,7 +88,6 @@ fun TimerCircle(
 fun TimerCirclePreview(){
     TimerCircle(
             modifier = Modifier.fillMaxSize(),
-            timerState = TimerState.RUNNING,
             elapsedTime = 5000L,
             totalTime = 30000L
     )

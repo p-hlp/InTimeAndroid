@@ -3,6 +3,7 @@ package com.example.intimesimple.services
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,6 +14,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
+import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.repositories.WorkoutRepository
@@ -36,6 +38,7 @@ class TestService : LifecycleService(){
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
+
     lateinit var currentNotificationBuilder: NotificationCompat.Builder
 
     @Inject
@@ -48,6 +51,7 @@ class TestService : LifecycleService(){
 
     private var firstRun = true
     private var isInitialized = false
+    private var isKilled = false
 
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
@@ -83,6 +87,9 @@ class TestService : LifecycleService(){
                        // First run, fetch workout from db, start service
                         it.extras?.let {bundle ->
                             val id = bundle.getLong(EXTRA_WORKOUT_ID)
+
+                            currentNotificationBuilder
+                                    .setContentIntent(buildPendingIntentWithId(id))
 
                             serviceScope.launch {
                                 workout = workoutRepository.getWorkout(id).first()
@@ -184,15 +191,18 @@ class TestService : LifecycleService(){
         }
 
         Timber.d("Starting foregroundService")
-        startForeground(Constants.NOTIFICATION_ID, baseNotificationBuilder.build())
+        startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
 
         // Observe timeInMillis and update notification
         timeInMillis.observe(this, Observer {
-            workout?.let {wo ->
-                val notification = currentNotificationBuilder
-                        .setContentTitle(wo.name)
-                        .setContentText(getFormattedStopWatchTime(it))
-                notificationManager.notify(NOTIFICATION_ID, notification.build())
+            if (!isKilled){
+                workout?.let {wo ->
+                    val notification = currentNotificationBuilder
+                            .setContentTitle(wo.name)
+                            .setContentText(getFormattedStopWatchTime(it))
+
+                    notificationManager.notify(NOTIFICATION_ID, notification.build())
+                }
             }
         })
     }
@@ -206,6 +216,7 @@ class TestService : LifecycleService(){
             timeInMillis.postValue(it.exerciseTime)
             progressTimeInMillis.postValue(it.exerciseTime)
         }
+        isKilled = true
         repetitionIndex = 0
         firstRun = true
         stopForeground(true)
@@ -220,5 +231,18 @@ class TestService : LifecycleService(){
                 NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)
+    }
+
+    private fun buildPendingIntentWithId(id: Long): PendingIntent {
+        Timber.d("buildPendingIntentWithId - id: $id")
+        return PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, MainActivity::class.java).also {
+                    it.action = Constants.ACTION_SHOW_MAIN_ACTIVITY
+                    it.putExtra(EXTRA_WORKOUT_ID, id)
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
     }
 }

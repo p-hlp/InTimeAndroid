@@ -55,7 +55,6 @@ class WorkoutDetailFragment : Fragment() {
     }
 
 
-
     private fun navigateHome() {
         sendCommandToTestService(ACTION_CANCEL)
         findNavController().navigate(WorkoutDetailFragmentDirections.actionWorkoutDetailFragmentToWorkoutListFragment())
@@ -66,22 +65,6 @@ class WorkoutDetailFragment : Fragment() {
             it.action = action
             if (action == ACTION_START) {
                 it.putExtra(EXTRA_WORKOUT_ID, args.wId)
-            }
-            context?.startService(it)
-        }
-    }
-
-    @SuppressLint("BinaryOperationInTimber")
-    private fun sendCommandToService(action: String, workout: Workout?) {
-        Intent(context, TimerService::class.java).also {
-            it.action = action
-            // If starting service pass needed information in extra
-            if (action == ACTION_START) {
-                workout?.let {wo->
-                    it.putExtra(EXTRA_REPETITION, wo.repetitions)
-                    it.putExtra(EXTRA_EXERCISETIME, wo.exerciseTime)
-                    it.putExtra(EXTRA_PAUSETIME, wo.pauseTime)
-                }
             }
             context?.startService(it)
         }

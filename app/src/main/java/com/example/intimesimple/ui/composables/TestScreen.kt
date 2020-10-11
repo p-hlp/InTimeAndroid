@@ -104,7 +104,6 @@ fun TestScreenContent(
                 modifier = Modifier.constrainAs(progCircle){
                     top.linkTo(parent.top, 8.dp)
                 },
-                timerState = timerState,
                 elapsedTime = if(timerState == TimerState.EXPIRED) exTimeInMillis else progressTime,
                 totalTime = exTimeInMillis
         )
