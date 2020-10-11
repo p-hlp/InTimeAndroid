@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.defaultWorkouts
 import com.example.intimesimple.utils.getRandomWorkout
@@ -109,6 +110,7 @@ fun WorkoutBodyContentPreview(){
 private fun AddWorkoutFab(onAddItem: (Workout) -> Unit) {
     FloatingActionButton(
         onClick = { onAddItem(getRandomWorkout()) },
-        icon = { Icon(Icons.Filled.Add) }
+        icon = { Icon(Icons.Filled.Add) },
+            backgroundColor = Green500
     )
 }

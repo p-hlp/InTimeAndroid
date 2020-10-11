@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.utils.convertLongToTime
 import com.example.intimesimple.utils.getFormattedCompletionTime
 
@@ -72,7 +73,7 @@ fun WorkoutCardInfoColumn(workout: Workout){
 @Composable
 fun WorkoutCardTimeColumn(workout: Workout){
     Surface(
-            color = MaterialTheme.colors.secondary.copy(alpha = 0.3f),
+            color = Green500.copy(alpha = 0.75f),
             shape = RoundedCornerShape(4.dp)
     ){
         Text(
