@@ -4,6 +4,8 @@ import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -46,10 +48,7 @@ fun WorkoutListScreen(
             },
             bodyContent = {
                 if (showDialog) {
-                    val hours = (0..99).toList()
-                    val minutesAndSeconds = (0..60).toList()
-
-                    INTimeAlertDialog(
+                    WorkoutAddAlertDialog(
                             onAccept = {
                                 // add workout
                                 // dismiss dialog
@@ -59,7 +58,18 @@ fun WorkoutListScreen(
                                 showDialog = false
                             },
                             bodyContent = {
-
+                                TimeInputField(
+                                        hoursField = {
+                                            DigitInputField(initValue = "00")
+                                        },
+                                        minutesField = {
+                                            DigitInputField(initValue = "00")
+                                        },
+                                        secondsField = {
+                                            DigitInputField(initValue = "45")
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
+                                )
                             },
                             buttonAcceptText = "add".toUpperCase(Locale.ROOT),
                             buttonDismissText = "cancel".toUpperCase(Locale.ROOT)
@@ -73,9 +83,11 @@ fun WorkoutListScreen(
                 )
             },
             floatingActionButton = {
-                AddWorkoutFab(onAddItem = {
-                    showDialog = true
-                })
+                FloatingActionButton(
+                        onClick = { showDialog = true },
+                        icon = { Icon(Icons.Filled.Add) },
+                        backgroundColor = Green500
+                )
             },
             floatingActionButtonPosition = FabPosition.End
     )

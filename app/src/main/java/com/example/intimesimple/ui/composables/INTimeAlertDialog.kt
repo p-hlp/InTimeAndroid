@@ -15,7 +15,7 @@ import com.example.intimesimple.ui.theme.INTimeDialogThemeOverlay
 
 
 @Composable
-fun INTimeAlertDialog(
+fun WorkoutAddAlertDialog(
         onAccept: () -> Unit,
         onDismiss: () -> Unit,
         bodyContent: @Composable () -> Unit,
@@ -61,7 +61,7 @@ fun INTimeAlertDialog(
 @Preview
 @Composable
 fun INTimeAlertDialogPreview(){
-    INTimeAlertDialog(
+    WorkoutAddAlertDialog(
             onAccept = {},
             onDismiss = {},
             bodyContent = {  },

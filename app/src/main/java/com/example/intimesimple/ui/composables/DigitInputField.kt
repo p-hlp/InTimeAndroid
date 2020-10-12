@@ -4,8 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.CoreTextField
+import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Surface
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 
@@ -28,11 +32,9 @@ fun TimeInputField(
         secondsField: @Composable () -> Unit
 ){
     Surface(
-            modifier,
-            color = Color.White
+            modifier
     ) {
         Row(
-                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
         ){
             hoursField()
@@ -44,20 +46,22 @@ fun TimeInputField(
 
 @Composable
 fun DigitInputField(
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        initValue: String
 ){
     Surface(
             modifier = modifier,
-            color = Color.LightGray
+            color = Color.LightGray,
+            shape = RoundedCornerShape(8.dp)
     ){
-        var textValue by remember { mutableStateOf(TextFieldValue("00")) }
-        CoreTextField(
+        var textValue by remember { mutableStateOf(TextFieldValue(initValue)) }
+        TextField(
                 value = textValue,
                 onValueChange = {
                     textValue = it
                 },
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier.padding(horizontal = 4.dp)
+                textStyle = typography.body2,
+                keyboardType = KeyboardType.NumberPassword
         )
     }
 }
@@ -66,16 +70,16 @@ fun DigitInputField(
 @Preview
 @Composable
 fun DigitInputFieldPreview(){
-    DigitInputField()
+    DigitInputField(initValue = "00")
 }
 
 @Preview
 @Composable
 fun TimeInputFieldPreview() {
     TimeInputField(
-            hoursField = { DigitInputField() },
-            minutesField = { DigitInputField() },
-            secondsField = { DigitInputField() },
+            hoursField = { DigitInputField(initValue = "00") },
+            minutesField = { DigitInputField(initValue = "00") },
+            secondsField = { DigitInputField(initValue = "45") },
             modifier = Modifier.fillMaxWidth()
     )
 }
