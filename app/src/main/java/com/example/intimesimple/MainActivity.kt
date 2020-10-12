@@ -39,11 +39,10 @@ class MainActivity : AppCompatActivity() {
                 val id = it.getLongExtra(EXTRA_WORKOUT_ID, -1L)
                 if(id != -1L){
                     Timber.d("Pressed Notification: navigating to: $id")
-                    navHostFragment
-                            .navController
-                            .navigate(WorkoutListFragmentDirections
-                                    .actionWorkoutListFragmentToWorkoutDetailFragment(id)
-                            )
+                    if(navHostFragment.navController.currentDestination?.id == R.id.workoutListFragment){
+                        navHostFragment.navController.navigate(WorkoutListFragmentDirections.actionWorkoutListFragmentToWorkoutDetailFragment(id))
+                    }
+
                 }
             }
         }
