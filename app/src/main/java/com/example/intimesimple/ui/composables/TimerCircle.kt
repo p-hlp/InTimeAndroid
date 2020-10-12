@@ -44,17 +44,10 @@ fun TimerCircle(
         val remainderColor = Color.White.copy(alpha = 0.25f)
         val completedColor = Green500
 
-        val arcRect = RectF()
-        val circlePaint = Paint()
-        circlePaint.isAntiAlias = true
-        circlePaint.style = Paint.Style.STROKE
 
         val arcStroke = Stroke(
                 width = strokeSize.value
         )
-        val circleFill = Paint()
-        circleFill.isAntiAlias = true
-        circleFill.style = Paint.Style.FILL
 
         val redPercent =
                 min(1f, elapsedTime.toFloat()/totalTime.toFloat())
