@@ -24,6 +24,7 @@ import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.ONE_SECOND
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import com.example.intimesimple.utils.getRandomWorkout
+import timber.log.Timber
 
 @Composable
 fun WorkoutAddAlertDialog(
@@ -36,6 +37,7 @@ fun WorkoutAddAlertDialog(
         var workTime by remember { mutableStateOf(40000L) }
         var pauseTime by remember { mutableStateOf(15000L) }
         var setCount by remember { mutableStateOf(1) }
+        var textFieldError by remember { mutableStateOf(false) }
 
         AlertDialog(
                 onDismissRequest = onDismiss,
@@ -43,10 +45,13 @@ fun WorkoutAddAlertDialog(
                     Column {
                         OutlinedTextField(
                                 value = nameText,
-                                onValueChange = {
-                                    nameText = it
+                                onValueChange = {s ->
+                                    if(s.text.count { it == '\n' } < 1){
+                                        nameText = s
+                                    }
                                 },
                                 label = {Text("Enter a workout name here")},
+                                isErrorValue = textFieldError,
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                                         .padding(bottom = 16.dp).fillMaxWidth()
                         )
@@ -105,8 +110,19 @@ fun WorkoutAddAlertDialog(
                             TextButton(
                                     onClick = {
                                         // TODO: Get values from fields, build and insert
-                                        workoutListViewModel.addWorkout(getRandomWorkout())
-                                        onAccept()
+                                        if(nameText.text.isNotEmpty()){
+                                            val workoutNew = Workout(
+                                                    name = nameText.text,
+                                                    exerciseTime = workTime,
+                                                    pauseTime = pauseTime,
+                                                    repetitions = setCount
+                                            )
+                                            workoutListViewModel.addWorkout(workoutNew)
+                                            textFieldError = false
+                                            onAccept()
+                                        }else{
+                                            textFieldError = true
+                                        }
                                     },
                                     shape = RectangleShape,
                                     contentPadding = PaddingValues(16.dp)
