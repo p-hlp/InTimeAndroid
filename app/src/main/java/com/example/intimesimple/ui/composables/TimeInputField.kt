@@ -23,76 +23,12 @@ import com.example.intimesimple.utils.getFormattedStopWatchTime
 
 @Composable
 fun TimeInputField(
-        title: String,
-        initValue: Long
-) {
-    var time by remember { mutableStateOf(initValue) }
-    ConstraintLayout() {
-        val (
-                minusButton,
-                plusButton,
-                timerText,
-                titleText
-        ) = createRefs()
-
-        Text(
-                text = title.toUpperCase(),
-                style = typography.subtitle1,
-                modifier = Modifier.constrainAs(titleText){
-                    bottom.linkTo(timerText.top, 4.dp)
-                    centerHorizontallyTo(parent)
-                }
-        )
-
-        Text(
-                text = getFormattedStopWatchTime(time),
-                style = typography.h3,
-                modifier = Modifier.constrainAs(timerText){
-                    centerHorizontallyTo(parent)
-                    centerVerticallyTo(parent)
-                }
-        )
-
-        FloatingActionButton(
-                onClick = {
-                    if(time - ONE_SECOND >= 0L){
-                        time -= ONE_SECOND
-                    }
-                },
-                modifier = Modifier.constrainAs(minusButton){
-                    absoluteRight.linkTo(timerText.absoluteLeft, 32.dp)
-                    centerVerticallyTo(parent)
-                },
-                shape = RoundedCornerShape(50),
-                backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.RemoveCircleOutline)},
-                elevation = 0.dp
-        )
-
-        FloatingActionButton(
-                onClick = {
-                    time += ONE_SECOND
-                },
-                modifier = Modifier.constrainAs(plusButton){
-                    absoluteLeft.linkTo(timerText.absoluteRight, 32.dp)
-                    centerVerticallyTo(parent)
-                },
-                shape = RoundedCornerShape(50),
-                backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.AddCircleOutline)},
-                elevation = 0.dp
-        )
-
-    }
-}
-
-@Composable
-fun RepsInputField(
         modifier: Modifier = Modifier,
         title: String,
-        initValue: Int
+        text: String,
+        onPlusPressed: () -> Unit,
+        onMinusPressed: () -> Unit
 ) {
-    var reps by remember { mutableStateOf(initValue) }
     ConstraintLayout(modifier) {
         val (
                 minusButton,
@@ -111,7 +47,68 @@ fun RepsInputField(
         )
 
         Text(
-                text = reps.toString(),
+                text = text,
+                style = typography.h3,
+                modifier = Modifier.constrainAs(timerText){
+                    centerHorizontallyTo(parent)
+                    centerVerticallyTo(parent)
+                }
+        )
+
+        FloatingActionButton(
+                onClick = {onMinusPressed()},
+                modifier = Modifier.constrainAs(minusButton){
+                    absoluteRight.linkTo(timerText.absoluteLeft, 32.dp)
+                    centerVerticallyTo(parent)
+                },
+                shape = RoundedCornerShape(50),
+                backgroundColor = Color.Transparent,
+                icon = {Icon(Icons.Filled.RemoveCircleOutline)},
+                elevation = 0.dp
+        )
+
+        FloatingActionButton(
+                onClick = { onPlusPressed() },
+                modifier = Modifier.constrainAs(plusButton){
+                    absoluteLeft.linkTo(timerText.absoluteRight, 32.dp)
+                    centerVerticallyTo(parent)
+                },
+                shape = RoundedCornerShape(50),
+                backgroundColor = Color.Transparent,
+                icon = {Icon(Icons.Filled.AddCircleOutline)},
+                elevation = 0.dp
+        )
+
+    }
+}
+
+@Composable
+fun RepsInputField(
+        modifier: Modifier = Modifier,
+        title: String,
+        text: String,
+        onMinusPressed: () -> Unit,
+        onPlusPressed: () -> Unit
+) {
+    ConstraintLayout(modifier) {
+        val (
+                minusButton,
+                plusButton,
+                timerText,
+                titleText
+        ) = createRefs()
+
+        Text(
+                text = title.toUpperCase(),
+                style = typography.subtitle1,
+                modifier = Modifier.constrainAs(titleText){
+                    bottom.linkTo(timerText.top, 4.dp)
+                    centerHorizontallyTo(parent)
+                }
+        )
+
+        Text(
+                text = text,
                 style = typography.h3,
                 modifier = Modifier.constrainAs(timerText){
                     centerHorizontallyTo(parent)
@@ -121,9 +118,7 @@ fun RepsInputField(
 
         FloatingActionButton(
                 onClick = {
-                    if(reps - 1 >= 0){
-                        reps -= 1
-                    }
+                    onMinusPressed()
                 },
                 modifier = Modifier.constrainAs(minusButton){
                     absoluteRight.linkTo(timerText.absoluteLeft, 32.dp)
@@ -137,7 +132,7 @@ fun RepsInputField(
 
         FloatingActionButton(
                 onClick = {
-                    reps += 1
+                    onPlusPressed()
                 },
                 modifier = Modifier.constrainAs(plusButton){
                     absoluteLeft.linkTo(timerText.absoluteRight, 32.dp)
@@ -158,6 +153,12 @@ fun RepsInputField(
 @Composable
 fun TimeInputFieldPreview(){
     MaterialTheme {
-        TimeInputField( "Work", 30000L)
+        TimeInputField(
+                Modifier,
+                "Work",
+                getFormattedStopWatchTime(30000L),
+                onMinusPressed = {},
+                onPlusPressed = {}
+        )
     }
 }

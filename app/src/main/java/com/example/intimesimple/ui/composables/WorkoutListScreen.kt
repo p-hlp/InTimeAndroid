@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,6 +36,7 @@ fun WorkoutListScreen(
     var showDialog by remember { mutableStateOf(false) }
     val workouts by workoutListViewModel.workouts.observeAsState(listOf())
 
+
     // build screen layout with scaffold
     Scaffold(
             modifier = modifier,
@@ -50,27 +53,12 @@ fun WorkoutListScreen(
                 if (showDialog) {
                     WorkoutAddAlertDialog(
                             onAccept = {
-                                // add workout
-                                // dismiss dialog
                                 showDialog = false
                             },
                             onDismiss = {
                                 showDialog = false
                             },
-                            bodyContent = {
-                                Column {
-                                    TimeInputField(title = "Work", initValue = 30000L)
-                                    TimeInputField(title = "Break", initValue = 15000L)
-                                    RepsInputField(
-                                            modifier = modifier.align(Alignment.CenterHorizontally),
-                                            title = "Sets",
-                                            initValue = 1
-                                    )
-                                }
-                            },
-                            buttonAcceptText = "add".toUpperCase(Locale.ROOT),
-                            buttonDismissText = "cancel".toUpperCase(Locale.ROOT)
-
+                            workoutListViewModel = workoutListViewModel
                     )
                 }
                 WorkoutListBodyContent(
