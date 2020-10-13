@@ -15,8 +15,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import com.example.intimesimple.MainActivity
+import com.example.intimesimple.R
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.di.CancelActionPendingIntent
+import com.example.intimesimple.di.PauseActionPendingIntent
+import com.example.intimesimple.di.ResumeActionPendingIntent
 import com.example.intimesimple.repositories.WorkoutRepository
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
@@ -25,7 +29,7 @@ import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
-import com.example.intimesimple.utils.Constants.ONE_SECOND
+import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -40,6 +44,18 @@ class TimerService : LifecycleService(){
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
 
     lateinit var currentNotificationBuilder: NotificationCompat.Builder
+
+    @ResumeActionPendingIntent
+    @Inject
+    lateinit var resumeActionPendingIntent: PendingIntent
+
+    @PauseActionPendingIntent
+    @Inject
+    lateinit var pauseActionPendingIntent: PendingIntent
+
+    @CancelActionPendingIntent
+    @Inject
+    lateinit var cancelActionPendingIntent: PendingIntent
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
@@ -69,7 +85,16 @@ class TimerService : LifecycleService(){
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
+
         currentNotificationBuilder = baseNotificationBuilder
+
+        // observe timerState and update notification actions
+        timerState.observe(this, Observer {
+            if(!isKilled)
+                timerState.value?.let {
+                    updateNotificationActions(it)
+                }
+        })
     }
 
     override fun onDestroy() {
@@ -153,7 +178,7 @@ class TimerService : LifecycleService(){
             timeInMillis.postValue(time)
             lastSecondTimestamp = time
             //Timber.d("Starting timer... with $time countdown")
-            timer = object : CountDownTimer(time, 5L) {
+            timer = object : CountDownTimer(time, TIMER_UPDATE_INTERVAL) {
                 override fun onTick(millisUntilFinished: Long) {
                     millisToCompletion = millisUntilFinished
                     progressTimeInMillis.postValue(millisUntilFinished)
@@ -221,6 +246,34 @@ class TimerService : LifecycleService(){
         firstRun = true
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun updateNotificationActions(state: TimerState){
+        // Updates actions of current notification depending on TimerState
+        val notificationActionText = if(state == TimerState.RUNNING) "Pause" else "Resume"
+
+        // Build pendingIntent
+        val pendingIntent = if(state == TimerState.RUNNING){
+            pauseActionPendingIntent
+        }else{
+            resumeActionPendingIntent
+        }
+
+        // Get notificationManager
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
+                as NotificationManager
+
+        // Clear current actions
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+        }
+
+        // Set Action, icon seems irrelevant
+        currentNotificationBuilder = baseNotificationBuilder
+                .addAction(R.drawable.ic_alarm, notificationActionText, pendingIntent)
+                .addAction(R.drawable.ic_alarm, "Cancel", cancelActionPendingIntent)
+        notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

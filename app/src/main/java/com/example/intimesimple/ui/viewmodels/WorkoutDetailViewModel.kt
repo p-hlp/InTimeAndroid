@@ -27,10 +27,6 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
                 workout.value =
                     workoutRepository.workoutDao.getWorkoutDistinctUntilChanged(it)
                     .first()
-                Timber.d("_workout: ${workout.value?.name} - " +
-                        "${workout.value?.repetitions } - " +
-                        "${workout.value?.exerciseTime} - " +
-                        "${workout.value?.pauseTime}")
             }
         }
     }

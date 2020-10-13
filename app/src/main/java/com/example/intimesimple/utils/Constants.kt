@@ -22,4 +22,5 @@ object Constants {
     const val NOTIFICATION_ID           = 1
 
     const val ONE_SECOND                = 1000L
+    const val TIMER_UPDATE_INTERVAL     = 5L    //5ms
 }
