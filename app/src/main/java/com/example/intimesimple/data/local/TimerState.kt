@@ -5,8 +5,3 @@ enum class TimerState(val stateName: String) {
     PAUSED("PAUSED"),
     EXPIRED("EXPIRED");
 }
-
-enum class WorkoutState(val stateName: String){
-    EXERCISE("EXERCISE"),
-    BREAK("BREAK")
-}
