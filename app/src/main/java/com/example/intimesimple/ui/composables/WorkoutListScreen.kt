@@ -2,7 +2,6 @@ package com.example.intimesimple.ui.composables
 
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumnFor
@@ -13,18 +12,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
-import com.example.intimesimple.utils.defaultWorkouts
 import com.example.intimesimple.utils.getRandomWorkout
-import java.util.*
+import timber.log.Timber
 
 @Composable
 fun WorkoutListScreen(
@@ -63,6 +59,7 @@ fun WorkoutListScreen(
                 }
                 WorkoutListBodyContent(
                         Modifier.fillMaxSize(),
+                        workoutListViewModel = workoutListViewModel,
                         items = workouts,
                         navigateToDetail = navigateToDetail
                 )
@@ -81,25 +78,21 @@ fun WorkoutListScreen(
 @Composable
 private fun WorkoutListBodyContent(
     modifier: Modifier = Modifier,
+    workoutListViewModel: WorkoutListViewModel,
     items: List<Workout>,
     navigateToDetail: (Long) -> Unit
 ) {
     LazyColumnFor(
-        items = items,
-        contentPadding = PaddingValues(top = 4.dp)
+            items = items,
+            contentPadding = PaddingValues(4.dp)
     ) { item ->
         WorkoutItem(
-            workout = item,
-            navigateToDetail = navigateToDetail
+                workout = item,
+                onClick = {
+                    workoutListViewModel.deleteWorkoutWithId(it.id)
+                }
         )
-    }
-}
 
-@Preview
-@Composable
-fun WorkoutBodyContentPreview(){
-    MaterialTheme {
-        WorkoutListBodyContent(items = defaultWorkouts, navigateToDetail = {})
     }
 }
 

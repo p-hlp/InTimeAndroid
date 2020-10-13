@@ -15,7 +15,7 @@ fun <T> AnimatedSwipeDismiss(
         item: T,
         background: @Composable (isDismissed: Boolean) -> Unit,
         content: @Composable (isDismissed: Boolean) -> Unit,
-        directions: Set<DismissDirection> = setOf(DismissDirection.EndToStart),
+        directions: Set<DismissDirection> = setOf(DismissDirection.StartToEnd),
         enter: EnterTransition = expandVertically(),
         exit: ExitTransition = shrinkVertically(
                 animSpec = tween(
@@ -25,10 +25,10 @@ fun <T> AnimatedSwipeDismiss(
         onDismiss: (T) -> Unit
 ) {
     val dismissState = rememberDismissState()
-    val isDismissed = dismissState.isDismissed(DismissDirection.EndToStart)
+    val isDismissed = dismissState.isDismissed(DismissDirection.StartToEnd)
 
     onCommit(dismissState.value) {
-        if (dismissState.value == DismissValue.DismissedToStart) {
+        if (dismissState.value == DismissValue.DismissedToEnd) {
             onDismiss(item)
         }
     }

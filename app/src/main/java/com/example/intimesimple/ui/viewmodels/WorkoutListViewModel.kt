@@ -1,5 +1,6 @@
 package com.example.intimesimple.ui.viewmodels
 
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -17,6 +18,18 @@ class WorkoutListViewModel @ViewModelInject constructor(
     fun addWorkout(workout: Workout){
         viewModelScope.launch {
             workoutRepository.workoutDao.insertWithTimestamp(workout)
+        }
+    }
+
+    fun deleteWorkout(workout: Workout){
+        viewModelScope.launch {
+            workoutRepository.workoutDao.deleteWorkout(workout)
+        }
+    }
+
+    fun deleteWorkoutWithId(wId: Long){
+        viewModelScope.launch {
+            workoutRepository.workoutDao.deleteWorkoutWithId(wId)
         }
     }
 }
