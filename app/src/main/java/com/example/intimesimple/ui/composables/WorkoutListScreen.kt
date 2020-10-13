@@ -58,18 +58,7 @@ fun WorkoutListScreen(
                                 showDialog = false
                             },
                             bodyContent = {
-                                TimeInputField(
-                                        hoursField = {
-                                            DigitInputField(initValue = "00")
-                                        },
-                                        minutesField = {
-                                            DigitInputField(initValue = "00")
-                                        },
-                                        secondsField = {
-                                            DigitInputField(initValue = "45")
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                )
+
                             },
                             buttonAcceptText = "add".toUpperCase(Locale.ROOT),
                             buttonDismissText = "cancel".toUpperCase(Locale.ROOT)

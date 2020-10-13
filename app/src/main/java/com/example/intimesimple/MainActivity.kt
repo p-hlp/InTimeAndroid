@@ -3,8 +3,6 @@ package com.example.intimesimple
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.example.intimesimple.ui.fragments.WorkoutListFragmentDirections
 import com.example.intimesimple.utils.Constants.ACTION_SHOW_MAIN_ACTIVITY
@@ -38,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                 // Get id and navigate to DetailFragment
                 val id = it.getLongExtra(EXTRA_WORKOUT_ID, -1L)
                 if(id != -1L){
-                    Timber.d("Pressed Notification: navigating to: $id")
+                    // Double check if destination is available
                     if(navHostFragment.navController.currentDestination?.id == R.id.workoutListFragment){
                         navHostFragment.navController.navigate(WorkoutListFragmentDirections.actionWorkoutListFragmentToWorkoutDetailFragment(id))
                     }
