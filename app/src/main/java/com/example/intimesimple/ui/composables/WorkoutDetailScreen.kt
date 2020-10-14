@@ -23,6 +23,9 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.data.local.WorkoutState
+import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
+import timber.log.Timber
 
 @Composable
 fun WorkoutDetailScreen(
@@ -72,6 +75,7 @@ fun TestScreenContent(
         workout: Workout
 ){
     val timerState by TimerService.timerState.observeAsState(TimerState.EXPIRED)
+    val workoutState by TimerService.workoutState.observeAsState(WorkoutState.STARTING)
     val timeInMillis by TimerService.timeInMillis.observeAsState()
     val timerRepCount by TimerService.repetitionCount.observeAsState()
     val exTimeInMillis: Long = workout.exerciseTime
@@ -94,7 +98,7 @@ fun TestScreenContent(
             val buttonModifier = Modifier.width(buttonWidth.dp)
             Text(
                     text = (if (timerState == TimerState.EXPIRED)
-                        getFormattedStopWatchTime(exTimeInMillis)
+                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
                     else getFormattedStopWatchTime(timeInMillis)),
                     color = Color.White,
                     style = typography.h2,
@@ -103,9 +107,20 @@ fun TestScreenContent(
 
             // Only show in portrait
             if(screenWidth.dp < 600.dp){
+                // TODO: Make this not ugly
+                //Timber.d("WorkoutState: ${workoutState.stateName}")
                 TimerCircle(
-                        elapsedTime = if(timerState == TimerState.EXPIRED) exTimeInMillis else progressTime,
-                        totalTime = exTimeInMillis,
+                        elapsedTime =
+                            if(timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+                            else progressTime,
+                        totalTime =
+                        if(timerState!! != TimerState.EXPIRED){
+                            when(workoutState!!) {
+                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                                WorkoutState.BREAK -> workout.pauseTime
+                                WorkoutState.WORK -> workout.exerciseTime
+                            }
+                        }else TIMER_STARTING_IN_TIME,
                         modifier = Modifier.layoutId("progCircle")
                 )
             }
@@ -115,6 +130,13 @@ fun TestScreenContent(
                     color = Color.White,
                     style = typography.h5,
                     modifier = Modifier.layoutId("stateText")
+            )
+
+            Text(
+                    text = workoutState.name,
+                    color = Color.White,
+                    style = typography.h5,
+                    modifier = Modifier.layoutId("workoutStateText")
             )
 
             Text(
@@ -192,6 +214,7 @@ private fun portraitConstraints(): ConstraintSet{
         val buttonRow = createRefFor("buttonRow")
         val timerText = createRefFor("timerText")
         val stateText = createRefFor("stateText")
+        val workoutStateText = createRefFor("workoutStateText")
         val repText = createRefFor("repText")
         val progCircle = createRefFor("progCircle")
 
@@ -205,6 +228,11 @@ private fun portraitConstraints(): ConstraintSet{
 
         constrain(timerText){
             top.linkTo(parent.top, 172.dp)
+            centerHorizontallyTo(parent)
+        }
+
+        constrain(workoutStateText){
+            bottom.linkTo(timerText.top, 16.dp)
             centerHorizontallyTo(parent)
         }
 
@@ -225,6 +253,7 @@ private fun landscapeConstraints(): ConstraintSet{
         val buttonRow = createRefFor("buttonRow")
         val timerText = createRefFor("timerText")
         val stateText = createRefFor("stateText")
+        val workoutStateText = createRefFor("workoutStateText")
         val repText = createRefFor("repText")
 
         constrain(buttonRow){
@@ -236,8 +265,12 @@ private fun landscapeConstraints(): ConstraintSet{
             centerHorizontallyTo(parent)
         }
 
-        constrain(stateText){
+        constrain(workoutStateText){
             top.linkTo(timerText.bottom, 8.dp)
+            centerHorizontallyTo(parent)
+        }
+        constrain(stateText){
+            top.linkTo(workoutStateText.bottom, 8.dp)
             centerHorizontallyTo(parent)
         }
 

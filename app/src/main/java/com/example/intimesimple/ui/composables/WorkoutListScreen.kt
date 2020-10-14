@@ -89,11 +89,21 @@ private fun WorkoutListBodyContent(
         WorkoutItem(
                 workout = item,
                 onClick = {
-                    workoutListViewModel.deleteWorkoutWithId(it.id)
+                    navigateToDetail(item.id)
                 }
         )
 
     }
+}
+
+@Composable
+private fun WorkoutListSwipeContent(
+        modifier: Modifier = Modifier,
+        workoutListViewModel: WorkoutListViewModel,
+        items: List<Workout>,
+        navigateToDetail: (Long) -> Unit
+) {
+
 }
 
 @Composable

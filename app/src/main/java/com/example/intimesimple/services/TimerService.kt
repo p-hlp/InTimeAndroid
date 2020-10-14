@@ -30,6 +30,7 @@ import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
+import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,6 +75,7 @@ class TimerService : LifecycleService(){
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
     private var repetitionIndex = 0
+    private var internalWorkoutState = WorkoutState.STARTING
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -122,11 +124,14 @@ class TimerService : LifecycleService(){
                                     .setContentIntent(buildPendingIntentWithId(id))
 
                             serviceScope.launch {
-                                workout = workoutRepository.getWorkout(id).first()
+                                workout = workoutRepository.getWorkout(id).first().apply {
+                                    this.repetitions *= 2
+                                }
                                 if(!isInitialized){
                                             // Post new timerState
                                             timerState.postValue(TimerState.RUNNING)
                                             workoutState.postValue(WorkoutState.STARTING)
+                                            internalWorkoutState = WorkoutState.STARTING
                                             // Post new timeInMillis -> workout.exerciseTime
                                             timeInMillis.postValue(workout?.exerciseTime)
                                             repetitionCount.postValue(workout?.repetitions)
@@ -174,11 +179,20 @@ class TimerService : LifecycleService(){
     }
 
 
+    @SuppressLint("BinaryOperationInTimber")
     private fun startTimer(wasPaused: Boolean){
         // Only start timer if workout is not null
         //Timber.d("Timer Workout - ${workout.hashCode()}")
         workout?.let {
-            val time = if (wasPaused) millisToCompletion else it.exerciseTime
+            val time = if (wasPaused) millisToCompletion
+            else {
+                when(internalWorkoutState){
+                    WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                    WorkoutState.BREAK -> it.pauseTime
+                    else -> it.exerciseTime
+                }
+            }
+
             timeInMillis.postValue(time)
             lastSecondTimestamp = time
             //Timber.d("Starting timer... with $time countdown")
@@ -190,14 +204,32 @@ class TimerService : LifecycleService(){
                     if(millisUntilFinished <= lastSecondTimestamp - 1000L){
                         timeInMillis.postValue(lastSecondTimestamp - 1000L)
                         lastSecondTimestamp -= 1000L
+                        // TODO: Do sound/vibration here
                     }
                 }
 
                 override fun onFinish() {
                     //Timber.d("Timer finished")
                     repetitionIndex += 1
-                    if((it.repetitions - repetitionIndex) > 0){
+                    if((it.repetitions  - repetitionIndex) > 0){
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
+
+                        //Figure out workoutState
+                        when(workoutState.value){
+                            WorkoutState.STARTING -> {
+                                workoutState.postValue(WorkoutState.WORK)
+                                internalWorkoutState = WorkoutState.WORK
+                            }
+                            WorkoutState.WORK -> {
+                                workoutState.postValue(WorkoutState.BREAK)
+                                internalWorkoutState = WorkoutState.BREAK
+                            }
+                            WorkoutState.BREAK -> {
+                                workoutState.postValue(WorkoutState.WORK)
+                                internalWorkoutState = WorkoutState.WORK
+                            }
+                        }
+
                         startTimer(false)
                     }else stopForegroundService()
                 }
