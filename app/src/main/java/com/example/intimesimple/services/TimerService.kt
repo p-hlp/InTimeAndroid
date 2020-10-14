@@ -8,6 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -61,6 +63,9 @@ class TimerService : LifecycleService(){
 
     @Inject
     lateinit var workoutRepository: WorkoutRepository
+
+    @Inject
+    lateinit var vibrator: Vibrator
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
@@ -202,14 +207,18 @@ class TimerService : LifecycleService(){
                     progressTimeInMillis.postValue(millisUntilFinished)
                     //Timber.d("timeInMillis $millisToCompletion")
                     if(millisUntilFinished <= lastSecondTimestamp - 1000L){
-                        timeInMillis.postValue(lastSecondTimestamp - 1000L)
                         lastSecondTimestamp -= 1000L
-                        // TODO: Do sound/vibration here
+                        timeInMillis.postValue(lastSecondTimestamp)
+                        if(lastSecondTimestamp <= 3000L){
+                            Timber.d("lastSecondTimeStamp: $lastSecondTimestamp")
+                            vibrate(200L)
+                        }
                     }
                 }
 
                 override fun onFinish() {
                     //Timber.d("Timer finished")
+                    vibrate(400L)
                     repetitionIndex += 1
                     if((it.repetitions  - repetitionIndex) > 0){
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
@@ -339,5 +348,15 @@ class TimerService : LifecycleService(){
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    private fun vibrate(ms: Long){
+        if (vibrator.hasVibrator()) { // Vibrator availability checking
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                vibrator.vibrate(ms) // Vibrate method for below API Level 26
+            }
+        }
     }
 }

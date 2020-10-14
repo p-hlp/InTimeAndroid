@@ -1,20 +1,12 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.animation.animate
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.Workout
-import com.example.intimesimple.ui.theme.Green500
 import timber.log.Timber
 
 @ExperimentalMaterialApi
@@ -44,7 +36,7 @@ fun WorkoutListContent(
             state = dismissState,
             directions = setOf(DismissDirection.StartToEnd),
             background = {
-//                WorkoutItemDismissBackground()
+                WorkoutItemDismissBackground()
             },
             dismissContent = {
                 WorkoutItem(

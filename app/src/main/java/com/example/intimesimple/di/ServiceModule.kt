@@ -3,7 +3,9 @@ package com.example.intimesimple.di
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Vibrator
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.intimesimple.MainActivity
 import com.example.intimesimple.R
 import com.example.intimesimple.services.TimerService
@@ -96,4 +98,10 @@ object ServiceModule {
         .setContentTitle("INTime")
         .setContentText("00:00:00")
         .setContentIntent(pendingIntent)
+
+    @ServiceScoped
+    @Provides
+    fun provideVibrator(
+        @ApplicationContext app: Context
+    ): Vibrator = app.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 }
