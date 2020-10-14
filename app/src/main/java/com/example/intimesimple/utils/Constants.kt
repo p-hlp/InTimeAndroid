@@ -23,4 +23,5 @@ object Constants {
 
     const val ONE_SECOND                = 1000L
     const val TIMER_UPDATE_INTERVAL     = 5L    //5ms
+    const val TIMER_STARTING_IN_TIME    = 5000L //5s
 }

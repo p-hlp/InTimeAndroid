@@ -18,6 +18,7 @@ import com.example.intimesimple.MainActivity
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.di.CancelActionPendingIntent
 import com.example.intimesimple.di.PauseActionPendingIntent
 import com.example.intimesimple.di.ResumeActionPendingIntent
@@ -76,6 +77,7 @@ class TimerService : LifecycleService(){
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
+        val workoutState = MutableLiveData<WorkoutState>()
         val timeInMillis = MutableLiveData<Long>()
         val progressTimeInMillis = MutableLiveData<Long>()
         val repetitionCount = MutableLiveData<Int>()
@@ -87,6 +89,9 @@ class TimerService : LifecycleService(){
         Timber.d("onCreate")
 
         currentNotificationBuilder = baseNotificationBuilder
+
+        timerState.postValue(TimerState.EXPIRED)
+        workoutState.postValue(WorkoutState.STARTING)
 
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
@@ -121,6 +126,7 @@ class TimerService : LifecycleService(){
                                 if(!isInitialized){
                                             // Post new timerState
                                             timerState.postValue(TimerState.RUNNING)
+                                            workoutState.postValue(WorkoutState.STARTING)
                                             // Post new timeInMillis -> workout.exerciseTime
                                             timeInMillis.postValue(workout?.exerciseTime)
                                             repetitionCount.postValue(workout?.repetitions)
@@ -147,15 +153,13 @@ class TimerService : LifecycleService(){
                 ACTION_PAUSE -> {
                     Timber.d("ACTION_PAUSE")
                     // Post new timerState
-                    timerState.postValue(TimerState.PAUSED)
                     stopTimer()
                 }
 
                 ACTION_RESUME -> {
                     Timber.d("ACTION_RESUME")
                     // Post new timerState
-                    timerState.postValue(TimerState.RUNNING)
-                    startTimer(true)
+                    resumeTimer()
                 }
 
                 ACTION_CANCEL -> {
@@ -202,7 +206,13 @@ class TimerService : LifecycleService(){
     }
 
     private fun stopTimer(){
+        timerState.postValue(TimerState.PAUSED)
         timer?.cancel()
+    }
+
+    private fun resumeTimer(){
+        timerState.postValue(TimerState.RUNNING)
+        startTimer(true)
     }
 
     private fun startForegroundService(){
