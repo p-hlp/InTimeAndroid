@@ -1,11 +1,14 @@
 package com.example.intimesimple.ui.composables
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.tween
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.AnimationClockAmbient
 
 // Credits to https://gist.github.com/bmc08gt
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -24,7 +27,7 @@ fun <T> AnimatedSwipeDismiss(
         ),
         onDismiss: (T) -> Unit
 ) {
-    val dismissState = rememberDismissState()
+    val dismissState: DismissState  = rememberDismissState()
     val isDismissed = dismissState.isDismissed(DismissDirection.StartToEnd)
 
     onCommit(dismissState.value) {

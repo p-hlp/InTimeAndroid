@@ -22,6 +22,7 @@ import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.getRandomWorkout
 import timber.log.Timber
 
+@ExperimentalMaterialApi
 @Composable
 fun WorkoutListScreen(
     modifier: Modifier = Modifier,
@@ -57,11 +58,16 @@ fun WorkoutListScreen(
                             workoutListViewModel = workoutListViewModel
                     )
                 }
-                WorkoutListBodyContent(
-                        Modifier.fillMaxSize(),
-                        workoutListViewModel = workoutListViewModel,
-                        items = workouts,
-                        navigateToDetail = navigateToDetail
+
+                WorkoutListContent(
+                    innerPadding = PaddingValues(4.dp),
+                    items = workouts,
+                    onSwipe = {
+                        workoutListViewModel.deleteWorkout(it)
+                    },
+                    onClick = {
+                        navigateToDetail(it.id)
+                    }
                 )
             },
             floatingActionButton = {
@@ -72,45 +78,5 @@ fun WorkoutListScreen(
                 )
             },
             floatingActionButtonPosition = FabPosition.End
-    )
-}
-
-@Composable
-private fun WorkoutListBodyContent(
-    modifier: Modifier = Modifier,
-    workoutListViewModel: WorkoutListViewModel,
-    items: List<Workout>,
-    navigateToDetail: (Long) -> Unit
-) {
-    LazyColumnFor(
-            items = items,
-            contentPadding = PaddingValues(4.dp)
-    ) { item ->
-        WorkoutItem(
-                workout = item,
-                onClick = {
-                    navigateToDetail(item.id)
-                }
-        )
-
-    }
-}
-
-@Composable
-private fun WorkoutListSwipeContent(
-        modifier: Modifier = Modifier,
-        workoutListViewModel: WorkoutListViewModel,
-        items: List<Workout>,
-        navigateToDetail: (Long) -> Unit
-) {
-
-}
-
-@Composable
-private fun AddWorkoutFab(onAddItem: (Workout) -> Unit) {
-    FloatingActionButton(
-        onClick = { onAddItem(getRandomWorkout()) },
-        icon = { Icon(Icons.Filled.Add) },
-            backgroundColor = Green500
     )
 }

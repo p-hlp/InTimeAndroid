@@ -142,7 +142,7 @@ fun TestScreenContent(
             Text(
                     text = "${
                         if (timerState == TimerState.EXPIRED)
-                            repCount ?: ""
+                            repCount
                         else timerRepCount
                     }",
                     color = Color.White,
@@ -158,7 +158,7 @@ fun TestScreenContent(
                     horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 timerState.let {
-                    when (it) {
+                    when (it!!) {
                         TimerState.EXPIRED -> {
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_START) },

@@ -31,7 +31,6 @@ fun TimerCircle(
             modifier = modifier.padding(16.dp).fillMaxSize(), onDraw = {
 
         val dotDiameter = 12.dp
-        val dotRadius = dotDiameter / 2f
         val strokeSize = 16.dp
         val radiusOffset
                 = calculateRadiusOffset(strokeSize.value, dotDiameter.value, 0f)

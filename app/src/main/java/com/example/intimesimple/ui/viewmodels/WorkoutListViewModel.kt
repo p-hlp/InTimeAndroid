@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.repositories.WorkoutRepository
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class WorkoutListViewModel @ViewModelInject constructor(
         private val workoutRepository: WorkoutRepository
@@ -22,6 +23,7 @@ class WorkoutListViewModel @ViewModelInject constructor(
     }
 
     fun deleteWorkout(workout: Workout){
+        Timber.d("Deleting workout: ${workout.id}")
         viewModelScope.launch {
             workoutRepository.workoutDao.deleteWorkout(workout)
         }

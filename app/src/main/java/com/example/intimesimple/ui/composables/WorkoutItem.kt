@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.ui.theme.Green500
@@ -47,6 +49,16 @@ fun WorkoutItem(
     }
 }
 
+@Composable
+fun WorkoutItemDismissBackground(){
+    Surface(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxSize(),
+        shape = MaterialTheme.shapes.medium,
+        color = Green500.copy(alpha = 0.75f)
+    ){}
+}
 
 @Composable
 fun WorkoutCardInfoColumn(workout: Workout){
