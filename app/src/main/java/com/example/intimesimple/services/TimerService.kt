@@ -189,15 +189,7 @@ class TimerService : LifecycleService(){
         // Only start timer if workout is not null
         //Timber.d("Timer Workout - ${workout.hashCode()}")
         workout?.let {
-            val time = if (wasPaused) millisToCompletion
-            else {
-                when(internalWorkoutState){
-                    WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                    WorkoutState.BREAK -> it.pauseTime
-                    else -> it.exerciseTime
-                }
-            }
-
+            val time = getTimeWithWorkoutState(wasPaused, it)
             timeInMillis.postValue(time)
             lastSecondTimestamp = time
             //Timber.d("Starting timer... with $time countdown")
@@ -224,25 +216,27 @@ class TimerService : LifecycleService(){
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
 
                         //Figure out workoutState
-                        when(workoutState.value){
-                            WorkoutState.STARTING -> {
-                                workoutState.postValue(WorkoutState.WORK)
-                                internalWorkoutState = WorkoutState.WORK
-                            }
-                            WorkoutState.WORK -> {
-                                workoutState.postValue(WorkoutState.BREAK)
-                                internalWorkoutState = WorkoutState.BREAK
-                            }
-                            WorkoutState.BREAK -> {
-                                workoutState.postValue(WorkoutState.WORK)
-                                internalWorkoutState = WorkoutState.WORK
-                            }
-                        }
+                        postWorkoutStateOnFinish()
 
                         startTimer(false)
                     }else stopForegroundService()
                 }
+
             }.start()
+        }
+    }
+
+    private fun getTimeWithWorkoutState(
+        wasPaused: Boolean,
+        workout: Workout
+    ): Long {
+        return if (wasPaused) millisToCompletion
+        else {
+            when (internalWorkoutState) {
+                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                WorkoutState.BREAK -> workout.pauseTime
+                else -> workout.exerciseTime
+            }
         }
     }
 
@@ -297,6 +291,23 @@ class TimerService : LifecycleService(){
         firstRun = true
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun postWorkoutStateOnFinish() {
+        when (workoutState.value) {
+            WorkoutState.STARTING -> {
+                workoutState.postValue(WorkoutState.WORK)
+                internalWorkoutState = WorkoutState.WORK
+            }
+            WorkoutState.WORK -> {
+                workoutState.postValue(WorkoutState.BREAK)
+                internalWorkoutState = WorkoutState.BREAK
+            }
+            WorkoutState.BREAK -> {
+                workoutState.postValue(WorkoutState.WORK)
+                internalWorkoutState = WorkoutState.WORK
+            }
+        }
     }
 
     private fun updateNotificationActions(state: TimerState){
