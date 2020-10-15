@@ -10,6 +10,9 @@ object Constants {
     const val ACTION_CANCEL             = "ACTION_CANCEL"
     const val ACTION_NEXT               = "ACTION_NEXT"
     const val ACTION_PREVIOUS           = "ACTION_PREVIOUS"
+    const val ACTION_MUTE               = "ACTION_MUTE"
+    const val ACTION_VIBRATE            = "ACTION_VIBRATE"
+    const val ACTION_SOUND              = "ACTION_SOUND"
     const val ACTION_SHOW_MAIN_ACTIVITY = "ACTION_SHOW_MAIN_ACTIVITY"
 
     const val EXTRA_REPETITION          = "EXTRA_REPETITION"

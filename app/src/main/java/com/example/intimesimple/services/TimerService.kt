@@ -19,6 +19,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import com.example.intimesimple.MainActivity
 import com.example.intimesimple.R
+import com.example.intimesimple.data.local.AudioState
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
@@ -28,14 +29,18 @@ import com.example.intimesimple.di.ResumeActionPendingIntent
 import com.example.intimesimple.repositories.WorkoutRepository
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
+import com.example.intimesimple.utils.Constants.ACTION_MUTE
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
 import com.example.intimesimple.utils.Constants.ACTION_RESUME
+import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_START
+import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.getFormattedStopWatchTime
+import com.example.intimesimple.utils.getNextWorkoutState
 import com.example.intimesimple.utils.millisToSeconds
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -82,12 +87,15 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private var firstRun = true
     private var isInitialized = false
     private var isKilled = false
+    private var isRunning = false
 
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
     private var repetitionIndex = 0
     private var internalWorkoutState = WorkoutState.STARTING
+    // TODO: Resets when reentering fragment via notification click
+    private var audioState = AudioState.MUTE
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -110,7 +118,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
-            if(!isKilled)
+            if(!isKilled && isRunning)
                 timerState.value?.let {
                     updateNotificationActions(it)
                 }
@@ -186,6 +194,21 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                     Timber.d("ACTION_CANCEL")
                     stopForegroundService()
                 }
+
+                ACTION_MUTE -> {
+                    Timber.d("ACTION_MUTE")
+                    audioState = AudioState.MUTE
+                }
+
+                ACTION_VIBRATE -> {
+                    Timber.d("ACTION_VIBRATE")
+                    audioState = AudioState.VIBRATE
+                }
+
+                ACTION_SOUND -> {
+                    Timber.d("ACTION_SOUND")
+                    audioState = AudioState.SOUND
+                }
                 else -> {}
             }
 
@@ -201,6 +224,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                 // set UK English as language for tts
                 val result = it.setLanguage(Locale.US)
                 it.voice = it.defaultVoice
+                it.language = Locale.US
 
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Timber.d( "The Language specified is not supported!")
@@ -230,23 +254,28 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                         timeInMillis.postValue(lastSecondTimestamp)
                         if(lastSecondTimestamp <= 3000L){
                             Timber.d("lastSecondTimeStamp: $lastSecondTimestamp")
-                            //vibrate(200L)
-                            ttsSpeak(millisToSeconds(lastSecondTimestamp).toString())
+                            speakOrVibrate(
+                                    millisToSeconds(lastSecondTimestamp).toString(),
+                                    200L
+                            )
                         }
                     }
                 }
 
                 override fun onFinish() {
                     //Timber.d("Timer finished")
-                    //vibrate(400L)
                     repetitionIndex += 1
                     if((it.repetitions  - repetitionIndex) > 0){
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
-
-                        //Figure out workoutState
-                        postWorkoutStateOnFinish()
-
+                        //Figure out next workoutState
+                        internalWorkoutState = getNextWorkoutState(internalWorkoutState)
+                        Timber.d("Next workoutState: ${internalWorkoutState.stateName}")
+                        workoutState.postValue(internalWorkoutState)
                         startTimer(false)
+
+                        speakOrVibrate(
+                                internalWorkoutState.stateName,
+                                500L)
                     }else stopForegroundService()
                 }
 
@@ -279,6 +308,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     }
 
     private fun startForegroundService(){
+        isRunning = true
         startTimer(false)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
@@ -293,7 +323,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
         // Observe timeInMillis and update notification
         timeInMillis.observe(this, Observer {
-            if (!isKilled){
+            if (!isKilled && isRunning){
                 workout?.let {wo ->
                     val notification = currentNotificationBuilder
                             .setContentTitle(wo.name)
@@ -315,10 +345,17 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
             progressTimeInMillis.postValue(it.exerciseTime)
         }
         isKilled = true
+        isRunning = false
         repetitionIndex = 0
         firstRun = true
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun getNextWorkoutState(current: WorkoutState) = when(current){
+        WorkoutState.STARTING -> WorkoutState.WORK
+        WorkoutState.WORK -> WorkoutState.BREAK
+        WorkoutState.BREAK -> WorkoutState.WORK
     }
 
     private fun postWorkoutStateOnFinish() {
@@ -387,6 +424,14 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
+    }
+
+    private fun speakOrVibrate(say: String, vLength: Long){
+        when(audioState){
+            AudioState.MUTE -> return
+            AudioState.VIBRATE -> vibrate(vLength)
+            AudioState.SOUND -> ttsSpeak(say)
+        }
     }
 
     private fun vibrate(ms: Long){

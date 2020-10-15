@@ -1,6 +1,7 @@
 package com.example.intimesimple.utils
 
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.utils.Constants.ONE_SECOND
 import java.text.DateFormat
 import java.util.*
@@ -81,6 +82,13 @@ fun convertDateToLong(date: String?): Long {
 }
 
 fun millisToSeconds(ms: Long) = (ms/ONE_SECOND).toInt()
+
+fun getNextWorkoutState(current: WorkoutState) = when(current){
+        WorkoutState.STARTING -> WorkoutState.WORK
+        WorkoutState.WORK -> WorkoutState.BREAK
+        WorkoutState.BREAK -> WorkoutState.WORK
+    }
+
 
 val defaultWorkouts = listOf(
         Workout("15min Posture", 35000L, 15000L, 18),
