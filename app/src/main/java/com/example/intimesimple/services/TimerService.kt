@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.speech.tts.TextToSpeech
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -35,14 +36,18 @@ import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.getFormattedStopWatchTime
+import com.example.intimesimple.utils.millisToSeconds
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
-class TimerService : LifecycleService(){
+class TimerService : LifecycleService(), TextToSpeech.OnInitListener
+{
 
     @Inject
     lateinit var baseNotificationBuilder: NotificationCompat.Builder
@@ -66,6 +71,8 @@ class TimerService : LifecycleService(){
 
     @Inject
     lateinit var vibrator: Vibrator
+
+    private var tts: TextToSpeech? = null
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
@@ -96,6 +103,7 @@ class TimerService : LifecycleService(){
         Timber.d("onCreate")
 
         currentNotificationBuilder = baseNotificationBuilder
+        tts = TextToSpeech(this, this)
 
         timerState.postValue(TimerState.EXPIRED)
         workoutState.postValue(WorkoutState.STARTING)
@@ -112,6 +120,8 @@ class TimerService : LifecycleService(){
     override fun onDestroy() {
         super.onDestroy()
         serviceJob.cancel()
+        tts?.stop()
+        tts?.shutdown()
     }
 
     @SuppressLint("BinaryOperationInTimber")
@@ -183,6 +193,23 @@ class TimerService : LifecycleService(){
         return super.onStartCommand(intent, flags, startId)
     }
 
+    // TTS
+    override fun onInit(status: Int) {
+        tts?.let{
+            if (status == TextToSpeech.SUCCESS) {
+                Timber.d("TTS successfully initialized")
+                // set UK English as language for tts
+                val result = it.setLanguage(Locale.US)
+                it.voice = it.defaultVoice
+
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Timber.d( "The Language specified is not supported!")
+                }
+            } else {
+                Timber.d( "Initialization Failed!")
+            }
+        }
+    }
 
     @SuppressLint("BinaryOperationInTimber")
     private fun startTimer(wasPaused: Boolean){
@@ -203,14 +230,15 @@ class TimerService : LifecycleService(){
                         timeInMillis.postValue(lastSecondTimestamp)
                         if(lastSecondTimestamp <= 3000L){
                             Timber.d("lastSecondTimeStamp: $lastSecondTimestamp")
-                            vibrate(200L)
+                            //vibrate(200L)
+                            ttsSpeak(millisToSeconds(lastSecondTimestamp).toString())
                         }
                     }
                 }
 
                 override fun onFinish() {
                     //Timber.d("Timer finished")
-                    vibrate(400L)
+                    //vibrate(400L)
                     repetitionIndex += 1
                     if((it.repetitions  - repetitionIndex) > 0){
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
@@ -369,5 +397,10 @@ class TimerService : LifecycleService(){
                 vibrator.vibrate(ms) // Vibrate method for below API Level 26
             }
         }
+    }
+
+    private fun ttsSpeak(message: String){
+        Timber.d("Trying to speak: $message")
+        tts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "")
     }
 }

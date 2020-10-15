@@ -143,10 +143,6 @@ fun WorkoutAddAlertDialog(
     }
 }
 
-@Composable
-fun DialogContent(){
-
-}
 
 
 @Composable

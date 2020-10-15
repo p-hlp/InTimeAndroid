@@ -31,6 +31,8 @@ fun WorkoutListContent(
                 onSwipe(item)
             }
         }
+
+        // This currently causes "IllegalStateException: entered drag with non-zero pending scroll"
         SwipeToDismiss(
             modifier = modifier,
             state = dismissState,
