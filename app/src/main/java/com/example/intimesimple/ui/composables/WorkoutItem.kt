@@ -18,30 +18,30 @@ import com.example.intimesimple.utils.getFormattedCompletionTime
 
 @Composable
 fun WorkoutItem(
-        modifier: Modifier = Modifier,
-        workout: Workout,
-        onClick: (Workout) -> Unit
+    modifier: Modifier = Modifier,
+    workout: Workout,
+    onClick: (Workout) -> Unit
 ){
     Card(
-            modifier = modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clickable(onClick = {onClick(workout)})
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable(onClick = {onClick(workout)})
     ) {
         Row(
-                modifier = modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                    Modifier.weight(1f)
+                Modifier.weight(1f)
             ){
                 WorkoutCardInfoColumn(workout)
             }
             Column(
-                    Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ){
                 WorkoutCardTimeColumn(workout)
             }
@@ -73,8 +73,8 @@ fun WorkoutCardInfoColumn(workout: Workout){
     }
     ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
         Text(
-                convertLongToTime(workout.lastCompletion),
-                style = MaterialTheme.typography.body2
+            convertLongToTime(workout.lastCompletion),
+            style = MaterialTheme.typography.body2
         )
     }
 }
@@ -83,13 +83,13 @@ fun WorkoutCardInfoColumn(workout: Workout){
 @Composable
 fun WorkoutCardTimeColumn(workout: Workout){
     Surface(
-            color = Green500.copy(alpha = 0.75f),
-            shape = RoundedCornerShape(4.dp)
+        color = Green500.copy(alpha = 0.75f),
+        shape = RoundedCornerShape(4.dp)
     ){
         Text(
-                getFormattedCompletionTime(workout.repetitions * workout.exerciseTime),
-                style = MaterialTheme.typography.h3,
-                modifier = Modifier.padding(8.dp)
+            getFormattedCompletionTime(workout.repetitions * workout.exerciseTime),
+            style = MaterialTheme.typography.h3,
+            modifier = Modifier.padding(8.dp)
         )
     }
 }
