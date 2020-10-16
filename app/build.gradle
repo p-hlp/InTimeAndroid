@@ -97,6 +97,7 @@ dependencies {
     implementation deps.legacy_support
     implementation deps.preference
     implementation deps.compose_compiler
+    implementation deps.compose_runtime
     implementation deps.compose_ui
     implementation deps.compose_material
     implementation deps.compose_material_icons

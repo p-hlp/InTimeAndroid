@@ -69,7 +69,7 @@ fun WorkoutDetailScreen(
 }
 
 
-
+// TODO: Redesign input for workout -> exploding fab to new screen
 @Composable
 fun TestScreenContent(
         modifier: Modifier = Modifier,

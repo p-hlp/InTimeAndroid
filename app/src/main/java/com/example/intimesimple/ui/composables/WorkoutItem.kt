@@ -64,19 +64,17 @@ fun WorkoutItemDismissBackground(){
 fun WorkoutCardInfoColumn(workout: Workout){
     // Name, last completion
     Text(workout.name, style = MaterialTheme.typography.h3, maxLines = 2)
-    ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
-        Text("${workout.repetitions} Repetitions", style = MaterialTheme.typography.body2)
-    }
+
+    Text("${workout.repetitions} Repetitions", style = MaterialTheme.typography.body2)
+
     Spacer(modifier = Modifier.padding(4.dp))
-    ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
-        Text("last completion", style = MaterialTheme.typography.body2)
-    }
-    ProvideEmphasis(emphasis = EmphasisAmbient.current.medium) {
-        Text(
-            convertLongToTime(workout.lastCompletion),
-            style = MaterialTheme.typography.body2
-        )
-    }
+
+    Text("last completion", style = MaterialTheme.typography.body2)
+
+    Text(
+        convertLongToTime(workout.lastCompletion),
+        style = MaterialTheme.typography.body2
+    )
 }
 
 

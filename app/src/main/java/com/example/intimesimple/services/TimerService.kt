@@ -332,7 +332,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                         acquire()
                     }
                 }
-
+        Timber.d("Acquired wakelock")
 
         startTimer(false)
 
@@ -367,6 +367,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
             wakeLock?.let {
                 if (it.isHeld) {
                     it.release()
+                    Timber.d("Released wakelock")
                 }
             }
         } catch (e: Exception) {
