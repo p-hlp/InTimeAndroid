@@ -6,10 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.CountDownTimer
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.speech.tts.TextToSpeech
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -82,6 +79,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private var workout: Workout? = null
 
@@ -94,9 +92,10 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
     private var repetitionIndex = 0
+
+    // keeping internal states, because reading posted LiveData is delayed
     private var internalWorkoutState = WorkoutState.STARTING
     private var internalAudioState = AudioState.MUTE
-    // TODO: Resets when reentering fragment via notification click, solution: via MutableLiveData and observe state in UI
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -109,6 +108,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
 
     override fun onCreate() {
+        // TODO: Needs to obtain (partial) wakelock otherwise no sound when locked
         super.onCreate()
         Timber.d("onCreate")
 
@@ -323,6 +323,8 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
     private fun startForegroundService(){
         isRunning = true
+
+        // TODO: Get wakelock here
         startTimer(false)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
@@ -351,6 +353,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
     private fun stopForegroundService(){
         Timber.d("Stopping foregroundService")
+        // TODO: Release wakelock here
         timer?.cancel()
         timerState.postValue(TimerState.EXPIRED)
         workout?.let {

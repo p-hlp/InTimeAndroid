@@ -1,6 +1,5 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames.remember
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.material.IconButton
@@ -14,14 +13,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.AudioState
-import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.services.TimerService
-import com.example.intimesimple.utils.Constants.ACTION_MUTE
-import com.example.intimesimple.utils.Constants.ACTION_SOUND
-import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.audioStateToIcon
 import com.example.intimesimple.utils.getNextAudioStateAction
-import timber.log.Timber
 
 @Composable
 fun DetailScreenTopBar(

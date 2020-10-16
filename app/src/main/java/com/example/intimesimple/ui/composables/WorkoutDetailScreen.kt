@@ -1,5 +1,8 @@
 package com.example.intimesimple.ui.composables
 
+import androidx.compose.animation.core.FloatPropKey
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.transitionDefinition
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
@@ -157,7 +160,7 @@ fun TestScreenContent(
                     horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 timerState.let {
-                    when (it!!) {
+                    when (it) {
                         TimerState.EXPIRED -> {
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_START) },
