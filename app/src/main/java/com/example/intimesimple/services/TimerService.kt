@@ -324,7 +324,16 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private fun startForegroundService(){
         isRunning = true
 
-        // TODO: Get wakelock here
+        // Get wakelock
+        wakeLock =
+                (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                    newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                            "com.example.intimesimple.services:TimerService::lock").apply {
+                        acquire()
+                    }
+                }
+
+
         startTimer(false)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
@@ -353,7 +362,17 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
     private fun stopForegroundService(){
         Timber.d("Stopping foregroundService")
-        // TODO: Release wakelock here
+        // Release wakelock
+        try {
+            wakeLock?.let {
+                if (it.isHeld) {
+                    it.release()
+                }
+            }
+        } catch (e: Exception) {
+            Timber.d("Wasn't able to release wakelock ${e.message}")
+        }
+
         timer?.cancel()
         timerState.postValue(TimerState.EXPIRED)
         workout?.let {
