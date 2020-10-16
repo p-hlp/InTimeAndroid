@@ -1,7 +1,13 @@
 package com.example.intimesimple.utils
 
+import androidx.compose.ui.graphics.vector.VectorAsset
+import com.example.intimesimple.data.local.AudioState
+import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
+import com.example.intimesimple.utils.Constants.ACTION_MUTE
+import com.example.intimesimple.utils.Constants.ACTION_SOUND
+import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.ONE_SECOND
 import java.text.DateFormat
 import java.util.*
@@ -87,7 +93,20 @@ fun getNextWorkoutState(current: WorkoutState) = when(current){
         WorkoutState.STARTING -> WorkoutState.WORK
         WorkoutState.WORK -> WorkoutState.BREAK
         WorkoutState.BREAK -> WorkoutState.WORK
-    }
+}
+
+fun getNextAudioStateAction(audioState: AudioState) = when(audioState){
+    AudioState.MUTE -> ACTION_VIBRATE
+    AudioState.VIBRATE -> ACTION_SOUND
+    AudioState.SOUND -> ACTION_MUTE
+}
+
+fun audioStateToIcon(audioState: AudioState) = when(audioState){
+    AudioState.MUTE -> VolumeButtonState.MUTE.asset
+    AudioState.VIBRATE -> VolumeButtonState.VIBRATE.asset
+    AudioState.SOUND -> VolumeButtonState.VOLUME.asset
+}
+
 
 
 val defaultWorkouts = listOf(

@@ -18,6 +18,7 @@ import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
+import com.example.intimesimple.utils.Constants.EXTRA_NAVIGATE_HOME
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -48,15 +49,18 @@ class WorkoutDetailFragment : Fragment() {
 
 
     private fun navigateHome() {
-        sendCommandToTestService(ACTION_CANCEL)
+        sendCommandToTestService(ACTION_CANCEL, true)
         findNavController().navigate(WorkoutDetailFragmentDirections.actionWorkoutDetailFragmentToWorkoutListFragment())
     }
 
-    private fun sendCommandToTestService(action: String){
+    private fun sendCommandToTestService(action: String, isNavigatingHome: Boolean = false){
         Intent(context, TimerService::class.java).also {
             it.action = action
             if (action == ACTION_START) {
                 it.putExtra(EXTRA_WORKOUT_ID, args.wId)
+            }
+            if(action == ACTION_CANCEL && isNavigatingHome){
+                it.putExtra(EXTRA_NAVIGATE_HOME, isNavigatingHome)
             }
             context?.startService(it)
         }

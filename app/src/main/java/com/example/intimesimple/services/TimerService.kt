@@ -35,6 +35,7 @@ import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
+import com.example.intimesimple.utils.Constants.EXTRA_NAVIGATE_HOME
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
@@ -94,8 +95,8 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private var lastSecondTimestamp = 0L
     private var repetitionIndex = 0
     private var internalWorkoutState = WorkoutState.STARTING
-    // TODO: Resets when reentering fragment via notification click
-    private var audioState = AudioState.MUTE
+    private var internalAudioState = AudioState.MUTE
+    // TODO: Resets when reentering fragment via notification click, solution: via MutableLiveData and observe state in UI
 
     companion object{
         val timerState = MutableLiveData<TimerState>()
@@ -103,6 +104,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         val timeInMillis = MutableLiveData<Long>()
         val progressTimeInMillis = MutableLiveData<Long>()
         val repetitionCount = MutableLiveData<Int>()
+        val audioState = MutableLiveData<AudioState>()
     }
 
 
@@ -114,8 +116,10 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         tts = TextToSpeech(this, this)
 
         timerState.postValue(TimerState.EXPIRED)
-        workoutState.postValue(WorkoutState.STARTING)
-
+        internalAudioState = AudioState.MUTE
+        internalWorkoutState = WorkoutState.STARTING
+        workoutState.postValue(internalWorkoutState)
+        audioState.postValue(internalAudioState)
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
             if(!isKilled && isRunning)
@@ -130,6 +134,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         serviceJob.cancel()
         tts?.stop()
         tts?.shutdown()
+        Timber.d("onDestroy")
     }
 
     @SuppressLint("BinaryOperationInTimber")
@@ -192,22 +197,31 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
                 ACTION_CANCEL -> {
                     Timber.d("ACTION_CANCEL")
+                    it.extras?.let {bundle ->
+                        if(bundle.getBoolean(EXTRA_NAVIGATE_HOME)){
+                            internalAudioState = AudioState.MUTE
+                            audioState.postValue(AudioState.MUTE)
+                        }
+                    }
                     stopForegroundService()
                 }
 
                 ACTION_MUTE -> {
                     Timber.d("ACTION_MUTE")
-                    audioState = AudioState.MUTE
+                    internalAudioState = AudioState.MUTE
+                    audioState.postValue(AudioState.MUTE)
                 }
 
                 ACTION_VIBRATE -> {
                     Timber.d("ACTION_VIBRATE")
-                    audioState = AudioState.VIBRATE
+                    internalAudioState = AudioState.VIBRATE
+                    audioState.postValue(AudioState.VIBRATE)
                 }
 
                 ACTION_SOUND -> {
                     Timber.d("ACTION_SOUND")
-                    audioState = AudioState.SOUND
+                    internalAudioState = AudioState.SOUND
+                    audioState.postValue(AudioState.SOUND)
                 }
                 else -> {}
             }
@@ -344,6 +358,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
             timeInMillis.postValue(it.exerciseTime)
             progressTimeInMillis.postValue(it.exerciseTime)
         }
+
         isKilled = true
         isRunning = false
         repetitionIndex = 0
@@ -426,11 +441,11 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         )
     }
 
-    private fun speakOrVibrate(say: String, vLength: Long){
-        when(audioState){
+    private fun speakOrVibrate(sayText: String, vLength: Long){
+        when(internalAudioState){
             AudioState.MUTE -> return
             AudioState.VIBRATE -> vibrate(vLength)
-            AudioState.SOUND -> ttsSpeak(say)
+            AudioState.SOUND -> ttsSpeak(sayText)
         }
     }
 
