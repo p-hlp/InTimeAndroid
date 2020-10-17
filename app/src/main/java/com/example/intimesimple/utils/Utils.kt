@@ -9,6 +9,7 @@ import com.example.intimesimple.utils.Constants.ACTION_MUTE
 import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.ONE_SECOND
+import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -107,7 +108,13 @@ fun audioStateToIcon(audioState: AudioState) = when(audioState){
     AudioState.SOUND -> VolumeButtonState.VOLUME.asset
 }
 
-
+fun getCompletitionTimeForWorkout(workout: Workout): String {
+    val reps = workout.repetitions
+    val pauses = workout.repetitions - 1
+    return getFormattedCompletionTime(
+            reps * workout.exerciseTime + pauses * workout.pauseTime
+    )
+}
 
 val defaultWorkouts = listOf(
         Workout("15min Posture", 35000L, 15000L, 18),

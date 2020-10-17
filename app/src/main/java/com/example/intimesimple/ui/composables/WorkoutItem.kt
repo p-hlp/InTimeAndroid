@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.utils.convertLongToTime
+import com.example.intimesimple.utils.getCompletitionTimeForWorkout
 import com.example.intimesimple.utils.getFormattedCompletionTime
 
 @Composable
@@ -65,16 +66,14 @@ fun WorkoutCardInfoColumn(workout: Workout){
     // Name, last completion
     Text(workout.name, style = MaterialTheme.typography.h3, maxLines = 2)
 
-    Text("${workout.repetitions} Repetitions", style = MaterialTheme.typography.body2)
-
     Spacer(modifier = Modifier.padding(4.dp))
 
-    Text("last completion", style = MaterialTheme.typography.body2)
+    Text("${workout.repetitions} Repetition${if(workout.repetitions > 1) "s" else ""}", style = MaterialTheme.typography.body2)
 
-    Text(
-        convertLongToTime(workout.lastCompletion),
-        style = MaterialTheme.typography.body2
-    )
+    Text("${getFormattedCompletionTime(workout.exerciseTime)} Work", style = MaterialTheme.typography.body2)
+
+    Text("${getFormattedCompletionTime(workout.pauseTime)} Pause", style = MaterialTheme.typography.body2)
+
 }
 
 
@@ -84,8 +83,7 @@ fun WorkoutCardTimeColumn(workout: Workout){
         color = Green500.copy(alpha = 0.75f),
         shape = RoundedCornerShape(4.dp)
     ){
-        Text(
-            getFormattedCompletionTime(workout.repetitions * workout.exerciseTime),
+        Text(text = getCompletitionTimeForWorkout(workout),
             style = MaterialTheme.typography.h3,
             modifier = Modifier.padding(8.dp)
         )

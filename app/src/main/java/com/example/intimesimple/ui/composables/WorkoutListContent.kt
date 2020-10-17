@@ -51,8 +51,42 @@ fun WorkoutListContent(
             ){
                 WorkoutItem(
                     workout = item,
-                    onClick = onClick)
+                    onClick = onClick
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun WorkoutListAnimatedContent(
+    modifier: Modifier = Modifier,
+    innerPadding: PaddingValues,
+    items: List<Workout>,
+    onSwipe: (Workout) -> Unit,
+    onClick: (Workout) -> Unit
+){
+    LazyColumnFor(
+        modifier = modifier.padding(innerPadding),
+        items = items,
+    ) { item ->
+        // https://developer.android.com/reference/kotlin/androidx/compose/runtime/package-summary#key
+        key(item.id){
+            AnimatedSwipeDismiss(
+                item = item,
+                background = {
+                    WorkoutItemDismissBackground()
+                },
+                content = {
+                    WorkoutItem(
+                        workout = item,
+                        onClick = onClick
+                    )
+                },
+                onDismiss = {
+                    onSwipe(item)
+                }
+            )
         }
     }
 }

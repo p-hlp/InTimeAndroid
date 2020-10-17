@@ -9,6 +9,7 @@ import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.AnimationClockAmbient
+import timber.log.Timber
 
 // Credits to https://gist.github.com/bmc08gt
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
@@ -33,6 +34,7 @@ fun <T> AnimatedSwipeDismiss(
     onCommit(dismissState.value) {
         if (dismissState.value == DismissValue.DismissedToEnd) {
             onDismiss(item)
+            Timber.d("isDismissed: $isDismissed")
         }
     }
 
