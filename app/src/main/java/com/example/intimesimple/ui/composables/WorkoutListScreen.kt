@@ -30,9 +30,8 @@ fun WorkoutListScreen(
     workoutListViewModel: WorkoutListViewModel
 ){
     // get workout list as observable state
-    var showDialog by remember { mutableStateOf(false) }
     val workouts by workoutListViewModel.workouts.observeAsState(listOf())
-
+    val screenState by workoutListViewModel.workoutListScreenState.observeAsState()
 
     // build screen layout with scaffold
     Scaffold(
@@ -47,32 +46,31 @@ fun WorkoutListScreen(
                 )
             },
             bodyContent = {
-                if (showDialog) {
-                    WorkoutAddAlertDialog(
-                            onAccept = {
-                                showDialog = false
-                            },
-                            onDismiss = {
-                                showDialog = false
-                            },
-                            workoutListViewModel = workoutListViewModel
-                    )
+
+                when(screenState){
+                    WorkoutListViewModel.WorkoutListScreenState.List -> {
+                        WorkoutListContent(
+                                innerPadding = PaddingValues(4.dp),
+                                items = workouts,
+                                onSwipe = {
+                                    workoutListViewModel.deleteWorkout(it)
+                                },
+                                onClick = {
+                                    navigateToDetail(it.id)
+                                }
+                        )
+                    }
+                    WorkoutListViewModel.WorkoutListScreenState.AddItem -> {
+                        // TODO: Show add item screen here
+                    }
                 }
 
-                WorkoutListContent(
-                    innerPadding = PaddingValues(4.dp),
-                    items = workouts,
-                    onSwipe = {
-                        workoutListViewModel.deleteWorkout(it)
-                    },
-                    onClick = {
-                        navigateToDetail(it.id)
-                    }
-                )
             },
             floatingActionButton = {
                 FloatingActionButton(
-                        onClick = { showDialog = true },
+                        onClick = { workoutListViewModel.setScreenState(
+                                WorkoutListViewModel.WorkoutListScreenState.AddItem)
+                        },
                         icon = { Icon(Icons.Filled.Add) },
                         backgroundColor = Green500
                 )

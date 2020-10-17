@@ -1,11 +1,16 @@
 package com.example.intimesimple.ui.viewmodels
 
 import android.annotation.SuppressLint
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.repositories.WorkoutRepository
+import com.example.intimesimple.services.TimerService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -18,6 +23,23 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     val workout = MutableLiveData<Workout>()
+
+    // Get immutable LiveData from TimerService singleton
+    val timerState: LiveData<TimerState>
+        get() = TimerService.timerState
+
+    val workoutState: LiveData<WorkoutState>
+        get() = TimerService.workoutState
+
+    val timeInMillis: LiveData<Long>
+        get() = TimerService.timeInMillis
+
+    val timerRepCount: LiveData<Int>
+        get() = TimerService.repetitionCount
+
+    val progressTime: LiveData<Long>
+        get() = TimerService.progressTimeInMillis
+
 
     init {
         // Getting first value in flow

@@ -1,38 +1,25 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.animation.core.FloatPropKey
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.transitionDefinition
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.getValue
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.VolumeMute
-import androidx.compose.mutableStateOf
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.TimerState
-import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import androidx.compose.ui.WithConstraints
-import androidx.compose.ui.graphics.vector.VectorAsset
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
-import timber.log.Timber
 
 
 @Composable
@@ -58,10 +45,11 @@ fun WorkoutDetailScreen(
            },
            bodyContent = {
                workout?.let { it1 ->
-                   TestScreenContent(
+                   WorkoutDetailScreenContent(
                            modifier = modifier,
                            sendCommand,
-                           it1
+                           it1,
+                           workoutDetailViewModel
                    )
                }
            }
@@ -71,18 +59,19 @@ fun WorkoutDetailScreen(
 
 // TODO: Redesign input for workout -> exploding fab to new screen
 @Composable
-fun TestScreenContent(
+fun WorkoutDetailScreenContent(
         modifier: Modifier = Modifier,
         sendCommand: (String) -> Unit,
-        workout: Workout
+        workout: Workout,
+        workoutDetailViewModel: WorkoutDetailViewModel
 ){
-    val timerState by TimerService.timerState.observeAsState(TimerState.EXPIRED)
-    val workoutState by TimerService.workoutState.observeAsState(WorkoutState.STARTING)
-    val timeInMillis by TimerService.timeInMillis.observeAsState()
-    val timerRepCount by TimerService.repetitionCount.observeAsState()
+    val timerState by workoutDetailViewModel.timerState.observeAsState(TimerState.EXPIRED)
+    val workoutState by workoutDetailViewModel.workoutState.observeAsState(WorkoutState.STARTING)
+    val timeInMillis by workoutDetailViewModel.timeInMillis.observeAsState()
+    val timerRepCount by workoutDetailViewModel.timerRepCount.observeAsState()
     val exTimeInMillis: Long = workout.exerciseTime
     val repCount: Int = workout.repetitions
-    val progressTime by TimerService.progressTimeInMillis.observeAsState(exTimeInMillis)
+    val progressTime by workoutDetailViewModel.progressTime.observeAsState(exTimeInMillis)
     val configuration = ConfigurationAmbient.current
     val screenWidth = configuration.screenWidthDp
     val buttonWidth = 0.3f * screenWidth
@@ -116,7 +105,7 @@ fun TestScreenContent(
                             if(timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
                             else progressTime,
                         totalTime =
-                        if(timerState!! != TimerState.EXPIRED){
+                        if(timerState != TimerState.EXPIRED){
                             when(workoutState!!) {
                                 WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
                                 WorkoutState.BREAK -> workout.pauseTime

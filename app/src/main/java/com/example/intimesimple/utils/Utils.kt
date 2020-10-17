@@ -108,7 +108,7 @@ fun audioStateToIcon(audioState: AudioState) = when(audioState){
     AudioState.SOUND -> VolumeButtonState.VOLUME.asset
 }
 
-fun getCompletitionTimeForWorkout(workout: Workout): String {
+fun getCompletionTimeForWorkout(workout: Workout): String {
     val reps = workout.repetitions
     val pauses = workout.repetitions - 1
     return getFormattedCompletionTime(
