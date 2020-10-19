@@ -1,6 +1,9 @@
 package com.example.intimesimple.di
 
 import android.content.Context
+import androidx.datastore.DataStore
+import androidx.datastore.preferences.Preferences
+import androidx.datastore.preferences.createDataStore
 import androidx.preference.PreferenceDataStore
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -54,4 +57,12 @@ object AppModule {
     @Singleton
     @Provides
     fun provideWorkoutDao(db: AppDatabase) = db.workoutDao()
+
+    @Singleton
+    @Provides
+    fun provideDataStore(
+            @ApplicationContext app: Context
+    ): DataStore<Preferences> = app.createDataStore(
+            name = "settings"
+    )
 }
