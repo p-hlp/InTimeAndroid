@@ -1,6 +1,7 @@
 package com.example.intimesimple.di
 
 import android.content.Context
+import androidx.preference.PreferenceDataStore
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase

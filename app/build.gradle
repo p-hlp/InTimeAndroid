@@ -106,6 +106,7 @@ dependencies {
     implementation deps.compose_animation
     implementation deps.compose_foundation
     implementation deps.compose_foundation_layout
+    implementation deps.datastore_preferences
 
     testImplementation test_deps.junit
     androidTestImplementation test_deps.androidx_junit
