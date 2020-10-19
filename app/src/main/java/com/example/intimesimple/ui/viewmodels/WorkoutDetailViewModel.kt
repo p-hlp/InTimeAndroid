@@ -7,8 +7,10 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.intimesimple.data.local.TimerState
+import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
+import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
 import com.example.intimesimple.services.TimerService
 import kotlinx.coroutines.flow.first
@@ -19,10 +21,15 @@ import timber.log.Timber
 @SuppressLint("BinaryOperationInTimber")
 class WorkoutDetailViewModel @ViewModelInject constructor(
     private val workoutRepository: WorkoutRepository,
+    private val preferenceRepository: PreferenceRepository,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val workout = MutableLiveData<Workout>()
+
+    val volumeButtonState = preferenceRepository.soundStateFlow.asLiveData().map {
+        it?.let{ VolumeButtonState.valueOf(it)} ?: VolumeButtonState.MUTE
+    }
 
     // Get immutable LiveData from TimerService singleton
     val timerState: LiveData<TimerState>
@@ -51,6 +58,11 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
                     .first()
             }
         }
+    }
+
+    fun setSoundState(state: String) = viewModelScope.launch {
+        preferenceRepository.setSoundState(state)
+        Timber.d("Set volumeButtonState to: $state")
     }
 
 }

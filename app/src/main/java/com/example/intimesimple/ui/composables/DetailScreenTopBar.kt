@@ -13,53 +13,52 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.ui.tooling.preview.Preview
 import com.example.intimesimple.data.local.AudioState
+import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.services.TimerService
+import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.audioStateToIcon
 import com.example.intimesimple.utils.getNextAudioStateAction
+import com.example.intimesimple.utils.getNextVolumeButtonState
+import com.example.intimesimple.utils.getTimerActionFromVolumeButtonState
 
 @Composable
 fun DetailScreenTopBar(
         modifier: Modifier = Modifier,
         title: String,
         navigateHome: () -> Unit,
-        sendCommand: (String) -> Unit
+        sendCommand: (String) -> Unit,
+        workoutDetailViewModel: WorkoutDetailViewModel
 ){
+    val buttonState by workoutDetailViewModel
+        .volumeButtonState
+        .observeAsState()
+
     TopAppBar(
-            title = {
-                Text(title)
-            },
-            navigationIcon = {
-                IconButton(onClick = {navigateHome()}) {
-                    Icon(Icons.Filled.ArrowBack)
+        title = { Text(title) },
+        navigationIcon = {
+            IconButton(
+                onClick = {navigateHome()},
+                icon = { Icon(Icons.Filled.ArrowBack) }
+            )
+        },
+        actions = {
+            IconButton(
+                onClick = {
+                    buttonState?.let {
+                        val nextState = getNextVolumeButtonState(it)
+                        workoutDetailViewModel.setSoundState(nextState.name)
+                        sendCommand(getTimerActionFromVolumeButtonState(nextState))
+                    }
+
+                },
+                icon = {
+                    buttonState?.let {
+                        Icon(it.asset)
+                    }
                 }
-            },
-            actions = {
-                TopBarActions(
-                        sendCommand = sendCommand
-                )
-            }
+            )
+        }
     )
 }
 
 
-@Composable
-fun TopBarActions(
-        sendCommand: (String) -> Unit
-){
-    val audioState by TimerService.audioState.observeAsState(AudioState.MUTE)
-    IconButton(
-            onClick = {
-                sendCommand(getNextAudioStateAction(audioState))
-            }
-    ) {
-        Icon(asset = audioStateToIcon(audioState))
-    }
-}
-
-@Preview
-@Composable
-fun DetailScreenTopBarPreview(){
-    DetailScreenTopBar(title = "Test",
-    navigateHome = {},
-    sendCommand = {})
-}

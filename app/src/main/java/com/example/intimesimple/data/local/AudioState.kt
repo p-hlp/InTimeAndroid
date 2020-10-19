@@ -15,5 +15,5 @@ enum class AudioState{
 enum class VolumeButtonState(val asset: VectorAsset){
     MUTE(Icons.Filled.VolumeOff),
     VIBRATE(Icons.Filled.Vibration),
-    VOLUME(Icons.Filled.VolumeUp)
+    SOUND(Icons.Filled.VolumeUp)
 }

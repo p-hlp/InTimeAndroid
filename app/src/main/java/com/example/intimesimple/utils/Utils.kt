@@ -105,7 +105,7 @@ fun getNextAudioStateAction(audioState: AudioState) = when(audioState){
 fun audioStateToIcon(audioState: AudioState) = when(audioState){
     AudioState.MUTE -> VolumeButtonState.MUTE.asset
     AudioState.VIBRATE -> VolumeButtonState.VIBRATE.asset
-    AudioState.SOUND -> VolumeButtonState.VOLUME.asset
+    AudioState.SOUND -> VolumeButtonState.SOUND.asset
 }
 
 fun getCompletionTimeForWorkout(workout: Workout): String {
@@ -114,6 +114,18 @@ fun getCompletionTimeForWorkout(workout: Workout): String {
     return getFormattedCompletionTime(
             reps * workout.exerciseTime + pauses * workout.pauseTime
     )
+}
+
+fun getNextVolumeButtonState(state: VolumeButtonState) = when(state){
+    VolumeButtonState.MUTE -> VolumeButtonState.VIBRATE
+    VolumeButtonState.VIBRATE -> VolumeButtonState.SOUND
+    VolumeButtonState.SOUND -> VolumeButtonState.MUTE
+}
+
+fun getTimerActionFromVolumeButtonState(state: VolumeButtonState) = when(state){
+    VolumeButtonState.MUTE -> ACTION_MUTE
+    VolumeButtonState.VIBRATE -> ACTION_VIBRATE
+    VolumeButtonState.SOUND -> ACTION_SOUND
 }
 
 val defaultWorkouts = listOf(

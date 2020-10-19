@@ -24,47 +24,48 @@ import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 
 @Composable
 fun WorkoutDetailScreen(
-        modifier: Modifier = Modifier,
-        sendCommand: (String) -> Unit,
-        navigateHome: () -> Unit,
-        workoutDetailViewModel: WorkoutDetailViewModel
+    modifier: Modifier = Modifier,
+    sendCommand: (String) -> Unit,
+    navigateHome: () -> Unit,
+    workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     val workout by workoutDetailViewModel.workout.observeAsState()
 
-   Scaffold(
-           modifier.fillMaxSize(),
-           topBar = {
-               workout?.let {
-                   DetailScreenTopBar(
-                           title = it.name,
-                           navigateHome = navigateHome,
-                           sendCommand = sendCommand
-                   )
-               }
+    Scaffold(
+        modifier.fillMaxSize(),
+        topBar = {
+            workout?.let {
+                DetailScreenTopBar(
+                    title = it.name,
+                    navigateHome = navigateHome,
+                    sendCommand = sendCommand,
+                    workoutDetailViewModel = workoutDetailViewModel
+                )
+            }
 
-           },
-           bodyContent = {
-               workout?.let { it1 ->
-                   WorkoutDetailScreenContent(
-                           modifier = modifier,
-                           sendCommand,
-                           it1,
-                           workoutDetailViewModel
-                   )
-               }
-           }
-   )
+        },
+        bodyContent = {
+            workout?.let { it1 ->
+                WorkoutDetailScreenContent(
+                    modifier = modifier,
+                    sendCommand,
+                    it1,
+                    workoutDetailViewModel
+                )
+            }
+        }
+    )
 }
 
 
 // TODO: Redesign input for workout -> exploding fab to new screen
 @Composable
 fun WorkoutDetailScreenContent(
-        modifier: Modifier = Modifier,
-        sendCommand: (String) -> Unit,
-        workout: Workout,
-        workoutDetailViewModel: WorkoutDetailViewModel
-){
+    modifier: Modifier = Modifier,
+    sendCommand: (String) -> Unit,
+    workout: Workout,
+    workoutDetailViewModel: WorkoutDetailViewModel
+) {
     val timerState by workoutDetailViewModel.timerState.observeAsState(TimerState.EXPIRED)
     val workoutState by workoutDetailViewModel.workoutState.observeAsState(WorkoutState.STARTING)
     val timeInMillis by workoutDetailViewModel.timeInMillis.observeAsState()
@@ -78,117 +79,116 @@ fun WorkoutDetailScreenContent(
 
     WithConstraints(modifier) {
 
-        val constraints = if (screenWidth.dp < 600.dp){
+        val constraints = if (screenWidth.dp < 600.dp) {
             portraitConstraints()
-        }
-        else landscapeConstraints()
+        } else landscapeConstraints()
 
         ConstraintLayout(modifier = modifier, constraintSet = constraints) {
 
 
             val buttonModifier = Modifier.width(buttonWidth.dp)
             Text(
-                    text = (if (timerState == TimerState.EXPIRED)
-                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-                    else getFormattedStopWatchTime(timeInMillis)),
-                    color = Color.White,
-                    style = typography.h2,
-                    modifier = Modifier.layoutId("timerText")
+                text = (if (timerState == TimerState.EXPIRED)
+                    getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+                else getFormattedStopWatchTime(timeInMillis)),
+                color = Color.White,
+                style = typography.h2,
+                modifier = Modifier.layoutId("timerText")
             )
 
             // Only show in portrait
-            if(screenWidth.dp < 600.dp){
+            if (screenWidth.dp < 600.dp) {
                 // TODO: Make this not ugly
                 //Timber.d("WorkoutState: ${workoutState.stateName}")
                 TimerCircle(
-                        elapsedTime =
-                            if(timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-                            else progressTime,
-                        totalTime =
-                        if(timerState != TimerState.EXPIRED){
-                            when(workoutState!!) {
-                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                                WorkoutState.BREAK -> workout.pauseTime
-                                WorkoutState.WORK -> workout.exerciseTime
-                            }
-                        }else TIMER_STARTING_IN_TIME,
-                        modifier = Modifier.layoutId("progCircle")
+                    elapsedTime =
+                    if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+                    else progressTime,
+                    totalTime =
+                    if (timerState != TimerState.EXPIRED) {
+                        when (workoutState) {
+                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                            WorkoutState.BREAK -> workout.pauseTime
+                            WorkoutState.WORK -> workout.exerciseTime
+                        }
+                    } else TIMER_STARTING_IN_TIME,
+                    modifier = Modifier.layoutId("progCircle")
                 )
             }
 
             Text(
-                    text = timerState.stateName,
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("stateText")
+                text = timerState.stateName,
+                color = Color.White,
+                style = typography.h5,
+                modifier = Modifier.layoutId("stateText")
             )
 
             Text(
-                    text = workoutState.name,
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("workoutStateText")
+                text = workoutState.name,
+                color = Color.White,
+                style = typography.h5,
+                modifier = Modifier.layoutId("workoutStateText")
             )
 
             Text(
-                    text = "${
-                        if (timerState == TimerState.EXPIRED)
-                            repCount
-                        else timerRepCount
-                    }",
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("repText")
+                text = "${
+                    if (timerState == TimerState.EXPIRED)
+                        repCount
+                    else timerRepCount
+                }",
+                color = Color.White,
+                style = typography.h5,
+                modifier = Modifier.layoutId("repText")
             )
 
 
             Row(
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .layoutId("buttonRow"),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .layoutId("buttonRow"),
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 timerState.let {
                     when (it) {
                         TimerState.EXPIRED -> {
                             Button(
-                                    onClick = { sendCommand(Constants.ACTION_START) },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = buttonModifier
+                                onClick = { sendCommand(Constants.ACTION_START) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                             ) {
                                 Text("Start")
                             }
                         }
                         TimerState.RUNNING -> {
                             Button(
-                                    onClick = { sendCommand(Constants.ACTION_PAUSE) },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = buttonModifier
+                                onClick = { sendCommand(Constants.ACTION_PAUSE) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                             ) {
                                 Text("Pause")
                             }
 
                             Button(
-                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = buttonModifier
+                                onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                             ) {
                                 Text("Cancel")
                             }
                         }
                         TimerState.PAUSED -> {
                             Button(
-                                    onClick = { sendCommand(Constants.ACTION_RESUME) },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = buttonModifier
+                                onClick = { sendCommand(Constants.ACTION_RESUME) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                             ) {
                                 Text("Resume")
                             }
 
                             Button(
-                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = RoundedCornerShape(50),
-                                    modifier = buttonModifier
+                                onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                                shape = RoundedCornerShape(50),
+                                modifier = buttonModifier
                             ) {
                                 Text("Cancel")
                             }
@@ -200,7 +200,7 @@ fun WorkoutDetailScreenContent(
     }
 }
 
-private fun portraitConstraints(): ConstraintSet{
+private fun portraitConstraints(): ConstraintSet {
     return ConstraintSet {
         val buttonRow = createRefFor("buttonRow")
         val timerText = createRefFor("timerText")
@@ -209,37 +209,37 @@ private fun portraitConstraints(): ConstraintSet{
         val repText = createRefFor("repText")
         val progCircle = createRefFor("progCircle")
 
-        constrain(progCircle){
+        constrain(progCircle) {
             top.linkTo(parent.top, 8.dp)
         }
 
-        constrain(buttonRow){
+        constrain(buttonRow) {
             bottom.linkTo(parent.bottom, 64.dp)
         }
 
-        constrain(timerText){
+        constrain(timerText) {
             top.linkTo(parent.top, 172.dp)
             centerHorizontallyTo(parent)
         }
 
-        constrain(workoutStateText){
+        constrain(workoutStateText) {
             bottom.linkTo(timerText.top, 16.dp)
             centerHorizontallyTo(parent)
         }
 
-        constrain(stateText){
+        constrain(stateText) {
             top.linkTo(timerText.bottom, 16.dp)
             centerHorizontallyTo(parent)
         }
 
-        constrain(repText){
+        constrain(repText) {
             top.linkTo(stateText.bottom, 8.dp)
             centerHorizontallyTo(parent)
         }
     }
 }
 
-private fun landscapeConstraints(): ConstraintSet{
+private fun landscapeConstraints(): ConstraintSet {
     return ConstraintSet {
         val buttonRow = createRefFor("buttonRow")
         val timerText = createRefFor("timerText")
@@ -247,25 +247,25 @@ private fun landscapeConstraints(): ConstraintSet{
         val workoutStateText = createRefFor("workoutStateText")
         val repText = createRefFor("repText")
 
-        constrain(buttonRow){
+        constrain(buttonRow) {
             bottom.linkTo(parent.bottom, 32.dp)
         }
 
-        constrain(timerText){
+        constrain(timerText) {
             top.linkTo(parent.top, 32.dp)
             centerHorizontallyTo(parent)
         }
 
-        constrain(workoutStateText){
+        constrain(workoutStateText) {
             top.linkTo(timerText.bottom, 8.dp)
             centerHorizontallyTo(parent)
         }
-        constrain(stateText){
+        constrain(stateText) {
             top.linkTo(workoutStateText.bottom, 8.dp)
             centerHorizontallyTo(parent)
         }
 
-        constrain(repText){
+        constrain(repText) {
             top.linkTo(stateText.bottom, 8.dp)
             centerHorizontallyTo(parent)
         }

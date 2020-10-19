@@ -23,6 +23,7 @@ import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.di.CancelActionPendingIntent
 import com.example.intimesimple.di.PauseActionPendingIntent
 import com.example.intimesimple.di.ResumeActionPendingIntent
+import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
@@ -73,6 +74,9 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     lateinit var workoutRepository: WorkoutRepository
 
     @Inject
+    lateinit var preferenceRepository: PreferenceRepository
+
+    @Inject
     lateinit var vibrator: Vibrator
 
     private var tts: TextToSpeech? = null
@@ -103,7 +107,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         val timeInMillis = MutableLiveData<Long>()
         val progressTimeInMillis = MutableLiveData<Long>()
         val repetitionCount = MutableLiveData<Int>()
-        val audioState = MutableLiveData<AudioState>()
     }
 
 
@@ -115,11 +118,16 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         currentNotificationBuilder = baseNotificationBuilder
         tts = TextToSpeech(this, this)
 
+        // get audio state from data store
+        serviceScope.launch {
+            internalAudioState = AudioState.valueOf(preferenceRepository.getCurrentSoundState())
+        }
+
         timerState.postValue(TimerState.EXPIRED)
-        internalAudioState = AudioState.MUTE
         internalWorkoutState = WorkoutState.STARTING
         workoutState.postValue(internalWorkoutState)
-        audioState.postValue(internalAudioState)
+
+
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
             if(!isKilled && isRunning)
@@ -200,7 +208,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                     it.extras?.let {bundle ->
                         if(bundle.getBoolean(EXTRA_NAVIGATE_HOME)){
                             internalAudioState = AudioState.MUTE
-                            audioState.postValue(AudioState.MUTE)
                         }
                     }
                     stopForegroundService()
@@ -209,19 +216,16 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                 ACTION_MUTE -> {
                     Timber.d("ACTION_MUTE")
                     internalAudioState = AudioState.MUTE
-                    audioState.postValue(AudioState.MUTE)
                 }
 
                 ACTION_VIBRATE -> {
                     Timber.d("ACTION_VIBRATE")
                     internalAudioState = AudioState.VIBRATE
-                    audioState.postValue(AudioState.VIBRATE)
                 }
 
                 ACTION_SOUND -> {
                     Timber.d("ACTION_SOUND")
                     internalAudioState = AudioState.SOUND
-                    audioState.postValue(AudioState.SOUND)
                 }
                 else -> {}
             }
