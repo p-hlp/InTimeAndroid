@@ -106,6 +106,7 @@ dependencies {
     implementation deps.compose_animation
     implementation deps.compose_foundation
     implementation deps.compose_foundation_layout
+    implementation deps.compose_navigation
     implementation deps.datastore_preferences
 
     testImplementation test_deps.junit
