@@ -17,6 +17,8 @@ import com.example.intimesimple.utils.getFormattedStopWatchTime
 import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
+import androidx.navigation.NavController
+import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
@@ -25,9 +27,9 @@ import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 @Composable
 fun WorkoutDetailScreen(
     modifier: Modifier = Modifier,
-    sendCommand: (String) -> Unit,
-    navigateHome: () -> Unit,
-    workoutDetailViewModel: WorkoutDetailViewModel
+    navController: NavController,
+    workoutDetailViewModel: WorkoutDetailViewModel,
+    sendServiceCommand: (String) -> Unit
 ) {
     val workout by workoutDetailViewModel.workout.observeAsState()
 
@@ -37,8 +39,12 @@ fun WorkoutDetailScreen(
             workout?.let {
                 DetailScreenTopBar(
                     title = it.name,
-                    navigateHome = navigateHome,
-                    sendCommand = sendCommand,
+                    navigateHome = {
+                        if(navController.previousBackStackEntry != null){
+                            navController.popBackStack()
+                        }
+                    },
+                    sendCommand = sendServiceCommand,
                     workoutDetailViewModel = workoutDetailViewModel
                 )
             }
@@ -48,7 +54,7 @@ fun WorkoutDetailScreen(
             workout?.let { it1 ->
                 WorkoutDetailScreenContent(
                     modifier = modifier,
-                    sendCommand,
+                    sendServiceCommand,
                     it1,
                     workoutDetailViewModel
                 )
@@ -152,7 +158,9 @@ fun WorkoutDetailScreenContent(
                     when (it) {
                         TimerState.EXPIRED -> {
                             Button(
-                                onClick = { sendCommand(Constants.ACTION_START) },
+                                onClick = {
+                                    sendCommand(Constants.ACTION_START)
+                                },
                                 shape = RoundedCornerShape(50),
                                 modifier = buttonModifier
                             ) {
