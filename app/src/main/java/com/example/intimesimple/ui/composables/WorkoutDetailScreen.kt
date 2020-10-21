@@ -50,13 +50,13 @@ fun WorkoutDetailScreen(
             }
 
         },
-        bodyContent = {
-            workout?.let { it1 ->
+        bodyContent = { paddingValues ->
+            workout?.let {
                 WorkoutDetailScreenContent(
-                    modifier = modifier,
-                    sendServiceCommand,
-                    it1,
-                    workoutDetailViewModel
+                    modifier = modifier.padding(paddingValues),
+                    sendCommand = sendServiceCommand,
+                    workout = it,
+                    workoutDetailViewModel = workoutDetailViewModel
                 )
             }
         }

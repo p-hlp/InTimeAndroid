@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.LightGray
@@ -32,6 +33,8 @@ fun AppNavigation(
         workoutDetailViewModel: WorkoutDetailViewModel,
         sendServiceCommand: (String) -> Unit
 ) {
+    val currentScreen by navController.currentBackStackEntryAsState()
+
     NavHost(navController, startDestination = Screen.WorkoutListScreen) {
         // NavGraph
         composable(Screen.WorkoutListScreen) {
