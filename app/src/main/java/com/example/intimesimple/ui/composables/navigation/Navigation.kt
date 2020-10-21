@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.*
+import com.example.intimesimple.ui.composables.WorkoutAddScreen
 import com.example.intimesimple.ui.composables.WorkoutDetailScreen
 import com.example.intimesimple.ui.composables.WorkoutListScreen
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
@@ -41,10 +42,15 @@ fun AppNavigation(
             )
         }
         composable(Screen.WorkoutAddScreen) {
-            WorkoutAddScreenNV(navController = navController)
+            WorkoutAddScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    navController = navController,
+                    workoutListViewModel = workoutListViewModel
+            )
         }
         composable(Screen.WorkoutDetailScreen) {
             WorkoutDetailScreen(
+                    modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     workoutDetailViewModel = workoutDetailViewModel,
                     sendServiceCommand = sendServiceCommand
@@ -53,74 +59,6 @@ fun AppNavigation(
     }
 }
 
-
-@Composable
-fun WorkoutListScreenNV(
-        navController: NavController,
-        workoutListViewModel: WorkoutListViewModel
-) {
-    ConstraintLayout(Modifier.fillMaxSize()) {
-        val buttonAdd = createRef()
-        val buttonDetail = createRef()
-
-        Button(
-                onClick = {
-                    // id=1 for now
-                    navController.navigate(Screen.WorkoutDetailScreen, bundleOf(EXTRA_WORKOUT_ID to 1L))
-                },
-                modifier = Modifier.constrainAs(buttonDetail) {
-                    centerHorizontallyTo(parent)
-                    centerVerticallyTo(parent)
-                }
-        ) {
-            Text(text = "To DetailScreen")
-        }
-
-        Button(
-                onClick = {
-                    navController.navigate(Screen.WorkoutAddScreen)
-                },
-                modifier = Modifier.constrainAs(buttonAdd) {
-                    top.linkTo(buttonDetail.bottom, 16.dp)
-                    centerHorizontallyTo(parent)
-                }
-        ) {
-            Text(text = "To AddScreen")
-        }
-
-    }
-}
-
-@Composable
-fun WorkoutAddScreenNV(navController: NavController) {
-    Column(Modifier.fillMaxSize()) {
-        Text("WorkoutAddScreen")
-        Box(modifier = Modifier.fillMaxSize()) {
-            NavigateBackButton(
-                    navController = navController,
-                    modifier = Modifier.align(Alignment.Center)
-            )
-        }
-    }
-}
-
-@Composable
-fun WorkoutDetailScreenNV(
-        navController: NavController,
-        workoutId: Long? = null,
-        workoutDetailViewModel: WorkoutDetailViewModel,
-        sendServiceCommand: (String) -> Unit
-) {
-    Column(Modifier.fillMaxSize()) {
-        Text("WorkoutDetailScreen - ID: $workoutId")
-        Box(modifier = Modifier.fillMaxSize()) {
-            NavigateBackButton(
-                    navController = navController,
-                    modifier = Modifier.align(Alignment.Center)
-            )
-        }
-    }
-}
 
 @Composable
 fun NavigateButton(
