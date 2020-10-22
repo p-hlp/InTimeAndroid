@@ -1,24 +1,19 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.ConstraintLayout
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import com.example.intimesimple.utils.Constants.ONE_SECOND
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 
 @Composable
@@ -63,8 +58,7 @@ fun TimeInputField(
                 },
                 shape = RoundedCornerShape(50),
                 backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.Remove)},
-                elevation = 0.dp
+                icon = {Icons.Filled.Remove}
         )
 
         FloatingActionButton(
@@ -75,8 +69,7 @@ fun TimeInputField(
                 },
                 shape = RoundedCornerShape(50),
                 backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.Add)},
-                elevation = 0.dp
+                icon = {Icons.Filled.Add},
         )
 
     }
@@ -126,8 +119,9 @@ fun RepsInputField(
                 },
                 shape = RoundedCornerShape(50),
                 backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.Remove)},
-                elevation = 0.dp
+                icon = {
+                    Icon(Icons.Filled.Remove)
+                },
         )
 
         FloatingActionButton(
@@ -140,10 +134,10 @@ fun RepsInputField(
                 },
                 shape = RoundedCornerShape(50),
                 backgroundColor = Color.Transparent,
-                icon = {Icon(Icons.Filled.Add)},
-                elevation = 0.dp
+                icon = {
+                    Icon(Icons.Filled.Add)
+                }
         )
-
     }
 }
 

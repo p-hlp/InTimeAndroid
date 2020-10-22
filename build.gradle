@@ -22,7 +22,7 @@ buildscript {
         junit_version = "4.13"
         legacy_support_version = "1.0.0"
         preference_version = "1.1.1"
-        compose_version = "1.0.0-alpha05"
+        compose_version = "1.0.0-SNAPSHOT"
         assistedInject_version = '0.5.2'
         datastore_version = "1.0.0-alpha02"
 
@@ -46,7 +46,8 @@ buildscript {
                 compose_animation: "androidx.compose.animation:animation:$compose_version",
                 compose_foundation: "androidx.compose.foundation:foundation:$compose_version",
                 compose_foundation_layout: "androidx.compose.foundation:foundation-layout:$compose_version",
-                compose_navigation: "androidx.navigation:navigation-compose:1.0.0-SNAPSHOT",       // pre alpha
+                compose_navigation: "androidx.navigation:navigation-compose:$compose_version",
+                compose_savedinstance: "androidx.compose.runtime:runtime-saved-instance-state:$compose_version",
                 lifecycle_viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version",
                 lifecycle_livedata: "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version",
                 lifecycle_viewmodel_savedstate: "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version",
@@ -103,7 +104,7 @@ allprojects {
         jcenter()
         maven { url = "https://dl.bintray.com/kotlin/kotlin-eap" }
         // snapshot for compose navigation
-        maven { url = 'https://androidx.dev/snapshots/builds/6923743/artifacts/repository' }
+        maven { url = 'https://androidx.dev/snapshots/builds/6924113/artifacts/repository' }
     }
 }
 

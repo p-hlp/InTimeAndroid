@@ -1,7 +1,7 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -45,7 +45,9 @@ fun DetailScreenTopBar(
                     // send command cancel
                     sendCommand(ACTION_CANCEL)
                 },
-                icon = { Icon(Icons.Filled.ArrowBack) }
+                icon = {
+                    Icon(Icons.Filled.ArrowBack)
+                }
             )
         },
         actions = {
@@ -60,7 +62,7 @@ fun DetailScreenTopBar(
                 },
                 icon = {
                     buttonState?.let {
-                        Icon(it.asset)
+                        it.asset
                     }
                 }
             )

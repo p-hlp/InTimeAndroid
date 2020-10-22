@@ -1,7 +1,7 @@
 package com.example.intimesimple.ui.composables
 
+import android.net.Uri
 import androidx.navigation.compose.*
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -23,6 +23,7 @@ import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
+import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
 import timber.log.Timber
 
 
@@ -58,8 +59,7 @@ fun WorkoutListScreen(
                         },
                         onClick = {
                             navController.navigate(
-                                    Screen.WorkoutDetailScreen,
-                                    bundleOf(EXTRA_WORKOUT_ID to it.id)
+                                Uri.parse(WORKOUT_DETAIL_URI + "${it.id}")
                             )
                         }
                 )
@@ -67,9 +67,11 @@ fun WorkoutListScreen(
             floatingActionButton = {
                 FloatingActionButton(
                         onClick = {
-                            navController.navigate(Screen.WorkoutAddScreen)
+                            navController.navigate(Screen.WorkoutAddScreen.route)
                         },
-                        icon = {Icon(Icons.Filled.Add)},
+                        icon = {
+                            Icon(Icons.Filled.Add)
+                        },
                         backgroundColor = Green500
                 )
             },

@@ -31,5 +31,95 @@
       <option name="name" value="maven" />
       <option name="url" value="https://dl.bintray.com/kotlin/kotlin-eap" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923743/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923815/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921267/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6924113/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923727/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923487/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923404/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923307/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923251/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923158/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6923115/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6922857/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921610/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921638/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921671/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921732/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6921995/artifacts/repository" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://androidx.dev/snapshots/builds/6922573/artifacts/repository" />
+    </remote-repository>
   </component>
 </project>

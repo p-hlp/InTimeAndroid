@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">INTime</string>
+    
+    <string name="workoutlist">WorkoutList</string>
+    <string name="workoutadd">WorkoutAdd</string>
+    <string name="workoutdetail">WorkoutDetail</string>
 </resources>

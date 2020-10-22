@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.*
 import android.speech.tts.TextToSpeech
 import androidx.annotation.RequiresApi
@@ -25,6 +26,7 @@ import com.example.intimesimple.di.PauseActionPendingIntent
 import com.example.intimesimple.di.ResumeActionPendingIntent
 import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
+import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_MUTE
@@ -37,6 +39,7 @@ import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
+import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
 import com.example.intimesimple.utils.getFormattedStopWatchTime
 import com.example.intimesimple.utils.getNextWorkoutState
 import com.example.intimesimple.utils.millisToSeconds
@@ -154,7 +157,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                        // First run, fetch workout from db, start service
                         it.extras?.let {bundle ->
                             val id = bundle.getLong(EXTRA_WORKOUT_ID)
-
+                            Timber.d("ID From bundles: $id")
                             currentNotificationBuilder
                                     .setContentIntent(buildPendingIntentWithId(id))
 
@@ -442,7 +445,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                     it.action = Constants.ACTION_SHOW_MAIN_ACTIVITY
                     it.putExtra(EXTRA_WORKOUT_ID, id)
                     //Set data uri to deeplink uri -> automatically navigates when navGraph is created
-
+                    it.data = Uri.parse(WORKOUT_DETAIL_URI + "$id")
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
