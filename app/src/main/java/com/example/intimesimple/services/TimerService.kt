@@ -394,28 +394,12 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         WorkoutState.BREAK -> WorkoutState.WORK
     }
 
-    private fun postWorkoutStateOnFinish() {
-        when (workoutState.value) {
-            WorkoutState.STARTING -> {
-                workoutState.postValue(WorkoutState.WORK)
-                internalWorkoutState = WorkoutState.WORK
-            }
-            WorkoutState.WORK -> {
-                workoutState.postValue(WorkoutState.BREAK)
-                internalWorkoutState = WorkoutState.BREAK
-            }
-            WorkoutState.BREAK -> {
-                workoutState.postValue(WorkoutState.WORK)
-                internalWorkoutState = WorkoutState.WORK
-            }
-        }
-    }
 
     private fun updateNotificationActions(state: TimerState){
         // Updates actions of current notification depending on TimerState
         val notificationActionText = if(state == TimerState.RUNNING) "Pause" else "Resume"
 
-        // Build pendingIntent
+        // Build pendingIntent depending on TimerState
         val pendingIntent = if(state == TimerState.RUNNING){
             pauseActionPendingIntent
         }else{
@@ -457,6 +441,8 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                 Intent(this, MainActivity::class.java).also {
                     it.action = Constants.ACTION_SHOW_MAIN_ACTIVITY
                     it.putExtra(EXTRA_WORKOUT_ID, id)
+                    //Set data uri to deeplink uri -> automatically navigates when navGraph is created
+
                 },
                 PendingIntent.FLAG_UPDATE_CURRENT
         )
