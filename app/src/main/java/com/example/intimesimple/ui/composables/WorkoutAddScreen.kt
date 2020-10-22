@@ -43,6 +43,7 @@ fun WorkoutAddScreen(
     )
 }
 
+//TODO: Add proper layout for adding a workout
 @Composable
 fun WorkoutAddScreenContent(
         modifier: Modifier = Modifier,

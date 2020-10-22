@@ -25,7 +25,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val workout = MutableLiveData<Workout>()
+    val workout = MutableLiveData<Workout?>()
 
     val volumeButtonState = preferenceRepository.soundStateFlow.asLiveData().map {
         it?.let{ VolumeButtonState.valueOf(it)} ?: VolumeButtonState.MUTE
@@ -65,4 +65,17 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         Timber.d("Set volumeButtonState to: $state")
     }
 
+    fun setCurrentWorkout(wId: Long?){
+        wId?.let {
+            viewModelScope.launch {
+                workout.value = workoutRepository.workoutDao
+                        .getWorkoutDistinctUntilChanged(it)
+                        .first()
+            }
+        }
+    }
+
+    fun resetCurrentWorkout(){
+        workout.value = null
+    }
 }

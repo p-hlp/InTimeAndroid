@@ -33,6 +33,8 @@ fun AppNavigation(
         workoutDetailViewModel: WorkoutDetailViewModel,
         sendServiceCommand: (String) -> Unit
 ) {
+    /* TODO: Implement NavHost in Scaffold bodyContent, change topBar depending on
+        currentScreen*/
     val currentScreen by navController.currentBackStackEntryAsState()
 
     NavHost(navController, startDestination = Screen.WorkoutListScreen) {
@@ -56,7 +58,8 @@ fun AppNavigation(
                     modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     workoutDetailViewModel = workoutDetailViewModel,
-                    sendServiceCommand = sendServiceCommand
+                    sendServiceCommand = sendServiceCommand,
+                    workoutId = it.arguments?.getLong(EXTRA_WORKOUT_ID)
             )
         }
     }
@@ -80,14 +83,18 @@ fun NavigateButton(
 }
 
 @Composable
-fun NavigateBackButton(navController: NavController, modifier: Modifier = Modifier) {
+fun NavigateBackButton(
+        text: String,
+        navController: NavController,
+        modifier: Modifier = Modifier)
+{
     if (navController.previousBackStackEntry != null) {
         Button(
                 onClick = { navController.popBackStack() },
                 backgroundColor = LightGray,
                 modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = "Go to Previous screen")
+            Text(text = text)
         }
     }
 }

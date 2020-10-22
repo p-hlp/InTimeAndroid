@@ -22,6 +22,7 @@ import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
+import timber.log.Timber
 
 
 @Composable
@@ -29,10 +30,13 @@ fun WorkoutDetailScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     workoutDetailViewModel: WorkoutDetailViewModel,
-    sendServiceCommand: (String) -> Unit
+    sendServiceCommand: (String) -> Unit,
+    workoutId: Long? = null
 ) {
+    workoutDetailViewModel.setCurrentWorkout(workoutId)
     val workout by workoutDetailViewModel.workout.observeAsState()
 
+    Timber.d("WorkoutId: $workoutId - Workout: ${workout?.name ?: "null"}")
     Scaffold(
         modifier.fillMaxSize(),
         topBar = {
@@ -61,10 +65,15 @@ fun WorkoutDetailScreen(
             }
         }
     )
+
+    onDispose(callback = {
+        // Reset viewModel workout state when disposing composable
+        workoutDetailViewModel.resetCurrentWorkout()
+    })
 }
 
 
-// TODO: Redesign input for workout -> exploding fab to new screen
+// TODO: Refactor - state hoisting when possible
 @Composable
 fun WorkoutDetailScreenContent(
     modifier: Modifier = Modifier,

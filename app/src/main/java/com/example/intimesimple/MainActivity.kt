@@ -38,9 +38,9 @@ class MainActivity : AppCompatActivity() {
             INTimeTheme {
                 navHostController = rememberNavController()
                 AppNavigation(
-                    navController = navHostController,
-                    workoutListViewModel = workoutListViewModel,
-                    workoutDetailViewModel = workoutDetailViewModel,
+                        navController = navHostController,
+                        workoutListViewModel = workoutListViewModel,
+                        workoutDetailViewModel = workoutDetailViewModel,
                         sendServiceCommand = ::sendCommandToService
                 )
             }
@@ -58,15 +58,14 @@ class MainActivity : AppCompatActivity() {
             if (it.action == ACTION_SHOW_MAIN_ACTIVITY) {
                 // Get id and navigate to DetailFragment
                 val id = it.getLongExtra(EXTRA_WORKOUT_ID, -1L)
-                if(id != -1L){
+                if (id != -1L) {
                     navHostController.navigate(Screen.WorkoutDetailScreen, bundleOf(EXTRA_WORKOUT_ID to id))
                 }
             }
         }
     }
 
-    // TODO: Figure out if getting args from backstack entry works
-    private fun sendCommandToService(action: String){
+    private fun sendCommandToService(action: String) {
         Intent(this, TimerService::class.java).also {
             it.action = action
             val id = navHostController.currentBackStackEntry?.arguments?.getLong(EXTRA_WORKOUT_ID)
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 //            if(action == ACTION_CANCEL && isNavigatingHome){
 //                it.putExtra(EXTRA_NAVIGATE_HOME, isNavigatingHome)
 //            }
-            //startService(it)
+            startService(it)
         }
     }
 }
