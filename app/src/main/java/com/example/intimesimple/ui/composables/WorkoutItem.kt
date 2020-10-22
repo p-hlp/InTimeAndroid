@@ -1,13 +1,17 @@
 package com.example.intimesimple.ui.composables
 
+import androidx.compose.animation.animate
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.ui.theme.Green500
@@ -48,14 +52,26 @@ fun WorkoutItem(
 }
 
 @Composable
-fun WorkoutItemDismissBackground(){
+fun WorkoutItemDismissBackground(isDismissed: Boolean){
     Surface(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxSize(),
         shape = MaterialTheme.shapes.medium,
         color = Green500.copy(alpha = 0.75f)
-    ){}
+    ){
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val boxRef = createRef()
+            Box(
+                modifier = Modifier.constrainAs(boxRef) {
+                centerVerticallyTo(parent)
+                start.linkTo(parent.start) }.padding(horizontal = 10.dp)
+            ){
+                val alpha = animate( if (isDismissed) 0f else 1f)
+                Icon(Icons.Filled.Delete, tint = Color.White.copy(alpha = alpha))
+            }
+        }
+    }
 }
 
 @Composable

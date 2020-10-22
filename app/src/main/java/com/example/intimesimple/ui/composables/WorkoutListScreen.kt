@@ -95,10 +95,12 @@ fun WorkoutListContent(
         // https://developer.android.com/reference/kotlin/androidx/compose/runtime/package-summary#key
         key(item.id){
             val dismissState = rememberDismissState()
+            var isDismissed by remember { mutableStateOf(false) }
             //Timber.d("DismissState: ${dismissState.value}")
             onCommit(dismissState.value){
                 if(dismissState.value == DismissValue.DismissedToEnd ){
                     //Timber.d("onSwipe() - Dismissing WorkoutID: ${item.id}")
+                    isDismissed = true
                     onSwipe(item)
                 }
             }
@@ -109,7 +111,7 @@ fun WorkoutListContent(
                     state = dismissState,
                     directions = setOf(DismissDirection.StartToEnd),
                     background = {
-                        WorkoutItemDismissBackground()
+                        WorkoutItemDismissBackground(isDismissed)
                     }
             ){
                 WorkoutItem(
@@ -138,7 +140,7 @@ fun WorkoutListAnimatedContent(
             AnimatedSwipeDismiss(
                     item = item,
                     background = {
-                        WorkoutItemDismissBackground()
+                        //WorkoutItemDismissBackground()
                     },
                     content = {
                         WorkoutItem(

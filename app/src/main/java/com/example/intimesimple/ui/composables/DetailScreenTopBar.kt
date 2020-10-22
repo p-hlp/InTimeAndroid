@@ -9,17 +9,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.ui.tooling.preview.Preview
-import com.example.intimesimple.data.local.AudioState
-import com.example.intimesimple.data.local.VolumeButtonState
-import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
-import com.example.intimesimple.utils.audioStateToIcon
-import com.example.intimesimple.utils.getNextAudioStateAction
 import com.example.intimesimple.utils.getNextVolumeButtonState
 import com.example.intimesimple.utils.getTimerActionFromVolumeButtonState
 
@@ -62,7 +55,7 @@ fun DetailScreenTopBar(
                 },
                 icon = {
                     buttonState?.let {
-                        it.asset
+                        Icon(it.asset)
                     }
                 }
             )
