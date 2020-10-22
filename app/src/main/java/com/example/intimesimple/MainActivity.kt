@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.d("onCreate")
         setContent {
             INTimeTheme {
                 navHostController = rememberNavController()
@@ -45,15 +46,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("onDestroy")
+    }
 
+    // TODO: Currently not being called when tapping notification
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        Timber.d("onNewIntent")
         navigateToAfterServiceNotificationPressed(intent)
     }
 
 
     private fun navigateToAfterServiceNotificationPressed(intent: Intent?) {
         intent?.let {
+            Timber.d("navigateToAfterServiceNotificationPressed - action: ${it.action}")
             if (it.action == ACTION_SHOW_MAIN_ACTIVITY) {
                 // Get id and navigate to DetailFragment
                 val id = it.getLongExtra(EXTRA_WORKOUT_ID, -1L)

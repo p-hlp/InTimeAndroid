@@ -33,7 +33,6 @@ import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
-import com.example.intimesimple.utils.Constants.EXTRA_NAVIGATE_HOME
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.NOTIFICATION_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
@@ -266,7 +265,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                         lastSecondTimestamp -= 1000L
                         timeInMillis.postValue(lastSecondTimestamp)
                         if(lastSecondTimestamp <= 3000L){
-                            Timber.d("lastSecondTimeStamp: $lastSecondTimestamp")
+                            //Timber.d("lastSecondTimeStamp: $lastSecondTimestamp")
                             speakOrVibrate(
                                     millisToSeconds(lastSecondTimestamp).toString(),
                                     200L
@@ -282,7 +281,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                         repetitionCount.postValue(repetitionCount.value?.minus(1))
                         //Figure out next workoutState
                         internalWorkoutState = getNextWorkoutState(internalWorkoutState)
-                        Timber.d("Next workoutState: ${internalWorkoutState.stateName}")
+                        //Timber.d("Next workoutState: ${internalWorkoutState.stateName}")
                         workoutState.postValue(internalWorkoutState)
                         startTimer(false)
 

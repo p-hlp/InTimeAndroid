@@ -93,10 +93,10 @@ fun WorkoutListContent(
         // https://developer.android.com/reference/kotlin/androidx/compose/runtime/package-summary#key
         key(item.id){
             val dismissState = rememberDismissState()
-            Timber.d("DismissState: ${dismissState.value}")
+            //Timber.d("DismissState: ${dismissState.value}")
             onCommit(dismissState.value){
                 if(dismissState.value == DismissValue.DismissedToEnd ){
-                    Timber.d("onSwipe() - Dismissing WorkoutID: ${item.id}")
+                    //Timber.d("onSwipe() - Dismissing WorkoutID: ${item.id}")
                     onSwipe(item)
                 }
             }

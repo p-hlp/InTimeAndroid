@@ -27,43 +27,39 @@ import timber.log.Timber
 
 @Composable
 fun WorkoutDetailScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    workoutDetailViewModel: WorkoutDetailViewModel,
-    sendServiceCommand: (String) -> Unit,
-    workoutId: Long? = null
+        modifier: Modifier = Modifier,
+        navController: NavController,
+        workoutDetailViewModel: WorkoutDetailViewModel,
+        sendServiceCommand: (String) -> Unit,
+        workoutId: Long? = null
 ) {
     workoutDetailViewModel.setCurrentWorkout(workoutId)
     val workout by workoutDetailViewModel.workout.observeAsState()
 
     Timber.d("WorkoutId: $workoutId - Workout: ${workout?.name ?: "null"}")
     Scaffold(
-        modifier.fillMaxSize(),
-        topBar = {
-            workout?.let {
-                DetailScreenTopBar(
-                    title = it.name,
-                    navigateHome = {
-                        if(navController.previousBackStackEntry != null){
-                            navController.popBackStack()
-                        }
-                    },
-                    sendCommand = sendServiceCommand,
-                    workoutDetailViewModel = workoutDetailViewModel
-                )
-            }
+            modifier.fillMaxSize(),
+            topBar = {
+                workout?.let {
+                    DetailScreenTopBar(
+                            title = it.name,
+                            navController = navController,
+                            sendCommand = sendServiceCommand,
+                            workoutDetailViewModel = workoutDetailViewModel
+                    )
+                }
 
-        },
-        bodyContent = { paddingValues ->
-            workout?.let {
-                WorkoutDetailScreenContent(
-                    modifier = modifier.padding(paddingValues),
-                    sendCommand = sendServiceCommand,
-                    workout = it,
-                    workoutDetailViewModel = workoutDetailViewModel
-                )
+            },
+            bodyContent = { paddingValues ->
+                workout?.let {
+                    WorkoutDetailScreenContent(
+                            modifier = modifier.padding(paddingValues),
+                            sendCommand = sendServiceCommand,
+                            workout = it,
+                            workoutDetailViewModel = workoutDetailViewModel
+                    )
+                }
             }
-        }
     )
 
     onDispose(callback = {
@@ -76,10 +72,10 @@ fun WorkoutDetailScreen(
 // TODO: Refactor - state hoisting when possible
 @Composable
 fun WorkoutDetailScreenContent(
-    modifier: Modifier = Modifier,
-    sendCommand: (String) -> Unit,
-    workout: Workout,
-    workoutDetailViewModel: WorkoutDetailViewModel
+        modifier: Modifier = Modifier,
+        sendCommand: (String) -> Unit,
+        workout: Workout,
+        workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     val timerState by workoutDetailViewModel.timerState.observeAsState(TimerState.EXPIRED)
     val workoutState by workoutDetailViewModel.workoutState.observeAsState(WorkoutState.STARTING)
@@ -103,12 +99,12 @@ fun WorkoutDetailScreenContent(
 
             val buttonModifier = Modifier.width(buttonWidth.dp)
             Text(
-                text = (if (timerState == TimerState.EXPIRED)
-                    getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-                else getFormattedStopWatchTime(timeInMillis)),
-                color = Color.White,
-                style = typography.h2,
-                modifier = Modifier.layoutId("timerText")
+                    text = (if (timerState == TimerState.EXPIRED)
+                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+                    else getFormattedStopWatchTime(timeInMillis)),
+                    color = Color.White,
+                    style = typography.h2,
+                    modifier = Modifier.layoutId("timerText")
             )
 
             // Only show in portrait
@@ -116,96 +112,96 @@ fun WorkoutDetailScreenContent(
                 // TODO: Make this not ugly
                 //Timber.d("WorkoutState: ${workoutState.stateName}")
                 TimerCircle(
-                    elapsedTime =
-                    if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-                    else progressTime,
-                    totalTime =
-                    if (timerState != TimerState.EXPIRED) {
-                        when (workoutState) {
-                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                            WorkoutState.BREAK -> workout.pauseTime
-                            WorkoutState.WORK -> workout.exerciseTime
-                        }
-                    } else TIMER_STARTING_IN_TIME,
-                    modifier = Modifier.layoutId("progCircle")
+                        elapsedTime =
+                        if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+                        else progressTime,
+                        totalTime =
+                        if (timerState != TimerState.EXPIRED) {
+                            when (workoutState) {
+                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                                WorkoutState.BREAK -> workout.pauseTime
+                                WorkoutState.WORK -> workout.exerciseTime
+                            }
+                        } else TIMER_STARTING_IN_TIME,
+                        modifier = Modifier.layoutId("progCircle")
                 )
             }
 
             Text(
-                text = timerState.stateName,
-                color = Color.White,
-                style = typography.h5,
-                modifier = Modifier.layoutId("stateText")
+                    text = timerState.stateName,
+                    color = Color.White,
+                    style = typography.h5,
+                    modifier = Modifier.layoutId("stateText")
             )
 
             Text(
-                text = workoutState.name,
-                color = Color.White,
-                style = typography.h5,
-                modifier = Modifier.layoutId("workoutStateText")
+                    text = workoutState.name,
+                    color = Color.White,
+                    style = typography.h5,
+                    modifier = Modifier.layoutId("workoutStateText")
             )
 
             Text(
-                text = "${
-                    if (timerState == TimerState.EXPIRED)
-                        repCount
-                    else timerRepCount
-                }",
-                color = Color.White,
-                style = typography.h5,
-                modifier = Modifier.layoutId("repText")
+                    text = "${
+                        if (timerState == TimerState.EXPIRED)
+                            repCount
+                        else timerRepCount
+                    }",
+                    color = Color.White,
+                    style = typography.h5,
+                    modifier = Modifier.layoutId("repText")
             )
 
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .layoutId("buttonRow"),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                            .fillMaxWidth()
+                            .layoutId("buttonRow"),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 timerState.let {
                     when (it) {
                         TimerState.EXPIRED -> {
                             Button(
-                                onClick = {
-                                    sendCommand(Constants.ACTION_START)
-                                },
-                                shape = RoundedCornerShape(50),
-                                modifier = buttonModifier
+                                    onClick = {
+                                        sendCommand(Constants.ACTION_START)
+                                    },
+                                    shape = RoundedCornerShape(50),
+                                    modifier = buttonModifier
                             ) {
                                 Text("Start")
                             }
                         }
                         TimerState.RUNNING -> {
                             Button(
-                                onClick = { sendCommand(Constants.ACTION_PAUSE) },
-                                shape = RoundedCornerShape(50),
-                                modifier = buttonModifier
+                                    onClick = { sendCommand(Constants.ACTION_PAUSE) },
+                                    shape = RoundedCornerShape(50),
+                                    modifier = buttonModifier
                             ) {
                                 Text("Pause")
                             }
 
                             Button(
-                                onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                shape = RoundedCornerShape(50),
-                                modifier = buttonModifier
+                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                                    shape = RoundedCornerShape(50),
+                                    modifier = buttonModifier
                             ) {
                                 Text("Cancel")
                             }
                         }
                         TimerState.PAUSED -> {
                             Button(
-                                onClick = { sendCommand(Constants.ACTION_RESUME) },
-                                shape = RoundedCornerShape(50),
-                                modifier = buttonModifier
+                                    onClick = { sendCommand(Constants.ACTION_RESUME) },
+                                    shape = RoundedCornerShape(50),
+                                    modifier = buttonModifier
                             ) {
                                 Text("Resume")
                             }
 
                             Button(
-                                onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                shape = RoundedCornerShape(50),
-                                modifier = buttonModifier
+                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                                    shape = RoundedCornerShape(50),
+                                    modifier = buttonModifier
                             ) {
                                 Text("Cancel")
                             }
