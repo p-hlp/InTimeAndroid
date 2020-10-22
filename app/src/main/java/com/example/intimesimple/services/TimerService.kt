@@ -205,11 +205,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
                 ACTION_CANCEL -> {
                     Timber.d("ACTION_CANCEL")
-                    it.extras?.let {bundle ->
-                        if(bundle.getBoolean(EXTRA_NAVIGATE_HOME)){
-                            internalAudioState = AudioState.MUTE
-                        }
-                    }
                     stopForegroundService()
                 }
 

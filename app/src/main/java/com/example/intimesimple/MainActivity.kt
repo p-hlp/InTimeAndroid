@@ -18,9 +18,7 @@ import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
-import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_START
-import com.example.intimesimple.utils.Constants.EXTRA_NAVIGATE_HOME
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
@@ -53,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         navigateToAfterServiceNotificationPressed(intent)
     }
 
+
     private fun navigateToAfterServiceNotificationPressed(intent: Intent?) {
         intent?.let {
             if (it.action == ACTION_SHOW_MAIN_ACTIVITY) {
@@ -65,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
     private fun sendCommandToService(action: String) {
         Intent(this, TimerService::class.java).also {
             it.action = action
@@ -73,9 +73,6 @@ class MainActivity : AppCompatActivity() {
             if (action == ACTION_START) {
                 it.putExtra(EXTRA_WORKOUT_ID, id)
             }
-//            if(action == ACTION_CANCEL && isNavigatingHome){
-//                it.putExtra(EXTRA_NAVIGATE_HOME, isNavigatingHome)
-//            }
             startService(it)
         }
     }
