@@ -69,8 +69,8 @@ fun INTimeTheme(content: @Composable() () -> Unit) {
                     letterSpacing = 3.sp
             ),
             subtitle2 = TextStyle(
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
                     letterSpacing = 0.1.em
             ),
             body1 = TextStyle(
@@ -86,8 +86,8 @@ fun INTimeTheme(content: @Composable() () -> Unit) {
             ),
             button = TextStyle(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    lineHeight = 16.sp,
+                    fontSize = 16.sp,
+                    lineHeight = 18.sp,
                     letterSpacing = 0.2.em
             ),
             caption = TextStyle(
@@ -101,28 +101,4 @@ fun INTimeTheme(content: @Composable() () -> Unit) {
     )
 
     MaterialTheme(colors = DarkColorPalette, typography = typography, shapes = shapes, content = content)
-}
-
-@Composable
-fun INTimeDialogThemeOverlay(content: @Composable () -> Unit) {
-        val dialogColors = darkColors(
-                primary = Color.White,
-                surface = Color.White.copy(alpha = 0.12f).compositeOver(Color.Black),
-                onSurface = Color.White
-        )
-
-        val currentTypography = MaterialTheme.typography
-        val dialogTypography = currentTypography.copy(
-                body2 = currentTypography.body1.copy(
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 20.sp,
-                        lineHeight = 28.sp,
-                        letterSpacing = 1.sp
-                ),
-                button = currentTypography.button.copy(
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.2.em
-                )
-        )
-        MaterialTheme(colors = dialogColors, typography = dialogTypography, content = content)
 }

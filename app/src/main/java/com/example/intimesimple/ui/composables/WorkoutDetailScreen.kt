@@ -1,5 +1,6 @@
 package com.example.intimesimple.ui.composables
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
+import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import timber.log.Timber
 
@@ -33,8 +35,12 @@ fun WorkoutDetailScreen(
         sendServiceCommand: (String) -> Unit,
         workoutId: Long? = null
 ) {
-    workoutDetailViewModel.setCurrentWorkout(workoutId)
     val workout by workoutDetailViewModel.workout.observeAsState()
+
+    onActive(callback = {
+        // Do once on composition
+        workoutDetailViewModel.setCurrentWorkout(workoutId)
+    })
 
     Timber.d("WorkoutId: $workoutId - Workout: ${workout?.name ?: "null"}")
     Scaffold(
@@ -107,6 +113,7 @@ fun WorkoutDetailScreenContent(
                     modifier = Modifier.layoutId("timerText")
             )
 
+            //TODO: Refactor this, maybe TimerCircle + TextComponents as one composable
             // Only show in portrait
             if (screenWidth.dp < 600.dp) {
                 // TODO: Make this not ugly
@@ -166,7 +173,7 @@ fun WorkoutDetailScreenContent(
                                     onClick = {
                                         sendCommand(Constants.ACTION_START)
                                     },
-                                    shape = RoundedCornerShape(50),
+                                    shape = MaterialTheme.shapes.medium,
                                     modifier = buttonModifier
                             ) {
                                 Text("Start")
@@ -175,7 +182,7 @@ fun WorkoutDetailScreenContent(
                         TimerState.RUNNING -> {
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_PAUSE) },
-                                    shape = RoundedCornerShape(50),
+                                    shape = MaterialTheme.shapes.medium,
                                     modifier = buttonModifier
                             ) {
                                 Text("Pause")
@@ -183,7 +190,7 @@ fun WorkoutDetailScreenContent(
 
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = RoundedCornerShape(50),
+                                    shape = MaterialTheme.shapes.medium,
                                     modifier = buttonModifier
                             ) {
                                 Text("Cancel")
@@ -192,7 +199,7 @@ fun WorkoutDetailScreenContent(
                         TimerState.PAUSED -> {
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_RESUME) },
-                                    shape = RoundedCornerShape(50),
+                                    shape = MaterialTheme.shapes.medium,
                                     modifier = buttonModifier
                             ) {
                                 Text("Resume")
@@ -200,7 +207,7 @@ fun WorkoutDetailScreenContent(
 
                             Button(
                                     onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = RoundedCornerShape(50),
+                                    shape = MaterialTheme.shapes.medium,
                                     modifier = buttonModifier
                             ) {
                                 Text("Cancel")

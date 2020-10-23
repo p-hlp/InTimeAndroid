@@ -96,7 +96,7 @@ fun WorkoutCardInfoColumn(workout: Workout){
 fun WorkoutCardTimeColumn(workout: Workout){
     Surface(
         color = Green500.copy(alpha = 0.75f),
-        shape = RoundedCornerShape(4.dp)
+        shape = MaterialTheme.shapes.medium
     ){
         Text(text = getCompletionTimeForWorkout(workout),
             style = MaterialTheme.typography.h3,

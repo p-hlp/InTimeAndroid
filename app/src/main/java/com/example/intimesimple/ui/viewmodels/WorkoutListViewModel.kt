@@ -11,21 +11,8 @@ class WorkoutListViewModel @ViewModelInject constructor(
         private val workoutRepository: WorkoutRepository
 ): ViewModel() {
 
-    enum class WorkoutListScreenState{
-        List, AddItem
-    }
-
-    val workoutListScreenState: LiveData<WorkoutListScreenState>
-        get() = _screenState
-
-    private val _screenState = MutableLiveData(WorkoutListScreenState.List)
 
     val workouts = workoutRepository.getAllWorkouts().asLiveData()
-
-    fun setScreenState(workoutListScreenState: WorkoutListScreenState){
-        _screenState.value = workoutListScreenState
-        Timber.d("Setting screenState: ${_screenState.value}")
-    }
 
     fun addWorkout(workout: Workout){
         viewModelScope.launch {
