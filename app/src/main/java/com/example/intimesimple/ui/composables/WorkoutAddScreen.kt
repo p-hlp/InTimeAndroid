@@ -230,6 +230,7 @@ fun clickInputField(
         onMinusClicked: () -> Unit,
         onPlusClicked: () -> Unit
 ){
+    //TODO: Add label <WORK/PAUSE/REPs>
     Card(
             modifier = modifier,
             elevation = 1.dp,
