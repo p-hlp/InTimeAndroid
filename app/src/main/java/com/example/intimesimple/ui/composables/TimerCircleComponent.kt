@@ -69,11 +69,14 @@ fun TimerCircleComponent(
                         )
                 }
 
-                TimerCircle(
-                        modifier = modifier,
-                        elapsedTime = elapsedTime,
-                        totalTime = totalTime
-                )
+                // only show in portrait mode
+                if(screenWidthDp.dp < 600.dp){
+                        TimerCircle(
+                                modifier = modifier,
+                                elapsedTime = elapsedTime,
+                                totalTime = totalTime
+                        )
+                }
         }
 }
 

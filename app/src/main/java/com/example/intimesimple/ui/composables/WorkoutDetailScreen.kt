@@ -96,82 +96,27 @@ fun WorkoutDetailScreenContent(
         } else landscapeConstraints()
 
         ConstraintLayout(modifier = modifier, constraintSet = constraints) {
-
-
             val buttonModifier = Modifier.width(buttonWidth.dp)
-//            Text(
-//                    text = (if (timerState == TimerState.EXPIRED)
-//                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-//                    else getFormattedStopWatchTime(timeInMillis)),
-//                    color = Color.White,
-//                    style = typography.h2,
-//                    modifier = Modifier.layoutId("timerText")
-//            )
 
-            //TODO: Refactor this, maybe TimerCircle + TextComponents as one composable
-            // Only show in portrait
-            if (screenWidthDp.dp < 600.dp) {
-                TimerCircleComponent(
-                        modifier = Modifier.layoutId("progCircle"),
-                        screenWidthDp = screenWidthDp,
-                        screenHeightDp = screenHeightDp,
-                        time = (if (timerState == TimerState.EXPIRED)
-                                getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-                                else getFormattedStopWatchTime(timeInMillis)),
-                        state = workoutState.name,
-                        reps = "${if (timerState == TimerState.EXPIRED) repCount else timerRepCount}",
-                        elapsedTime =   if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-                                        else progressTime,
-                        totalTime = if (timerState != TimerState.EXPIRED) {
-                                        when (workoutState) {
-                                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                                            WorkoutState.BREAK -> workout.pauseTime
-                                            WorkoutState.WORK -> workout.exerciseTime
-                                        }
-                                    } else TIMER_STARTING_IN_TIME
-                )
-                //Timber.d("WorkoutState: ${workoutState.stateName}")
-//                TimerCircle(
-//                        elapsedTime =
-//                        if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-//                        else progressTime,
-//                        totalTime =
-//                        if (timerState != TimerState.EXPIRED) {
-//                            when (workoutState) {
-//                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-//                                WorkoutState.BREAK -> workout.pauseTime
-//                                WorkoutState.WORK -> workout.exerciseTime
-//                            }
-//                        } else TIMER_STARTING_IN_TIME,
-//                        modifier = Modifier.layoutId("progCircle").wrapContentSize()
-//                )
-            }
-//
-//            Text(
-//                    text = timerState.stateName,
-//                    color = Color.White,
-//                    style = typography.h5,
-//                    modifier = Modifier.layoutId("stateText")
-//            )
-//
-//            Text(
-//                    text = workoutState.name,
-//                    color = Color.White,
-//                    style = typography.h5,
-//                    modifier = Modifier.layoutId("workoutStateText")
-//            )
-//
-//            Text(
-//                    text = "${
-//                        if (timerState == TimerState.EXPIRED)
-//                            repCount
-//                        else timerRepCount
-//                    }",
-//                    color = Color.White,
-//                    style = typography.h5,
-//                    modifier = Modifier.layoutId("repText")
-//            )
-
+            TimerCircleComponent(
+                    modifier = Modifier.layoutId("progCircle"),
+                    screenWidthDp = screenWidthDp,
+                    screenHeightDp = screenHeightDp,
+                    time = (if (timerState == TimerState.EXPIRED)
+                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+                    else getFormattedStopWatchTime(timeInMillis)),
+                    state = workoutState.name,
+                    reps = "${if (timerState == TimerState.EXPIRED) repCount else timerRepCount}",
+                    elapsedTime =   if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+                    else progressTime,
+                    totalTime = if (timerState != TimerState.EXPIRED) {
+                        when (workoutState) {
+                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                            WorkoutState.BREAK -> workout.pauseTime
+                            WorkoutState.WORK -> workout.exerciseTime
+                        }
+                    } else TIMER_STARTING_IN_TIME
+            )
 
             Row(
                     modifier = Modifier
@@ -236,10 +181,6 @@ fun WorkoutDetailScreenContent(
 private fun portraitConstraints(): ConstraintSet {
     return ConstraintSet {
         val buttonRow = createRefFor("buttonRow")
-        val timerText = createRefFor("timerText")
-        val stateText = createRefFor("stateText")
-        val workoutStateText = createRefFor("workoutStateText")
-        val repText = createRefFor("repText")
         val progCircle = createRefFor("progCircle")
 
         constrain(progCircle) {
@@ -250,57 +191,20 @@ private fun portraitConstraints(): ConstraintSet {
         constrain(buttonRow) {
             bottom.linkTo(parent.bottom, 64.dp)
         }
-
-        constrain(timerText) {
-            top.linkTo(parent.top, 172.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(workoutStateText) {
-            bottom.linkTo(timerText.top, 16.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(stateText) {
-            top.linkTo(timerText.bottom, 16.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(repText) {
-            top.linkTo(stateText.bottom, 8.dp)
-            centerHorizontallyTo(parent)
-        }
     }
 }
 
 private fun landscapeConstraints(): ConstraintSet {
     return ConstraintSet {
         val buttonRow = createRefFor("buttonRow")
-        val timerText = createRefFor("timerText")
-        val stateText = createRefFor("stateText")
-        val workoutStateText = createRefFor("workoutStateText")
-        val repText = createRefFor("repText")
+        val progCircle = createRefFor("progCircle")
 
         constrain(buttonRow) {
             bottom.linkTo(parent.bottom, 32.dp)
         }
 
-        constrain(timerText) {
-            top.linkTo(parent.top, 32.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(workoutStateText) {
-            top.linkTo(timerText.bottom, 8.dp)
-            centerHorizontallyTo(parent)
-        }
-        constrain(stateText) {
-            top.linkTo(workoutStateText.bottom, 8.dp)
-            centerHorizontallyTo(parent)
-        }
-
-        constrain(repText) {
-            top.linkTo(stateText.bottom, 8.dp)
+        constrain(progCircle) {
+            top.linkTo(parent.top)
             centerHorizontallyTo(parent)
         }
     }
