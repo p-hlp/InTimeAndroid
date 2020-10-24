@@ -35,9 +35,9 @@ fun TimerCircleComponent(
 
         Box(
                 modifier = modifier.size(maxRadius.dp).padding(8.dp)
-                        .background(Color.Red.copy(alpha = 0.1f))
         ){
 
+                //TODO: change layout depending on orientation
                 ConstraintLayout(modifier = Modifier.fillMaxSize()) {
                         val (timerText, workoutStateText, repText) = createRefs()
 
