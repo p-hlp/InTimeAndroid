@@ -1,15 +1,11 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
@@ -19,10 +15,8 @@ import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.navigation.NavController
-import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
-import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import timber.log.Timber
 
@@ -91,12 +85,13 @@ fun WorkoutDetailScreenContent(
     val repCount: Int = workout.repetitions
     val progressTime by workoutDetailViewModel.progressTime.observeAsState(exTimeInMillis)
     val configuration = ConfigurationAmbient.current
-    val screenWidth = configuration.screenWidthDp
-    val buttonWidth = 0.3f * screenWidth
+    val screenWidthDp = configuration.screenWidthDp
+    val screenHeightDp = configuration.screenHeightDp
+    val buttonWidth = 0.3f * screenWidthDp
 
     WithConstraints(modifier) {
 
-        val constraints = if (screenWidth.dp < 600.dp) {
+        val constraints = if (screenWidthDp.dp < 600.dp) {
             portraitConstraints()
         } else landscapeConstraints()
 
@@ -104,60 +99,78 @@ fun WorkoutDetailScreenContent(
 
 
             val buttonModifier = Modifier.width(buttonWidth.dp)
-            Text(
-                    text = (if (timerState == TimerState.EXPIRED)
-                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-                    else getFormattedStopWatchTime(timeInMillis)),
-                    color = Color.White,
-                    style = typography.h2,
-                    modifier = Modifier.layoutId("timerText")
-            )
+//            Text(
+//                    text = (if (timerState == TimerState.EXPIRED)
+//                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+//                    else getFormattedStopWatchTime(timeInMillis)),
+//                    color = Color.White,
+//                    style = typography.h2,
+//                    modifier = Modifier.layoutId("timerText")
+//            )
 
             //TODO: Refactor this, maybe TimerCircle + TextComponents as one composable
             // Only show in portrait
-            if (screenWidth.dp < 600.dp) {
-                // TODO: Make this not ugly
-                //Timber.d("WorkoutState: ${workoutState.stateName}")
-                TimerCircle(
-                        elapsedTime =
-                        if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-                        else progressTime,
-                        totalTime =
-                        if (timerState != TimerState.EXPIRED) {
-                            when (workoutState) {
-                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                                WorkoutState.BREAK -> workout.pauseTime
-                                WorkoutState.WORK -> workout.exerciseTime
-                            }
-                        } else TIMER_STARTING_IN_TIME,
-                        modifier = Modifier.layoutId("progCircle")
+            if (screenWidthDp.dp < 600.dp) {
+                TimerCircleComponent(
+                        modifier = Modifier.layoutId("progCircle"),
+                        screenWidthDp = screenWidthDp,
+                        screenHeightDp = screenHeightDp,
+                        time = (if (timerState == TimerState.EXPIRED)
+                                getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+                                else getFormattedStopWatchTime(timeInMillis)),
+                        state = workoutState.name,
+                        reps = "${if (timerState == TimerState.EXPIRED) repCount else timerRepCount}",
+                        elapsedTime =   if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+                                        else progressTime,
+                        totalTime = if (timerState != TimerState.EXPIRED) {
+                                        when (workoutState) {
+                                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+                                            WorkoutState.BREAK -> workout.pauseTime
+                                            WorkoutState.WORK -> workout.exerciseTime
+                                        }
+                                    } else TIMER_STARTING_IN_TIME
                 )
+                //Timber.d("WorkoutState: ${workoutState.stateName}")
+//                TimerCircle(
+//                        elapsedTime =
+//                        if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
+//                        else progressTime,
+//                        totalTime =
+//                        if (timerState != TimerState.EXPIRED) {
+//                            when (workoutState) {
+//                                WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
+//                                WorkoutState.BREAK -> workout.pauseTime
+//                                WorkoutState.WORK -> workout.exerciseTime
+//                            }
+//                        } else TIMER_STARTING_IN_TIME,
+//                        modifier = Modifier.layoutId("progCircle").wrapContentSize()
+//                )
             }
-
-            Text(
-                    text = timerState.stateName,
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("stateText")
-            )
-
-            Text(
-                    text = workoutState.name,
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("workoutStateText")
-            )
-
-            Text(
-                    text = "${
-                        if (timerState == TimerState.EXPIRED)
-                            repCount
-                        else timerRepCount
-                    }",
-                    color = Color.White,
-                    style = typography.h5,
-                    modifier = Modifier.layoutId("repText")
-            )
+//
+//            Text(
+//                    text = timerState.stateName,
+//                    color = Color.White,
+//                    style = typography.h5,
+//                    modifier = Modifier.layoutId("stateText")
+//            )
+//
+//            Text(
+//                    text = workoutState.name,
+//                    color = Color.White,
+//                    style = typography.h5,
+//                    modifier = Modifier.layoutId("workoutStateText")
+//            )
+//
+//            Text(
+//                    text = "${
+//                        if (timerState == TimerState.EXPIRED)
+//                            repCount
+//                        else timerRepCount
+//                    }",
+//                    color = Color.White,
+//                    style = typography.h5,
+//                    modifier = Modifier.layoutId("repText")
+//            )
 
 
             Row(
@@ -230,7 +243,8 @@ private fun portraitConstraints(): ConstraintSet {
         val progCircle = createRefFor("progCircle")
 
         constrain(progCircle) {
-            top.linkTo(parent.top, 8.dp)
+            top.linkTo(parent.top)
+            centerHorizontallyTo(parent)
         }
 
         constrain(buttonRow) {
