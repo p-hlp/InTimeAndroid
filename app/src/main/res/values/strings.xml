@@ -4,4 +4,5 @@
     <string name="workoutlist">WorkoutList</string>
     <string name="workoutadd">WorkoutAdd</string>
     <string name="workoutdetail">WorkoutDetail</string>
+    <string name="workoutAddTitle">Add a workout</string>
 </resources>

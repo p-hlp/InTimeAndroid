@@ -1,24 +1,23 @@
 package com.example.intimesimple.ui.composables
 
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.intimesimple.R
-import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.utils.Constants.ONE_SECOND
@@ -48,7 +47,19 @@ fun WorkoutAddScreen(
                 TopAppBar(
                         title = {
                             Text(
-                                    text = stringResource(id = R.string.app_name).toUpperCase()
+                                    text = stringResource(id = R.string.workoutAddTitle)
+                                            .toUpperCase()
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                    onClick = {
+                                        // navigate back
+                                        navController.popBackStack()
+                                    },
+                                    icon = {
+                                        Icon(Icons.Filled.ArrowBack)
+                                    }
                             )
                         }
                 )
@@ -82,7 +93,7 @@ fun WorkoutAddScreenContent(
     ConstraintLayout(
             modifier = modifier
     ) {
-        val (buttonRow, textField, workRow, pauseRow, repsRow) = createRefs()
+        val (buttonRow, textFieldRow, workRow, pauseRow, repsRow) = createRefs()
         var nameField by savedInstanceState {""}
         var workField by savedInstanceState {30000L}
         var pauseField by savedInstanceState {10000L}
@@ -91,7 +102,7 @@ fun WorkoutAddScreenContent(
         val invalidInput = nameField.isBlank()
 
         OutlinedTextField(
-                modifier = Modifier.width(rowWidth.dp).constrainAs(textField) {
+                modifier = Modifier.width(rowWidth.dp).constrainAs(textFieldRow) {
                     top.linkTo(parent.top, 64.dp)
                     centerHorizontallyTo(parent)
                 },
@@ -110,7 +121,7 @@ fun WorkoutAddScreenContent(
 
         clickInputField(
                 modifier = Modifier.width(rowWidth.dp).height(50.dp).constrainAs(workRow){
-                    top.linkTo(textField.bottom, 32.dp)
+                    top.linkTo(textFieldRow.bottom, 32.dp)
                     centerHorizontallyTo(parent)
                 },
                 content = {
@@ -219,11 +230,9 @@ fun clickInputField(
         onMinusClicked: () -> Unit,
         onPlusClicked: () -> Unit
 ){
-    Surface(
+    Card(
             modifier = modifier,
-            elevation = 0.dp,
-            color = Green500.copy(alpha = .3f),
-            shape = MaterialTheme.shapes.medium
+            elevation = 1.dp,
     ){
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (minusFab, plusFab, textBox) = createRefs()
