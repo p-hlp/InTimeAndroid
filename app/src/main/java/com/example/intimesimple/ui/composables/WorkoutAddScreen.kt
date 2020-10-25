@@ -75,7 +75,6 @@ fun WorkoutAddScreen(
     )
 }
 
-//TODO: Add proper layout for adding a workout
 @ExperimentalMaterialApi
 @Composable
 fun WorkoutAddScreenContent(

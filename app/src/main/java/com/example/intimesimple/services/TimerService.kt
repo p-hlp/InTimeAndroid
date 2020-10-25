@@ -113,7 +113,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
 
     override fun onCreate() {
-        // TODO: Needs to obtain (partial) wakelock otherwise no sound when locked
         super.onCreate()
         Timber.d("onCreate")
 
