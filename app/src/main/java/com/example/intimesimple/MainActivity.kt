@@ -1,8 +1,13 @@
 package com.example.intimesimple
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Messenger
 import androidx.activity.viewModels
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.platform.setContent
@@ -26,6 +31,19 @@ class MainActivity : AppCompatActivity() {
     private val workoutListViewModel: WorkoutListViewModel by viewModels()
     private lateinit var navHostController: NavHostController
 
+    private var bound: Boolean = false
+    private val mConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            bound = true
+        }
+
+        override fun onServiceDisconnected(className: ComponentName) {
+            bound = false
+        }
+    }
+
+
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +57,23 @@ class MainActivity : AppCompatActivity() {
                         sendServiceCommand = ::sendCommandToService
                 )
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to the service
+        Intent(this, TimerService::class.java).also { intent ->
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Unbind from the service
+        if (bound) {
+            unbindService(mConnection)
+            bound = false
         }
     }
 

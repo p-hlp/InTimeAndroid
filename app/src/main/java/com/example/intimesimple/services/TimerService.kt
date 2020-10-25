@@ -249,6 +249,20 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         }
     }
 
+    override fun onBind(intent: Intent): IBinder? {
+        /*TODO: StopForeground, since screen is visible - needs to be called when
+        *  MainActivity is resumed/created*/
+        Timber.d("onBind")
+        return super.onBind(intent)
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        /*TODO: StartForeground, since screen is no longer visible - needs to be called
+        *  when MainActivity is stopped/destroyed*/
+        Timber.d("onUnbind")
+        return super.onUnbind(intent)
+    }
+
     @SuppressLint("BinaryOperationInTimber")
     private fun startTimer(wasPaused: Boolean){
         // Only start timer if workout is not null
