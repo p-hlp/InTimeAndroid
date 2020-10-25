@@ -129,7 +129,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
-            if(!isKilled && isRunning && !isBound)
+            if(!isKilled && isRunning)
                 timerState.value?.let {
                     updateNotificationActions(it)
                 }
@@ -159,6 +159,8 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                                     .setContentIntent(buildPendingIntentWithId(id))
 
                             serviceScope.launch {
+                                /*TODO: This should happen internally, so correct rep count
+                                *  is still being posted*/
                                 workout = workoutRepository.getWorkout(id).first().apply {
                                     this.repetitions *= 2
                                 }
@@ -451,7 +453,10 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         currentNotificationBuilder = baseNotificationBuilder
                 .addAction(R.drawable.ic_alarm, notificationActionText, pendingIntent)
                 .addAction(R.drawable.ic_alarm, "Cancel", cancelActionPendingIntent)
-        notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
+        if(!isBound){
+            /*Only notify if UI not visible -> isBound = false*/
+            notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
