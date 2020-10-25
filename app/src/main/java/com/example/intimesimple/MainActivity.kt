@@ -32,17 +32,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostController: NavHostController
 
     private var bound: Boolean = false
+
+    /*This acts as a dummy to trigger onBind/onRebind/onUnbind in TimerService*/
     private val mConnection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            bound = true
-        }
-
-        override fun onServiceDisconnected(className: ComponentName) {
-            bound = false
-        }
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {}
+        override fun onServiceDisconnected(className: ComponentName) {}
     }
-
 
     @ExperimentalMaterialApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,16 +57,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        //Timber.d("onStart")
         // Bind to the service
         Intent(this, TimerService::class.java).also { intent ->
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
         }
+        bound = true
     }
 
     override fun onStop() {
         super.onStop()
+        //Timber.d("onStop")
         // Unbind from the service
         if (bound) {
+            //Timber.d("Trying to unbind service")
             unbindService(mConnection)
             bound = false
         }

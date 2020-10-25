@@ -14,7 +14,6 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.asLiveData
 import com.example.intimesimple.MainActivity
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.AudioState
@@ -26,7 +25,6 @@ import com.example.intimesimple.di.PauseActionPendingIntent
 import com.example.intimesimple.di.ResumeActionPendingIntent
 import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
-import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_MUTE
@@ -41,7 +39,6 @@ import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
 import com.example.intimesimple.utils.getFormattedStopWatchTime
-import com.example.intimesimple.utils.getNextWorkoutState
 import com.example.intimesimple.utils.millisToSeconds
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -93,6 +90,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private var isInitialized = false
     private var isKilled = false
     private var isRunning = false
+    private var isBound = false
 
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
@@ -131,7 +129,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
         // observe timerState and update notification actions
         timerState.observe(this, Observer {
-            if(!isKilled && isRunning)
+            if(!isKilled && isRunning && !isBound)
                 timerState.value?.let {
                     updateNotificationActions(it)
                 }
@@ -173,7 +171,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                                             timeInMillis.postValue(workout?.exerciseTime)
                                             repetitionCount.postValue(workout?.repetitions)
                                             // start foreground service + timer
-                                            startForegroundService()
+                                            startTimerService()
                                             isInitialized = true
                                 }
                             }
@@ -206,7 +204,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
                 ACTION_CANCEL -> {
                     Timber.d("ACTION_CANCEL")
-                    stopForegroundService()
+                    stopTimerService()
                 }
 
                 ACTION_MUTE -> {
@@ -250,17 +248,24 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     }
 
     override fun onBind(intent: Intent): IBinder? {
-        /*TODO: StopForeground, since screen is visible - needs to be called when
-        *  MainActivity is resumed/created*/
+        /* screen is visible - remove notifications*/
         Timber.d("onBind")
+        pushToBackground()
         return super.onBind(intent)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        /*TODO: StartForeground, since screen is no longer visible - needs to be called
-        *  when MainActivity is stopped/destroyed*/
+        /* screen is not visible, show notifications if timer is running*/
         Timber.d("onUnbind")
-        return super.onUnbind(intent)
+        if(isRunning) pushToForeground()
+        return true
+    }
+
+    override fun onRebind(intent: Intent?) {
+        /* screen is visible - remove notifications*/
+        Timber.d("onRebind")
+        if(isRunning) pushToBackground()
+        super.onRebind(intent)
     }
 
     @SuppressLint("BinaryOperationInTimber")
@@ -304,7 +309,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                         speakOrVibrate(
                                 internalWorkoutState.stateName,
                                 500L)
-                    }else stopForegroundService()
+                    }else stopTimerService()
                 }
 
             }.start()
@@ -335,35 +340,39 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         startTimer(true)
     }
 
-    private fun startForegroundService(){
+    private fun startTimerService(){
+        Timber.d("startTimerService")
         isRunning = true
-
+        startTimer(false)
         // Get wakelock
         wakeLock =
-                (getSystemService(Context.POWER_SERVICE) as PowerManager).run {
+                (getSystemService(POWER_SERVICE) as PowerManager).run {
                     newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                             "com.example.intimesimple.services:TimerService::lock").apply {
                         acquire()
                     }
                 }
         Timber.d("Acquired wakelock")
+    }
 
-        startTimer(false)
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE)
+    private fun pushToForeground() {
+        /*This is called when the activity unbinds from service, so notifications are shown
+        * and the service moves to foreground*/
+        isBound = false
+        Timber.d("pushToForeground - isBound: $isBound")
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE)
                 as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager = notificationManager)
         }
 
-        Timber.d("Starting foregroundService")
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
 
         // Observe timeInMillis and update notification
         timeInMillis.observe(this, Observer {
-            if (!isKilled && isRunning){
-                workout?.let {wo ->
+            if (!isKilled && isRunning && !isBound) {
+                workout?.let { wo ->
                     val notification = currentNotificationBuilder
                             .setContentTitle(wo.name)
                             .setContentText(getFormattedStopWatchTime(it))
@@ -374,8 +383,15 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         })
     }
 
-    private fun stopForegroundService(){
-        Timber.d("Stopping foregroundService")
+    private fun pushToBackground(){
+        /*This is called when the activity binds to the service, removes notifications and
+        * moves service to "background"*/
+        isBound = true
+        Timber.d("pushToBackground - isBound: $isBound")
+        stopForeground(true)
+    }
+    private fun stopTimerService(){
+        Timber.d("Stopping TimerService")
         // Release wakelock
         try {
             wakeLock?.let {
@@ -400,7 +416,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         isRunning = false
         repetitionIndex = 0
         firstRun = true
-        stopForeground(true)
         stopSelf()
     }
 
