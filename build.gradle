@@ -104,7 +104,7 @@ allprojects {
         jcenter()
         maven { url = "https://dl.bintray.com/kotlin/kotlin-eap" }
         // snapshot for compose navigation
-        maven { url = 'https://androidx.dev/snapshots/builds/6924113/artifacts/repository' }
+        maven { url = 'https://androidx.dev/snapshots/builds/6931706/artifacts/repository' }
     }
 }
 
