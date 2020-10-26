@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -87,7 +86,7 @@ fun TimerCircle(
         elapsedTime: Long,
         totalTime: Long
 ){
-        Box(modifier.fillMaxSize().drawWithCache {
+        Canvas(modifier = modifier.fillMaxSize(), onDraw = {
                 val height = size.height
                 val width = size.width
                 val dotDiameter = 12.dp
@@ -108,27 +107,26 @@ fun TimerCircle(
                         min(1f, elapsedTime.toFloat()/totalTime.toFloat())
                 val greenPercent = 1 - whitePercent
 
-                onDraw {
-                        drawArc(
-                                completedColor,
-                                270f,
-                                -greenPercent * 360f,
-                                false,
-                                topLeft = Offset(radiusOffset, radiusOffset),
-                                size = arcSize,
-                                style = Stroke(width = strokeSize.value)
-                        )
+                drawArc(
+                        completedColor,
+                        270f,
+                        -greenPercent * 360f,
+                        false,
+                        topLeft = Offset(radiusOffset, radiusOffset),
+                        size = arcSize,
+                        style = Stroke(width = strokeSize.value)
+                )
 
-                        drawArc(
-                                remainderColor,
-                                270f,
-                                whitePercent*360,
-                                false,
-                                topLeft = Offset(radiusOffset, radiusOffset),
-                                size = arcSize,
-                                style = Stroke(width = strokeSize.value)
-                        )
-                }
+                drawArc(
+                        remainderColor,
+                        270f,
+                        whitePercent*360,
+                        false,
+                        topLeft = Offset(radiusOffset, radiusOffset),
+                        size = arcSize,
+                        style = Stroke(width = strokeSize.value)
+                )
+
         })
 }
 

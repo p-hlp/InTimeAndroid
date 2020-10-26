@@ -148,6 +148,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let{
             when(it.action){
+                /*TODO: Start-Button currently has to be pressed twice for timer to start, fix bug*/
                 ACTION_START -> {
                     Timber.d("ACTION_START - firstRun: $firstRun")
                     if(firstRun){
