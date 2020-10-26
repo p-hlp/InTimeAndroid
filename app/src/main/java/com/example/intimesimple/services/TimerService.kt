@@ -95,7 +95,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
-    private var repetitionIndex = 0
+    private var timerIndex = 0
 
     // keeping internal states, because reading posted LiveData is delayed
     private var internalWorkoutState = WorkoutState.STARTING
@@ -145,6 +145,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
     }
 
     @SuppressLint("BinaryOperationInTimber")
+    /*TODO: Needs refactoring*/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let{
             when(it.action){
@@ -160,12 +161,11 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
                                     .setContentIntent(buildPendingIntentWithId(id))
 
                             serviceScope.launch {
-                                /*TODO: This should happen internally, so correct rep count
-                                *  is still being posted*/
-                                workout = workoutRepository.getWorkout(id).first().apply {
-                                    this.repetitions *= 2
-                                }
+                                workout = workoutRepository.getWorkout(id).first()
                                 if(!isInitialized){
+                                            // set timer index
+                                            timerIndex = workout?.repetitions?.times(2) ?: 0
+                                            Timber.d("ACTION_START - timerIndex: $timerIndex")
                                             // Post new timerState
                                             timerState.postValue(TimerState.RUNNING)
                                             workoutState.postValue(WorkoutState.STARTING)
@@ -300,9 +300,13 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
                 override fun onFinish() {
                     //Timber.d("Timer finished")
-                    repetitionIndex += 1
-                    if((it.repetitions  - repetitionIndex) > 0){
-                        repetitionCount.postValue(repetitionCount.value?.minus(1))
+                    timerIndex -= 1
+                    if(timerIndex > 0){
+                        if(timerIndex % 2 == 0){
+                            // post new value if index is even
+                            repetitionCount.postValue(repetitionCount.value?.minus(1))
+                        }
+
                         //Figure out next workoutState
                         internalWorkoutState = getNextWorkoutState(internalWorkoutState)
                         //Timber.d("Next workoutState: ${internalWorkoutState.stateName}")
@@ -407,6 +411,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
             Timber.d("Wasn't able to release wakelock ${e.message}")
         }
 
+        /*TODO: States are not resetting properly*/
         timer?.cancel()
         timerState.postValue(TimerState.EXPIRED)
         workout?.let {
@@ -417,7 +422,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
 
         isKilled = true
         isRunning = false
-        repetitionIndex = 0
+        timerIndex = workout?.repetitions?.times(2) ?: 0
         firstRun = true
         stopSelf()
     }

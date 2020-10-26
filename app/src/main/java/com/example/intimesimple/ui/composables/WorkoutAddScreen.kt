@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -119,10 +120,11 @@ fun WorkoutAddScreenContent(
         )
 
         clickInputField(
-                modifier = Modifier.width(rowWidth.dp).height(50.dp).constrainAs(workRow){
+                modifier = Modifier.width(rowWidth.dp).constrainAs(workRow){
                     top.linkTo(textFieldRow.bottom, 32.dp)
                     centerHorizontallyTo(parent)
                 },
+                label = "Work",
                 content = {
                     Text(getFormattedStopWatchTime(workField),style = typography.h3)
                 },
@@ -137,10 +139,11 @@ fun WorkoutAddScreenContent(
         )
 
         clickInputField(
-                modifier = Modifier.width(rowWidth.dp).height(50.dp).constrainAs(pauseRow){
+                modifier = Modifier.width(rowWidth.dp).constrainAs(pauseRow){
                     top.linkTo(workRow.bottom, 32.dp)
                     centerHorizontallyTo(parent)
                 },
+                label = "Pause",
                 content = {
                     Text(getFormattedStopWatchTime(pauseField),style = typography.h3)
                 },
@@ -155,10 +158,11 @@ fun WorkoutAddScreenContent(
         )
 
         clickInputField(
-                modifier = Modifier.width(rowWidth.dp).height(50.dp).constrainAs(repsRow){
+                modifier = Modifier.width(rowWidth.dp).constrainAs(repsRow){
                     top.linkTo(pauseRow.bottom, 32.dp)
                     centerHorizontallyTo(parent)
                 },
+                label = "Reps",
                 content = {
                     Text(repsField.toString(),style = typography.h3)
                 },
@@ -225,46 +229,59 @@ fun WorkoutAddScreenContent(
 @Composable
 fun clickInputField(
         modifier: Modifier = Modifier,
+        label: String,
         content: @Composable () -> Unit,
         onMinusClicked: () -> Unit,
         onPlusClicked: () -> Unit
 ){
-    //TODO: Add label <WORK/PAUSE/REPs>
-    Card(
-            modifier = modifier,
-            elevation = 1.dp,
+    val emphasisLevels = AmbientEmphasisLevels.current
+
+    Column(
+            modifier
     ){
-        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-            val (minusFab, plusFab, textBox) = createRefs()
 
-
-            IconButton(
-                    modifier = Modifier.constrainAs(minusFab) {
-                        start.linkTo(parent.start)
-                        centerVerticallyTo(parent)
-                    },
-                    onClick = {onMinusClicked()},
-                    icon = {Icon(Icons.Filled.Remove)}
-            )
-
-            Box(
-                    modifier = Modifier.constrainAs(textBox){
-                        centerVerticallyTo(parent)
-                        centerHorizontallyTo(parent)
-                    }
-            ){
-                content()
-            }
-
-
-            IconButton(
-                    modifier = Modifier. constrainAs(plusFab){
-                        end.linkTo(parent.end)
-                        centerVerticallyTo(parent)
-                    },
-                    onClick = {onPlusClicked()},
-                    icon = {Icon(Icons.Filled.Add)}
+        ProvideEmphasis(emphasisLevels.disabled){
+            Text(
+                    text = label,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 4.dp)
             )
         }
+
+        Card(
+                modifier = Modifier.height(50.dp),
+                elevation = 1.dp,
+        ){
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (minusFab, plusFab, textBox) = createRefs()
+
+                IconButton(
+                        modifier = Modifier.constrainAs(minusFab) {
+                            start.linkTo(parent.start)
+                            centerVerticallyTo(parent)
+                        },
+                        onClick = {onMinusClicked()},
+                        icon = {Icon(Icons.Filled.Remove)}
+                )
+
+                Box(
+                        modifier = Modifier.constrainAs(textBox){
+                            centerVerticallyTo(parent)
+                            centerHorizontallyTo(parent)
+                        }
+                ){
+                    content()
+                }
+
+                IconButton(
+                        modifier = Modifier. constrainAs(plusFab){
+                            end.linkTo(parent.end)
+                            centerVerticallyTo(parent)
+                        },
+                        onClick = {onPlusClicked()},
+                        icon = {Icon(Icons.Filled.Add)}
+                )
+            }
+        }
     }
+
 }

@@ -98,6 +98,7 @@ fun WorkoutDetailScreenContent(
         ConstraintLayout(modifier = modifier, constraintSet = constraints) {
             val buttonModifier = Modifier.width(buttonWidth.dp)
 
+            /*TODO: Needs refactoring -> figure out parameters beforehand*/
             TimerCircleComponent(
                     modifier = Modifier.layoutId("progCircle"),
                     screenWidthDp = screenWidthDp,
