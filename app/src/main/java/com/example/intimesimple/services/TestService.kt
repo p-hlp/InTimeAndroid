@@ -1,12 +1,21 @@
 package com.example.intimesimple.services
 
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.os.PowerManager
+import android.os.Vibrator
 import android.speech.tts.TextToSpeech
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import com.example.intimesimple.data.local.AudioState
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.di.CancelActionPendingIntent
+import com.example.intimesimple.di.PauseActionPendingIntent
+import com.example.intimesimple.di.ResumeActionPendingIntent
+import com.example.intimesimple.repositories.PreferenceRepository
+import com.example.intimesimple.repositories.WorkoutRepository
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL_AND_RESET
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
@@ -16,24 +25,58 @@ import com.example.intimesimple.utils.Constants.ACTION_RESUME
 import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
+import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TestService : LifecycleService(), TextToSpeech.OnInitListener{
+
+    // notification builder
+    @Inject lateinit var baseNotificationBuilder: NotificationCompat.Builder
+    lateinit var currentNotificationBuilder: NotificationCompat.Builder
+
+    // pending intents for action-handling
+    @ResumeActionPendingIntent @Inject lateinit var resumeActionPendingIntent: PendingIntent
+    @PauseActionPendingIntent @Inject lateinit var pauseActionPendingIntent: PendingIntent
+    @CancelActionPendingIntent @Inject lateinit var cancelActionPendingIntent: PendingIntent
+
+    // repositories
+    @Inject lateinit var workoutRepository: WorkoutRepository
+    @Inject lateinit var preferenceRepository: PreferenceRepository
 
     // current workout
     private var workout: Workout? = null
 
-    // service state variables
+    // service state
     private var isInitialized = false
     private var isKilled = true
     private var isTimerRunning = false
     private var isBound = false
     private var audioState = AudioState.MUTE
 
-    // timer variables
+    // timer
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
     private var timerIndex = 0
+
+    // audio/tts
+    @Inject lateinit var vibrator: Vibrator
+    private var tts: TextToSpeech? = null
+
+    // utility
+    private val serviceJob = Job()
+    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    companion object{
+        // holds MutableLiveData for UI to observe
+    }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -116,4 +159,33 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         super.onDestroy()
     }
 
+    private fun startTimer(){
+        // time to count down
+
+        val timeInMillis = 10000L
+
+        timer = object : CountDownTimer(timeInMillis, TIMER_UPDATE_INTERVAL){
+            override fun onTick(millisUntilFinished: Long) {
+                /*handle what happens on every tick/interval of TIMER_UPDATE_INTERVAL*/
+
+            }
+
+            override fun onFinish() {
+                /*handle finishing of a timer
+                * start new one if there are still repetition left*/
+
+            }
+
+        }
+    }
+
+    private fun pauseTimer(){}
+
+    private fun resumeTimer(){}
+
+    private fun cancelTimer(){}
+
+    private fun resetTimer(){}
+
+    private fun initService(){}
 }

@@ -397,6 +397,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         Timber.d("pushToBackground - isBound: $isBound")
         stopForeground(true)
     }
+
     private fun stopTimerService(){
         Timber.d("Stopping TimerService")
         // Release wakelock
