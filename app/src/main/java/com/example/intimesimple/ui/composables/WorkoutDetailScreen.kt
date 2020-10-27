@@ -5,29 +5,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.TimerState
-import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants
-import com.example.intimesimple.utils.getFormattedStopWatchTime
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.navigation.NavController
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
+import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import timber.log.Timber
 
 
 @Composable
 fun WorkoutDetailScreen(
-        modifier: Modifier = Modifier,
-        navController: NavController,
-        workoutDetailViewModel: WorkoutDetailViewModel,
-        sendServiceCommand: (String) -> Unit,
-        workoutId: Long? = null
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    workoutDetailViewModel: WorkoutDetailViewModel,
+    sendServiceCommand: (String) -> Unit,
+    workoutId: Long? = null
 ) {
     val workout by workoutDetailViewModel.workout.observeAsState()
 
@@ -78,12 +79,12 @@ fun WorkoutDetailScreenContent(
         workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     val timerState by workoutDetailViewModel.timerState.observeAsState(TimerState.EXPIRED)
+    val timeString by workoutDetailViewModel.timeString.observeAsState("")
     val workoutState by workoutDetailViewModel.workoutState.observeAsState(WorkoutState.STARTING)
-    val timeInMillis by workoutDetailViewModel.timeInMillis.observeAsState()
-    val timerRepCount by workoutDetailViewModel.timerRepCount.observeAsState()
-    val exTimeInMillis: Long = workout.exerciseTime
-    val repCount: Int = workout.repetitions
-    val progressTime by workoutDetailViewModel.progressTime.observeAsState(exTimeInMillis)
+    val repsString by workoutDetailViewModel.repString.observeAsState("")
+    val elapsedTime by workoutDetailViewModel.elapsedTime.observeAsState(TIMER_STARTING_IN_TIME)
+    val totalTime by workoutDetailViewModel.totalTime.observeAsState(TIMER_STARTING_IN_TIME)
+
     val configuration = ConfigurationAmbient.current
     val screenWidthDp = configuration.screenWidthDp
     val screenHeightDp = configuration.screenHeightDp
@@ -98,25 +99,15 @@ fun WorkoutDetailScreenContent(
         ConstraintLayout(modifier = modifier, constraintSet = constraints) {
             val buttonModifier = Modifier.width(buttonWidth.dp)
 
-            /*TODO: Needs refactoring -> figure out parameters beforehand*/
             TimerCircleComponent(
-                    modifier = Modifier.layoutId("progCircle"),
-                    screenWidthDp = screenWidthDp,
-                    screenHeightDp = screenHeightDp,
-                    time = (if (timerState == TimerState.EXPIRED)
-                        getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
-                    else getFormattedStopWatchTime(timeInMillis)),
-                    state = workoutState.name,
-                    reps = "${if (timerState == TimerState.EXPIRED) repCount else timerRepCount}",
-                    elapsedTime =   if (timerState == TimerState.EXPIRED) TIMER_STARTING_IN_TIME
-                    else progressTime,
-                    totalTime = if (timerState != TimerState.EXPIRED) {
-                        when (workoutState) {
-                            WorkoutState.STARTING -> TIMER_STARTING_IN_TIME
-                            WorkoutState.BREAK -> workout.pauseTime
-                            WorkoutState.WORK -> workout.exerciseTime
-                        }
-                    } else TIMER_STARTING_IN_TIME
+                modifier = Modifier.layoutId("progCircle"),
+                screenWidthDp = screenWidthDp,
+                screenHeightDp = screenHeightDp,
+                time = timeString,
+                state = workoutState.stateName,
+                reps = repsString,
+                elapsedTime = elapsedTime,
+                totalTime = totalTime
             )
 
             Row(

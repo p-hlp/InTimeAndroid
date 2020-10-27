@@ -16,20 +16,20 @@ class WorkoutListViewModel @ViewModelInject constructor(
 
     fun addWorkout(workout: Workout){
         viewModelScope.launch {
-            workoutRepository.workoutDao.insertWithTimestamp(workout)
+            workoutRepository.insertWorkout(workout)
         }
     }
 
     fun deleteWorkout(workout: Workout){
         Timber.d("Deleting workout: ${workout.id}")
         viewModelScope.launch {
-            workoutRepository.workoutDao.deleteWorkout(workout)
+            workoutRepository.deleteWorkout(workout)
         }
     }
 
     fun deleteWorkoutWithId(wId: Long){
         viewModelScope.launch {
-            workoutRepository.workoutDao.deleteWorkoutWithId(wId)
+            workoutRepository.deleteWorkoutWithId(wId)
         }
     }
 }

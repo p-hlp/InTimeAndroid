@@ -19,10 +19,10 @@ import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
 @ExperimentalMaterialApi
 @Composable
 fun AppNavigation(
-        navController: NavHostController,
-        workoutListViewModel: WorkoutListViewModel,
-        workoutDetailViewModel: WorkoutDetailViewModel,
-        sendServiceCommand: (String) -> Unit
+    navController: NavHostController,
+    workoutListViewModel: WorkoutListViewModel,
+    workoutDetailViewModel: WorkoutDetailViewModel,
+    sendServiceCommand: (String) -> Unit
 ) {
     NavHost(navController, startDestination = Screen.WorkoutListScreen.route) {
         // NavGraph

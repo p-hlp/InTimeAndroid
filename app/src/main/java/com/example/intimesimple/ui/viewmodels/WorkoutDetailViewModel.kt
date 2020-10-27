@@ -1,9 +1,6 @@
 package com.example.intimesimple.ui.viewmodels
 
-import android.annotation.SuppressLint
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.hilt.Assisted
+
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.intimesimple.data.local.TimerState
@@ -12,20 +9,22 @@ import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
 import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
+import com.example.intimesimple.services.TestService
 import com.example.intimesimple.services.TimerService
+import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
+import com.example.intimesimple.utils.getFormattedStopWatchTime
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
-@SuppressLint("BinaryOperationInTimber")
 class WorkoutDetailViewModel @ViewModelInject constructor(
     private val workoutRepository: WorkoutRepository,
-    private val preferenceRepository: PreferenceRepository,
-    @Assisted private val savedStateHandle: SavedStateHandle
+    private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
 
-    val workout = MutableLiveData<Workout?>()
+    val workout: MutableLiveData<Workout?>
+        get() = TestService.currentWorkout
 
     val volumeButtonState = preferenceRepository.soundStateFlow.asLiveData().map {
         it?.let{ VolumeButtonState.valueOf(it)} ?: VolumeButtonState.MUTE
@@ -33,32 +32,47 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
 
     // Get immutable LiveData from TimerService singleton
     val timerState: LiveData<TimerState>
-        get() = TimerService.timerState
+        get() = TestService.currentTimerState
 
     val workoutState: LiveData<WorkoutState>
-        get() = TimerService.workoutState
+        get() = TestService.currentWorkoutState
 
-    val timeInMillis: LiveData<Long>
-        get() = TimerService.timeInMillis
-
-    val timerRepCount: LiveData<Int>
-        get() = TimerService.repetitionCount
-
-    val progressTime: LiveData<Long>
-        get() = TimerService.progressTimeInMillis
-
-    //TODO: keep timerState in viewModel make changes to progressTime etc. accordingly
-
-    init {
-        // Getting first value in flow
-        Timber.d("DetaiLViewModel init")
-        savedStateHandle.get<Long>("wId")?.let {
-            viewModelScope.launch {
-                workout.value =
-                    workoutRepository.getWorkout(it).first()
-            }
+    val repString: LiveData<String>
+        get() = TestService.currentRepetition.map {
+            "$it/${workout.value?.repetitions}"
         }
-    }
+
+    val timeString: LiveData<String>
+        get() = TestService.elapsedTimeInMillisEverySecond.map {
+            if(timerState.value != TimerState.EXPIRED)
+                getFormattedStopWatchTime(it)
+            else
+                getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+        }
+
+    val elapsedTime: LiveData<Long>
+        get() = TestService.elapsedTimeInMillis.map {
+            if(timerState.value != TimerState.EXPIRED)
+                it
+            else
+                TIMER_STARTING_IN_TIME
+        }
+
+    val totalTime: LiveData<Long>
+        get() = TimerService.workoutState.map {
+            if (timerState.value == TimerState.EXPIRED)
+                TIMER_STARTING_IN_TIME
+            else
+                when(it){
+                    WorkoutState.BREAK -> {
+                        workout.value?.pauseTime ?: 0L
+                    }
+                    WorkoutState.WORK -> {
+                        workout.value?.exerciseTime ?: 0L
+                    }
+                    else -> {TIMER_STARTING_IN_TIME}
+                }
+        }
 
     fun setSoundState(state: String) = viewModelScope.launch {
         preferenceRepository.setSoundState(state)

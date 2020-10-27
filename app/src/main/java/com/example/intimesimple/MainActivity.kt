@@ -7,22 +7,18 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
-import android.os.Messenger
 import androidx.activity.viewModels
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.ui.platform.setContent
 import androidx.navigation.NavHostController
-import com.example.intimesimple.utils.Constants.ACTION_SHOW_MAIN_ACTIVITY
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import androidx.navigation.compose.rememberNavController
 import com.example.intimesimple.services.TestService
-import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.composables.navigation.AppNavigation
 import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
-import com.example.intimesimple.utils.Constants.ACTION_START
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 

@@ -6,13 +6,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
-import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL_AND_RESET
 import com.example.intimesimple.utils.getNextVolumeButtonState
 import com.example.intimesimple.utils.getTimerActionFromVolumeButtonState

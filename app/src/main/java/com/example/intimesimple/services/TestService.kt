@@ -29,6 +29,7 @@ import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_START
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
+import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.buildMainActivityPendingIntentWithId
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,7 +84,8 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
 
     companion object{
         // holds MutableLiveData for UI to observe
-        val currentWorkout = MutableLiveData<Workout>()
+        val currentTimerState = MutableLiveData<TimerState>()
+        val currentWorkout = MutableLiveData<Workout?>()
         val currentWorkoutState = MutableLiveData<WorkoutState>()
         val currentRepetition = MutableLiveData<Int>()
         val elapsedTimeInMillis = MutableLiveData<Long>()
@@ -249,6 +251,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
 
     private fun postInitializedData(){
         /*Post current data to MutableLiveData*/
+        workout?.let {
+            currentTimerState.postValue(TimerState.EXPIRED)
+            currentWorkout.postValue(it)
+            currentWorkoutState.postValue(WorkoutState.STARTING)
+            currentRepetition.postValue(1)
+            elapsedTimeInMillis.postValue(TIMER_STARTING_IN_TIME)
+            elapsedTimeInMillisEverySecond.postValue(TIMER_STARTING_IN_TIME)
+        }
     }
 
     private fun resetData(){
