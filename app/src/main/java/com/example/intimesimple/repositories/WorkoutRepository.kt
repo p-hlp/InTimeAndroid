@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class WorkoutRepository @Inject constructor(
-    val workoutDao: WorkoutDao
+    private val workoutDao: WorkoutDao
 ){
     suspend fun insertWorkout(workout: Workout) = workoutDao.insertWithTimestamp(workout)
 

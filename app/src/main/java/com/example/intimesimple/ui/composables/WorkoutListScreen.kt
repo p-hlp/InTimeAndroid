@@ -22,6 +22,7 @@ import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
+import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
 import timber.log.Timber
@@ -32,7 +33,8 @@ import timber.log.Timber
 fun WorkoutListScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    workoutListViewModel: WorkoutListViewModel
+    workoutListViewModel: WorkoutListViewModel,
+    sendServiceCommand: (String) -> Unit
 ){
     // get workout list as observable state
     val workouts by workoutListViewModel.workouts.observeAsState(listOf())
@@ -61,6 +63,7 @@ fun WorkoutListScreen(
                             navController.navigate(
                                 Uri.parse(WORKOUT_DETAIL_URI + "${it.id}")
                             )
+                            sendServiceCommand(ACTION_INITIALIZE_DATA)
                         }
                 )
             },

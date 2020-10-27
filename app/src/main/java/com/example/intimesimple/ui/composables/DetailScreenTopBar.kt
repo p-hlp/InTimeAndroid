@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
+import com.example.intimesimple.utils.Constants.ACTION_CANCEL_AND_RESET
 import com.example.intimesimple.utils.getNextVolumeButtonState
 import com.example.intimesimple.utils.getTimerActionFromVolumeButtonState
 
@@ -36,7 +37,7 @@ fun DetailScreenTopBar(
                     // navigate back
                     navController.popBackStack()
                     // send command cancel
-                    sendCommand(ACTION_CANCEL)
+                    sendCommand(ACTION_CANCEL_AND_RESET)
                 },
                 icon = {
                     Icon(Icons.Filled.ArrowBack)

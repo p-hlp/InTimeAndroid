@@ -15,11 +15,13 @@ import androidx.navigation.NavHostController
 import com.example.intimesimple.utils.Constants.ACTION_SHOW_MAIN_ACTIVITY
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import androidx.navigation.compose.rememberNavController
+import com.example.intimesimple.services.TestService
 import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.composables.navigation.AppNavigation
 import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
+import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
 import com.example.intimesimple.utils.Constants.ACTION_START
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
@@ -59,7 +61,10 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         //Timber.d("onStart")
         // Bind to the service
-        Intent(this, TimerService::class.java).also { intent ->
+//        Intent(this, TimerService::class.java).also { intent ->
+//            bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
+//        }
+        Intent(this, TestService::class.java).also { intent ->
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
         }
         bound = true
@@ -88,11 +93,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendCommandToService(action: String) {
-        Intent(this, TimerService::class.java).also {
+        Intent(this, TestService::class.java).also {
             it.action = action
             val id = navHostController.currentBackStackEntry?.arguments?.get("id") as? Long
             Timber.d("sendCommandService - Action: $action - ID: $id")
-            if (action == ACTION_START) {
+            if (action == ACTION_INITIALIZE_DATA) {
                 it.putExtra(EXTRA_WORKOUT_ID, id)
             }
             startService(it)

@@ -1,6 +1,15 @@
 package com.example.intimesimple.utils
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.speech.tts.TextToSpeech
 import androidx.compose.ui.graphics.vector.VectorAsset
+import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.AudioState
 import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.data.local.Workout
@@ -10,17 +19,15 @@ import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.ONE_SECOND
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
+import timber.log.Timber
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 
-fun calculateRadiusOffset(
-        strokeSize: Float,
-        dotStrokeSize: Float,
-        markerStrokeSize: Float
-): Float {
+fun calculateRadiusOffset(strokeSize: Float, dotStrokeSize: Float, markerStrokeSize: Float)
+        : Float {
     return max(strokeSize, max(dotStrokeSize, markerStrokeSize))
 }
 
@@ -126,6 +133,48 @@ fun getTimerActionFromVolumeButtonState(state: VolumeButtonState) = when(state){
     VolumeButtonState.MUTE -> ACTION_MUTE
     VolumeButtonState.VIBRATE -> ACTION_VIBRATE
     VolumeButtonState.SOUND -> ACTION_SOUND
+}
+
+fun buildMainActivityPendingIntentWithId(id: Long, context: Context): PendingIntent {
+    return PendingIntent.getActivity(
+        context,
+        0,
+        Intent(context, MainActivity::class.java).also {
+            it.action = Constants.ACTION_SHOW_MAIN_ACTIVITY
+            it.putExtra(Constants.EXTRA_WORKOUT_ID, id)
+            //Set data uri to deeplink uri -> automatically navigates when navGraph is created
+            it.data = Uri.parse(Constants.WORKOUT_DETAIL_URI + "$id")
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
+}
+
+fun speakOrVibrate(
+    tts: TextToSpeech?,
+    vibrator: Vibrator,
+    audioState: AudioState,
+    sayText: String,
+    vLength: Long
+) {
+    when(audioState){
+        AudioState.MUTE -> return
+        AudioState.VIBRATE -> vibrate(vibrator, vLength)
+        AudioState.SOUND -> ttsSpeak(tts, sayText)
+    }
+}
+
+fun vibrate(vibrator: Vibrator, ms: Long){
+    if (vibrator.hasVibrator()) { // Vibrator availability checking
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            vibrator.vibrate(ms) // Vibrate method for below API Level 26
+        }
+    }
+}
+
+fun ttsSpeak(tts: TextToSpeech?, message: String){
+    tts?.speak(message, TextToSpeech.QUEUE_FLUSH, null, "")
 }
 
 val defaultWorkouts = listOf(

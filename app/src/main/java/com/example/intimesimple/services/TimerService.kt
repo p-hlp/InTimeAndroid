@@ -236,7 +236,6 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener
         tts?.let{
             if (status == TextToSpeech.SUCCESS) {
                 Timber.d("TTS successfully initialized")
-                // set UK English as language for tts
                 val result = it.setLanguage(Locale.US)
                 it.voice = it.defaultVoice
                 it.language = Locale.US

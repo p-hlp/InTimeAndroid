@@ -47,6 +47,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
     val progressTime: LiveData<Long>
         get() = TimerService.progressTimeInMillis
 
+    //TODO: keep timerState in viewModel make changes to progressTime etc. accordingly
 
     init {
         // Getting first value in flow
@@ -54,8 +55,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         savedStateHandle.get<Long>("wId")?.let {
             viewModelScope.launch {
                 workout.value =
-                    workoutRepository.workoutDao.getWorkoutDistinctUntilChanged(it)
-                    .first()
+                    workoutRepository.getWorkout(it).first()
             }
         }
     }
@@ -68,9 +68,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
     fun setCurrentWorkout(wId: Long?){
         wId?.let {
             viewModelScope.launch {
-                workout.value = workoutRepository.workoutDao
-                        .getWorkoutDistinctUntilChanged(it)
-                        .first()
+                workout.value = workoutRepository.getWorkout(it).first()
             }
         }
     }

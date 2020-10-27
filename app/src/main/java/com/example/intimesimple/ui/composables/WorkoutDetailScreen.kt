@@ -6,12 +6,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
 import com.example.intimesimple.utils.Constants
 import com.example.intimesimple.utils.getFormattedStopWatchTime
-import androidx.compose.ui.WithConstraints
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
 import androidx.navigation.NavController
