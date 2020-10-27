@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.utils.calculateRadiusOffset
@@ -37,33 +38,25 @@ fun TimerCircleComponent(
                 modifier = modifier.size(maxRadius.dp).padding(8.dp)
         ){
 
-                //TODO: change layout depending on orientation
-                ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                        val (timerText, workoutStateText, repText) = createRefs()
+                val constraints = if (screenWidthDp.dp < 600.dp) {
+                        portraitConstraints()
+                } else landscapeConstraints()
+                ConstraintLayout(modifier = Modifier.fillMaxSize(), constraintSet = constraints) {
 
                         Text(
-                                modifier = Modifier.constrainAs(timerText){
-                                        centerHorizontallyTo(parent)
-                                        centerVerticallyTo(parent)
-                                },
+                                modifier = Modifier.layoutId("timerText"),
                                 text = time,
                                 style = typography.h2,
                         )
 
                         Text(
-                                modifier = Modifier.constrainAs(workoutStateText){
-                                        centerHorizontallyTo(parent)
-                                        bottom.linkTo(timerText.top, 8.dp)
-                                },
+                                modifier = Modifier.layoutId("workoutStateText"),
                                 text = state,
                                 style = typography.h5,
                         )
 
                         Text(
-                                modifier = Modifier.constrainAs(repText){
-                                        centerHorizontallyTo(parent)
-                                        top.linkTo(timerText.bottom, 8.dp)
-                                },
+                                modifier = Modifier.layoutId("repText"),
                                 text = reps,
                                 style = typography.h5,
                         )
@@ -149,4 +142,50 @@ fun DebugCenterLines(
                         strokeWidth = 4f
                 )
         })
+}
+
+private fun portraitConstraints(): ConstraintSet {
+        return ConstraintSet {
+                val timerText = createRefFor("timerText")
+                val workoutStateText = createRefFor("workoutStateText")
+                val repText = createRefFor("repText")
+
+                constrain(timerText) {
+                        centerHorizontallyTo(parent)
+                        centerVerticallyTo(parent)
+                }
+
+                constrain(workoutStateText) {
+                        centerHorizontallyTo(parent)
+                        bottom.linkTo(timerText.top, 8.dp)
+                }
+
+                constrain(repText){
+                        centerHorizontallyTo(parent)
+                        top.linkTo(timerText.bottom, 8.dp)
+                }
+        }
+}
+
+private fun landscapeConstraints(): ConstraintSet {
+        return ConstraintSet {
+                val timerText = createRefFor("timerText")
+                val workoutStateText = createRefFor("workoutStateText")
+                val repText = createRefFor("repText")
+
+                constrain(timerText) {
+                        centerHorizontallyTo(parent)
+                        bottom.linkTo(repText.top, 8.dp)
+                }
+
+                constrain(workoutStateText) {
+                        centerHorizontallyTo(parent)
+                        bottom.linkTo(timerText.top, 8.dp)
+                }
+
+                constrain(repText){
+                        centerHorizontallyTo(parent)
+                        centerVerticallyTo(parent)
+                }
+        }
 }
