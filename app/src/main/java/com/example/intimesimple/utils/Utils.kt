@@ -97,7 +97,7 @@ fun convertDateToLong(date: String?): Long {
 
 fun millisToSeconds(ms: Long) = (ms/ONE_SECOND).toInt()
 
-fun getNextWorkoutState(current: WorkoutState) = when(current){
+fun getNextWorkoutState(state: WorkoutState) = when(state){
         WorkoutState.STARTING -> WorkoutState.WORK
         WorkoutState.WORK -> WorkoutState.BREAK
         WorkoutState.BREAK -> WorkoutState.WORK
@@ -133,20 +133,6 @@ fun getTimerActionFromVolumeButtonState(state: VolumeButtonState) = when(state){
     VolumeButtonState.MUTE -> ACTION_MUTE
     VolumeButtonState.VIBRATE -> ACTION_VIBRATE
     VolumeButtonState.SOUND -> ACTION_SOUND
-}
-
-fun buildMainActivityPendingIntentWithId(id: Long, context: Context): PendingIntent {
-    return PendingIntent.getActivity(
-        context,
-        0,
-        Intent(context, MainActivity::class.java).also {
-            it.action = Constants.ACTION_SHOW_MAIN_ACTIVITY
-            it.putExtra(Constants.EXTRA_WORKOUT_ID, id)
-            //Set data uri to deeplink uri -> automatically navigates when navGraph is created
-            it.data = Uri.parse(Constants.WORKOUT_DETAIL_URI + "$id")
-        },
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
 }
 
 fun speakOrVibrate(

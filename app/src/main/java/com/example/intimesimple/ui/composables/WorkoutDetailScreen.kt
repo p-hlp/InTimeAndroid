@@ -32,10 +32,10 @@ fun WorkoutDetailScreen(
 ) {
     val workout by workoutDetailViewModel.workout.observeAsState()
 
-    onActive(callback = {
-        // Do once on composition
-        workoutDetailViewModel.setCurrentWorkout(workoutId)
-    })
+//    onActive(callback = {
+//        // Do once on composition
+//        workoutDetailViewModel.setCurrentWorkout(workoutId)
+//    })
 
     Timber.d("WorkoutId: $workoutId - Workout: ${workout?.name ?: "null"}")
     Scaffold(
@@ -63,10 +63,10 @@ fun WorkoutDetailScreen(
             }
     )
 
-    onDispose(callback = {
-        // Reset viewModel workout state when disposing composable
-        workoutDetailViewModel.resetCurrentWorkout()
-    })
+//    onDispose(callback = {
+//        // Reset viewModel workout state when disposing composable
+//        workoutDetailViewModel.resetCurrentWorkout()
+//    })
 }
 
 

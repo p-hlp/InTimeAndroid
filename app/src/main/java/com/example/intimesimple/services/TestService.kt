@@ -32,6 +32,8 @@ import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
 import com.example.intimesimple.utils.buildMainActivityPendingIntentWithId
+import com.example.intimesimple.utils.getNextWorkoutState
+import com.example.intimesimple.utils.getTimeFromWorkoutState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +41,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,12 +69,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     private var isTimerRunning = false
     private var isBound = false
     private var audioState = AudioState.MUTE
+    private var workoutState = WorkoutState.STARTING
 
     // timer
     private var timer: CountDownTimer? = null
     private var millisToCompletion = 0L
     private var lastSecondTimestamp = 0L
     private var timerIndex = 0
+    private var timerMaxRepetitions = 0
 
     // audio/tts
     @Inject lateinit var vibrator: Vibrator
@@ -104,6 +109,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     override fun onInit(status: Int) {
         /* Initialize TTS here */
         Timber.i("onInit")
+        initializeTTS(status = status)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -122,17 +128,27 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     * isTimerRunning = true*/
                     //startTimer()
                     Timber.i("ACTION_START")
+                    isTimerRunning = true
+                    resetTimer()
+                    startTimer()
+                    currentTimerState.postValue(TimerState.RUNNING)
                 }
                 ACTION_PAUSE -> {
                     /*Called when pause button is pressed, pause timer, set isTimerRunning = false*/
                     //pauseTimer()
                     Timber.i("ACTION_PAUSE")
+                    isTimerRunning = false
+                    currentTimerState.postValue(TimerState.PAUSED)
+                    pauseTimer()
                 }
                 ACTION_RESUME -> {
                     /*Called when resume button is pressed, resume timer here, set isTimerRunning
                     * = true*/
                     //resumeTimer()
                     Timber.i("ACTION_RESUME")
+                    isTimerRunning = true
+                    currentTimerState.postValue(TimerState.RUNNING)
+                    resumeTimer()
                 }
                 ACTION_CANCEL -> {
                     /*This i called when cancel button is pressed - "reset" the current timer to
@@ -140,12 +156,21 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     * values*/
                     //timer?.cancel()
                     Timber.i("ACTION_CANCEL")
+                    isTimerRunning = false
+                    cancelTimer()
+                    currentTimerState.postValue(TimerState.EXPIRED)
                 }
                 ACTION_CANCEL_AND_RESET -> {
                     /*Is called when navigating back to ListsScreen, resetting acquired data
                     * to null*/
                     Timber.i("ACTION_CANCEL_AND_RESET")
+                    isTimerRunning = false
+                    cancelTimer()
                     resetData()
+                    currentTimerState.postValue(TimerState.EXPIRED)
+
+                    // -1 is an invalid value, therefore repString will reset to an empty string
+                    currentRepetition.postValue(-1)
                 }
 
                 // Audio related actions
@@ -200,33 +225,87 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         tts?.shutdown()
     }
 
-    private fun startTimer(){
-        // time to count down
+    private fun startTimer(wasPaused: Boolean = false){
+        workout?.let {
 
-        val timeInMillis = 10000L
+            // time to count down
+            val time = getTimeFromWorkoutState(wasPaused, workoutState, millisToCompletion, it)
+            Timber.i("Starting timer - time: $time - workoutState: ${workoutState.stateName}")
 
-        timer = object : CountDownTimer(timeInMillis, TIMER_UPDATE_INTERVAL){
-            override fun onTick(millisUntilFinished: Long) {
-                /*handle what happens on every tick/interval of TIMER_UPDATE_INTERVAL*/
+            // post start values
+            elapsedTimeInMillisEverySecond.postValue(time)
+            elapsedTimeInMillis.postValue(time)
+            lastSecondTimestamp = time
 
-            }
+            //initialize timer and start
+            timer = object : CountDownTimer(time, TIMER_UPDATE_INTERVAL){
+                override fun onTick(millisUntilFinished: Long) {
+                    /*handle what happens on every tick with interval of TIMER_UPDATE_INTERVAL*/
+                    onTimerTick(millisUntilFinished)
+                }
 
-            override fun onFinish() {
-                /*handle finishing of a timer
-                * start new one if there are still repetition left*/
-
-            }
+                override fun onFinish() {
+                    /*handle finishing of a timer
+                    * start new one if there are still repetition left*/
+                    Timber.i("onFinish")
+                    onTimerFinish()
+                }
+            }.start()
 
         }
     }
 
-    private fun pauseTimer(){}
+    private fun onTimerTick(millisUntilFinished: Long){
+        millisToCompletion = millisUntilFinished
+        elapsedTimeInMillis.postValue(millisUntilFinished)
+        if(millisUntilFinished <= lastSecondTimestamp - 1000L){
+            lastSecondTimestamp -= 1000L
+            //Timber.i("onTick - lastSecondTimestamp: $lastSecondTimestamp")
+            elapsedTimeInMillisEverySecond.postValue(lastSecondTimestamp)
 
-    private fun resumeTimer(){}
+            // if lastSecondTimestamp within 3 seconds of end, start counting/vibrating
+        }
+    }
 
-    private fun cancelTimer(){}
+    private fun onTimerFinish(){
+        // increase timerIndex
+        timerIndex += 1
+        Timber.d("onTimerFinish - timerIndex: $timerIndex - maxRep: $timerMaxRepetitions")
+        // check if index still in bound
+        if(timerIndex < timerMaxRepetitions){
+            // if timerIndex odd -> post new rep
+            if(timerIndex % 2 != 0)
+                currentRepetition.postValue(currentRepetition.value?.plus(1))
+            // get next workout state
+            workoutState = getNextWorkoutState(workoutState)
+            currentWorkoutState.postValue(workoutState)
+            // start new timer
+            startTimer()
+        }else{
+            // finished all repetitions, cancel timer
+            cancelTimer()
+        }
+    }
 
-    private fun resetTimer(){}
+    private fun pauseTimer(){
+        timer?.cancel()
+    }
+
+    private fun resumeTimer(){
+        startTimer(wasPaused = true)
+    }
+
+    private fun cancelTimer(){
+        timer?.cancel()
+        resetTimer()
+    }
+
+    private fun resetTimer(){
+        timerIndex = 0
+        timerMaxRepetitions = workout?.repetitions?.times(2)?.minus(2) ?: 0
+        workoutState = WorkoutState.STARTING
+        postInitData()
+    }
 
     private fun initializeData(intent: Intent){
         if(!isInitialized){
@@ -242,14 +321,30 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                         workout = workoutRepository.getWorkout(id).first()
                         audioState = AudioState.valueOf(preferenceRepository.getCurrentSoundState())
                         isInitialized = true
-                        postInitializedData()
+                        postInitData()
                     }
                 }
             }
         }
     }
 
-    private fun postInitializedData(){
+    private fun initializeTTS(status: Int){
+        tts?.let{
+            if (status == TextToSpeech.SUCCESS) {
+                val result = it.setLanguage(Locale.US)
+                it.voice = it.defaultVoice
+                it.language = Locale.US
+
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Timber.d( "The Language specified is not supported!")
+                }
+            } else {
+                Timber.d( "Initialization Failed!")
+            }
+        }
+    }
+
+    private fun postInitData(){
         /*Post current data to MutableLiveData*/
         workout?.let {
             currentTimerState.postValue(TimerState.EXPIRED)

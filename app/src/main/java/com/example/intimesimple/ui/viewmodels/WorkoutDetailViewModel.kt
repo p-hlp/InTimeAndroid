@@ -23,7 +23,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
     private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
 
-    val workout: MutableLiveData<Workout?>
+    val workout: LiveData<Workout?>
         get() = TestService.currentWorkout
 
     val volumeButtonState = preferenceRepository.soundStateFlow.asLiveData().map {
@@ -39,19 +39,23 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
 
     val repString: LiveData<String>
         get() = TestService.currentRepetition.map {
-            "$it/${workout.value?.repetitions}"
+            if(workout.value != null && it != -1) "$it/${workout.value?.repetitions}"
+            else ""
         }
 
     val timeString: LiveData<String>
         get() = TestService.elapsedTimeInMillisEverySecond.map {
-            if(timerState.value != TimerState.EXPIRED)
-                getFormattedStopWatchTime(it)
-            else
-                getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+            if(workout.value != null){
+                if(timerState.value != TimerState.EXPIRED)
+                    getFormattedStopWatchTime(it)
+                else
+                    getFormattedStopWatchTime(TIMER_STARTING_IN_TIME)
+            }else ""
         }
 
     val elapsedTime: LiveData<Long>
         get() = TestService.elapsedTimeInMillis.map {
+            //Timber.i("elapsedTime: $it")
             if(timerState.value != TimerState.EXPIRED)
                 it
             else
@@ -59,7 +63,8 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         }
 
     val totalTime: LiveData<Long>
-        get() = TimerService.workoutState.map {
+        get() = TestService.currentWorkoutState.map {
+            Timber.i("totalTime: ${it.stateName}")
             if (timerState.value == TimerState.EXPIRED)
                 TIMER_STARTING_IN_TIME
             else
@@ -79,15 +84,17 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         Timber.d("Set volumeButtonState to: $state")
     }
 
-    fun setCurrentWorkout(wId: Long?){
-        wId?.let {
-            viewModelScope.launch {
-                workout.value = workoutRepository.getWorkout(it).first()
-            }
-        }
-    }
 
-    fun resetCurrentWorkout(){
-        workout.value = null
-    }
+
+//    fun setCurrentWorkout(wId: Long?){
+//        wId?.let {
+//            viewModelScope.launch {
+//                workout.value = workoutRepository.getWorkout(it).first()
+//            }
+//        }
+//    }
+//
+//    fun resetCurrentWorkout(){
+//        workout.value = null
+//    }
 }
