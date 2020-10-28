@@ -88,7 +88,7 @@ buildscript {
         maven { url = "https://dl.bintray.com/kotlin/kotlin-eap" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.0-alpha14'
+        classpath 'com.android.tools.build:gradle:4.2.0-alpha15'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigation_version"
@@ -104,7 +104,7 @@ allprojects {
         jcenter()
         maven { url = "https://dl.bintray.com/kotlin/kotlin-eap" }
         // snapshot for compose navigation
-        maven { url = 'https://androidx.dev/snapshots/builds/6934220/artifacts/repository' }
+        maven { url = 'https://androidx.dev/snapshots/builds/6936622/artifacts/repository' }
     }
 }
 
