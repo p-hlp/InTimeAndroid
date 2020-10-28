@@ -250,6 +250,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
             elapsedTimeInMillisEverySecond.postValue(lastSecondTimestamp)
 
             // if lastSecondTimestamp within 3 seconds of end, start counting/vibrating
+            if(lastSecondTimestamp <= 3000L)
+                speakOrVibrate(
+                    tts = tts,
+                    vibrator = vibrator,
+                    audioState = audioState,
+                    sayText = millisToSeconds(lastSecondTimestamp).toString(),
+                    vibrationLength = 200L
+                )
         }
     }
 
@@ -265,6 +273,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
             // get next workout state
             workoutState = getNextWorkoutState(workoutState)
             currentWorkoutState.postValue(workoutState)
+            // announce next timer with tts or vibration
+            speakOrVibrate(
+                tts = tts,
+                vibrator = vibrator,
+                audioState = audioState,
+                sayText = workoutState.stateName,
+                vibrationLength = 500L
+            )
             // start new timer
             startTimer()
         }else{
@@ -418,13 +434,9 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         elapsedTimeInMillisEverySecond.observe(this, Observer {
             if (!isKilled && !isBound) {
                 // Only do something if timer is running and service in foreground
-                workout?.let { wo ->
-                    val notification = currentNotificationBuilder
-                        .setContentTitle(wo.name)
-                        .setContentText(getFormattedStopWatchTime(it))
-
-                    notificationManager.notify(Constants.NOTIFICATION_ID, notification.build())
-                }
+                val notification = currentNotificationBuilder
+                    .setContentText(getFormattedStopWatchTime(it))
+                notificationManager.notify(Constants.NOTIFICATION_ID, notification.build())
             }
         })
     }
@@ -448,6 +460,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
 
         // Set Action, icon seems irrelevant
         currentNotificationBuilder = baseNotificationBuilder
+            .setContentTitle(workout?.name)
             .addAction(R.drawable.ic_alarm, notificationActionText, pendingIntent)
             .addAction(R.drawable.ic_alarm, "Cancel", cancelActionPendingIntent)
         notificationManager.notify(Constants.NOTIFICATION_ID, currentNotificationBuilder.build())

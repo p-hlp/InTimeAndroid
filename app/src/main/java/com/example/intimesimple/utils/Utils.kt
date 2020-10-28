@@ -140,11 +140,11 @@ fun speakOrVibrate(
     vibrator: Vibrator,
     audioState: AudioState,
     sayText: String,
-    vLength: Long
+    vibrationLength: Long
 ) {
     when(audioState){
         AudioState.MUTE -> return
-        AudioState.VIBRATE -> vibrate(vibrator, vLength)
+        AudioState.VIBRATE -> vibrate(vibrator, vibrationLength)
         AudioState.SOUND -> ttsSpeak(tts, sayText)
     }
 }
