@@ -1,5 +1,6 @@
 package com.example.intimesimple.di
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -104,4 +105,11 @@ object ServiceModule {
     fun provideVibrator(
         @ApplicationContext app: Context
     ): Vibrator = app.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+    @ServiceScoped
+    @Provides
+    fun provideNotificationManager(
+        @ApplicationContext app: Context
+    ): NotificationManager = app.getSystemService(Context.NOTIFICATION_SERVICE)
+            as NotificationManager
 }

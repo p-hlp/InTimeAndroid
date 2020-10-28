@@ -1,15 +1,16 @@
 package com.example.intimesimple.services
 
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import android.os.CountDownTimer
-import android.os.IBinder
-import android.os.PowerManager
-import android.os.Vibrator
+import android.os.*
 import android.speech.tts.TextToSpeech
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.example.intimesimple.R
 import com.example.intimesimple.data.local.AudioState
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.data.local.Workout
@@ -19,6 +20,7 @@ import com.example.intimesimple.di.PauseActionPendingIntent
 import com.example.intimesimple.di.ResumeActionPendingIntent
 import com.example.intimesimple.repositories.PreferenceRepository
 import com.example.intimesimple.repositories.WorkoutRepository
+import com.example.intimesimple.utils.*
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL_AND_RESET
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
@@ -31,9 +33,6 @@ import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
 import com.example.intimesimple.utils.Constants.TIMER_UPDATE_INTERVAL
-import com.example.intimesimple.utils.buildMainActivityPendingIntentWithId
-import com.example.intimesimple.utils.getNextWorkoutState
-import com.example.intimesimple.utils.getTimeFromWorkoutState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +42,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class TestService : LifecycleService(), TextToSpeech.OnInitListener{
@@ -50,6 +50,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     // notification builder
     @Inject lateinit var baseNotificationBuilder: NotificationCompat.Builder
     lateinit var currentNotificationBuilder: NotificationCompat.Builder
+    @Inject lateinit var notificationManager: NotificationManager
 
     // pending intents for notification action-handling
     @ResumeActionPendingIntent @Inject lateinit var resumeActionPendingIntent: PendingIntent
@@ -104,6 +105,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // Initialize notificationBuilder & TTS class
         currentNotificationBuilder = baseNotificationBuilder
         tts = TextToSpeech(this, this)
+        setupObservers()
     }
 
     override fun onInit(status: Int) {
@@ -128,25 +130,19 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     * isTimerRunning = true*/
                     //startTimer()
                     Timber.i("ACTION_START")
-                    isTimerRunning = true
-                    resetTimer()
-                    startTimer()
-                    currentTimerState.postValue(TimerState.RUNNING)
+                    /*TODO: Acquire wakelock, setup notification updates*/
+                    startServiceTimer()
                 }
                 ACTION_PAUSE -> {
                     /*Called when pause button is pressed, pause timer, set isTimerRunning = false*/
-                    //pauseTimer()
                     Timber.i("ACTION_PAUSE")
-                    isTimerRunning = false
                     currentTimerState.postValue(TimerState.PAUSED)
                     pauseTimer()
                 }
                 ACTION_RESUME -> {
                     /*Called when resume button is pressed, resume timer here, set isTimerRunning
                     * = true*/
-                    //resumeTimer()
                     Timber.i("ACTION_RESUME")
-                    isTimerRunning = true
                     currentTimerState.postValue(TimerState.RUNNING)
                     resumeTimer()
                 }
@@ -156,16 +152,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     * values*/
                     //timer?.cancel()
                     Timber.i("ACTION_CANCEL")
-                    isTimerRunning = false
-                    cancelTimer()
+                    cancelServiceTimer()
                     currentTimerState.postValue(TimerState.EXPIRED)
                 }
                 ACTION_CANCEL_AND_RESET -> {
                     /*Is called when navigating back to ListsScreen, resetting acquired data
                     * to null*/
                     Timber.i("ACTION_CANCEL_AND_RESET")
-                    isTimerRunning = false
-                    cancelTimer()
+                    cancelServiceTimer()
                     resetData()
                     currentTimerState.postValue(TimerState.EXPIRED)
 
@@ -176,17 +170,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                 // Audio related actions
                 ACTION_MUTE -> {
                     /*Sets current audio state to mute*/
-                    Timber.i("ACTION_MUTE")
                     audioState = AudioState.MUTE
                 }
                 ACTION_VIBRATE -> {
                     /*Sets current audio state to vibrate*/
-                    Timber.i("ACTION_VIBRATE")
                     audioState = AudioState.VIBRATE
                 }
                 ACTION_SOUND -> {
                     /*Sets current audio state to sound enabled*/
-                    Timber.i("ACTION_SOUND")
                     audioState = AudioState.SOUND
                 }
             }
@@ -198,6 +189,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is visible, use service without being foreground
         Timber.i("onBind")
         isBound = true
+        pushToBackground()
         return super.onBind(intent)
     }
 
@@ -205,6 +197,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is visible again, push service to background -> notification are not visible
         Timber.i("onRebind")
         isBound = true
+        pushToBackground()
         super.onRebind(intent)
     }
 
@@ -212,6 +205,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is not visible anymore, push service to foreground -> notifications visible
         Timber.i("onUnbind")
         isBound = false
+        pushToForeground()
         // return true so onRebind is used if service is alive and client connects
         return true
     }
@@ -288,14 +282,17 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     }
 
     private fun pauseTimer(){
+        isTimerRunning = false
         timer?.cancel()
     }
 
     private fun resumeTimer(){
+        isTimerRunning = true
         startTimer(wasPaused = true)
     }
 
     private fun cancelTimer(){
+        isTimerRunning = false
         timer?.cancel()
         resetTimer()
     }
@@ -359,5 +356,106 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     private fun resetData(){
         isInitialized = false
         workout = null
+    }
+
+    private fun startServiceTimer(){
+        // get wakelock
+        acquireWakelock()
+        isKilled = false
+        resetTimer()
+        startTimer()
+        isTimerRunning = true
+        currentTimerState.postValue(TimerState.RUNNING)
+    }
+
+    private fun cancelServiceTimer(){
+        // release wakelock
+        releaseWakelock()
+        cancelTimer()
+        isKilled = true
+    }
+
+
+    private fun acquireWakelock(){
+        wakeLock = (getSystemService(POWER_SERVICE) as PowerManager).run {
+            newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                "com.example.intimesimple.services:TimerService::lock").apply {
+                acquire()
+            }
+        }
+    }
+
+    private fun releaseWakelock(){
+        try {
+            wakeLock?.let {
+                if (it.isHeld) {
+                    it.release()
+                    Timber.d("Released wakelock")
+                }
+            }
+        } catch (e: Exception) {
+            Timber.d("Wasn't able to release wakelock ${e.message}")
+        }
+    }
+
+    private fun pushToForeground() {
+        Timber.d("pushToForeground - isBound: $isBound")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            createNotificationChannel(notificationManager)
+        startForeground(Constants.NOTIFICATION_ID, baseNotificationBuilder.build())
+    }
+
+    private fun pushToBackground(){
+        Timber.d("pushToBackground - isBound: $isBound")
+        stopForeground(true)
+    }
+
+    private fun setupObservers(){
+        // observe timerState and update notification actions
+        currentTimerState.observe(this, Observer {
+            if(!isKilled && isTimerRunning)
+                updateNotificationActions(it)
+        })
+
+        // Observe timeInMillis and update notification
+        elapsedTimeInMillisEverySecond.observe(this, Observer {
+            if (!isKilled && isTimerRunning && !isBound) {
+                // Only do something if timer is running and service in foreground
+                workout?.let { wo ->
+                    val notification = currentNotificationBuilder
+                        .setContentTitle(wo.name)
+                        .setContentText(getFormattedStopWatchTime(it))
+
+                    notificationManager.notify(Constants.NOTIFICATION_ID, notification.build())
+                }
+            }
+        })
+    }
+
+    private fun updateNotificationActions(state: TimerState){
+        // Updates actions of current notification depending on TimerState
+        val notificationActionText = if(state == TimerState.RUNNING) "Pause" else "Resume"
+
+        // Build pendingIntent depending on TimerState
+        val pendingIntent = if(state == TimerState.RUNNING){
+            pauseActionPendingIntent
+        }else{
+            resumeActionPendingIntent
+        }
+
+        // Clear current actions
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+        }
+
+        // Set Action, icon seems irrelevant
+        currentNotificationBuilder = baseNotificationBuilder
+            .addAction(R.drawable.ic_alarm, notificationActionText, pendingIntent)
+            .addAction(R.drawable.ic_alarm, "Cancel", cancelActionPendingIntent)
+        if(!isBound){
+            /*Only notify if service is in foreground*/
+            notificationManager.notify(Constants.NOTIFICATION_ID, currentNotificationBuilder.build())
+        }
     }
 }
