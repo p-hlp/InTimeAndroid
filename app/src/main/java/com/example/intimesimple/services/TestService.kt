@@ -130,20 +130,17 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     * isTimerRunning = true*/
                     //startTimer()
                     Timber.i("ACTION_START")
-                    /*TODO: Acquire wakelock, setup notification updates*/
                     startServiceTimer()
                 }
                 ACTION_PAUSE -> {
                     /*Called when pause button is pressed, pause timer, set isTimerRunning = false*/
                     Timber.i("ACTION_PAUSE")
-                    currentTimerState.postValue(TimerState.PAUSED)
                     pauseTimer()
                 }
                 ACTION_RESUME -> {
                     /*Called when resume button is pressed, resume timer here, set isTimerRunning
                     * = true*/
                     Timber.i("ACTION_RESUME")
-                    currentTimerState.postValue(TimerState.RUNNING)
                     resumeTimer()
                 }
                 ACTION_CANCEL -> {
@@ -153,7 +150,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     //timer?.cancel()
                     Timber.i("ACTION_CANCEL")
                     cancelServiceTimer()
-                    currentTimerState.postValue(TimerState.EXPIRED)
                 }
                 ACTION_CANCEL_AND_RESET -> {
                     /*Is called when navigating back to ListsScreen, resetting acquired data
@@ -161,7 +157,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     Timber.i("ACTION_CANCEL_AND_RESET")
                     cancelServiceTimer()
                     resetData()
-                    currentTimerState.postValue(TimerState.EXPIRED)
                 }
 
                 // Audio related actions
@@ -279,10 +274,12 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     }
 
     private fun pauseTimer(){
+        currentTimerState.postValue(TimerState.PAUSED)
         timer?.cancel()
     }
 
     private fun resumeTimer(){
+        currentTimerState.postValue(TimerState.RUNNING)
         startTimer(wasPaused = true)
     }
 
@@ -369,6 +366,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // release wakelock
         releaseWakelock()
         cancelTimer()
+        currentTimerState.postValue(TimerState.EXPIRED)
         isKilled = true
         stopForeground(true)
     }
