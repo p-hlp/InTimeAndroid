@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.setContent
 import androidx.navigation.NavHostController
 import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import androidx.navigation.compose.rememberNavController
-import com.example.intimesimple.services.TestService
+import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.ui.composables.navigation.AppNavigation
 import com.example.intimesimple.ui.theme.INTimeTheme
 import com.example.intimesimple.ui.viewmodels.WorkoutDetailViewModel
@@ -55,12 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        //Timber.d("onStart")
-        // Bind to the service
-//        Intent(this, TimerService::class.java).also { intent ->
-//            bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
-//        }
-        Intent(this, TestService::class.java).also { intent ->
+        Intent(this, TimerService::class.java).also { intent ->
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE)
         }
         bound = true
@@ -68,7 +63,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        //Timber.d("onStop")
         // Unbind from the service
         if (bound) {
             //Timber.d("Trying to unbind service")
@@ -89,7 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendCommandToService(action: String) {
-        Intent(this, TestService::class.java).also {
+        Intent(this, TimerService::class.java).also {
             it.action = action
             val id = navHostController.currentBackStackEntry?.arguments?.get("id") as? Long
             Timber.d("sendCommandService - Action: $action - ID: $id")
