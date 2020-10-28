@@ -67,7 +67,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     // service state
     private var isInitialized = false
     private var isKilled = true
-    private var isTimerRunning = false
     private var isBound = false
     private var audioState = AudioState.MUTE
     private var workoutState = WorkoutState.STARTING
@@ -87,6 +86,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
     private var wakeLock: PowerManager.WakeLock? = null
+    @Inject lateinit var dummyWorkout: Workout
 
     companion object{
         // holds MutableLiveData for UI to observe
@@ -162,9 +162,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
                     cancelServiceTimer()
                     resetData()
                     currentTimerState.postValue(TimerState.EXPIRED)
-
-                    // -1 is an invalid value, therefore repString will reset to an empty string
-                    currentRepetition.postValue(-1)
                 }
 
                 // Audio related actions
@@ -189,7 +186,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is visible, use service without being foreground
         Timber.i("onBind")
         isBound = true
-        pushToBackground()
+        if(!isKilled) pushToBackground()
         return super.onBind(intent)
     }
 
@@ -197,7 +194,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is visible again, push service to background -> notification are not visible
         Timber.i("onRebind")
         isBound = true
-        pushToBackground()
+        if(!isKilled) pushToBackground()
         super.onRebind(intent)
     }
 
@@ -205,7 +202,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         // UI is not visible anymore, push service to foreground -> notifications visible
         Timber.i("onUnbind")
         isBound = false
-        pushToForeground()
+        if(!isKilled) pushToForeground()
         // return true so onRebind is used if service is alive and client connects
         return true
     }
@@ -264,7 +261,7 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     private fun onTimerFinish(){
         // increase timerIndex
         timerIndex += 1
-        Timber.d("onTimerFinish - timerIndex: $timerIndex - maxRep: $timerMaxRepetitions")
+        Timber.i("onTimerFinish - timerIndex: $timerIndex - maxRep: $timerMaxRepetitions")
         // check if index still in bound
         if(timerIndex < timerMaxRepetitions){
             // if timerIndex odd -> post new rep
@@ -282,17 +279,14 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     }
 
     private fun pauseTimer(){
-        isTimerRunning = false
         timer?.cancel()
     }
 
     private fun resumeTimer(){
-        isTimerRunning = true
         startTimer(wasPaused = true)
     }
 
     private fun cancelTimer(){
-        isTimerRunning = false
         timer?.cancel()
         resetTimer()
     }
@@ -356,6 +350,10 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     private fun resetData(){
         isInitialized = false
         workout = null
+        // set current workout to dummyWorkout
+        currentWorkout.postValue(dummyWorkout)
+        // -1 is an invalid value, therefore repString will reset to an empty string
+        currentRepetition.postValue(-1)
     }
 
     private fun startServiceTimer(){
@@ -364,7 +362,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         isKilled = false
         resetTimer()
         startTimer()
-        isTimerRunning = true
         currentTimerState.postValue(TimerState.RUNNING)
     }
 
@@ -373,8 +370,8 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         releaseWakelock()
         cancelTimer()
         isKilled = true
+        stopForeground(true)
     }
-
 
     private fun acquireWakelock(){
         wakeLock = (getSystemService(POWER_SERVICE) as PowerManager).run {
@@ -399,27 +396,29 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
     }
 
     private fun pushToForeground() {
-        Timber.d("pushToForeground - isBound: $isBound")
+        Timber.i("pushToForeground - isBound: $isBound")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createNotificationChannel(notificationManager)
         startForeground(Constants.NOTIFICATION_ID, baseNotificationBuilder.build())
+        currentTimerState.value?.let { updateNotificationActions(it) }
     }
 
     private fun pushToBackground(){
-        Timber.d("pushToBackground - isBound: $isBound")
+        Timber.i("pushToBackground - isBound: $isBound")
         stopForeground(true)
     }
 
     private fun setupObservers(){
         // observe timerState and update notification actions
         currentTimerState.observe(this, Observer {
-            if(!isKilled && isTimerRunning)
+            Timber.i("currentTimerState changed - ${it.stateName}")
+            if(!isKilled && !isBound)
                 updateNotificationActions(it)
         })
 
         // Observe timeInMillis and update notification
         elapsedTimeInMillisEverySecond.observe(this, Observer {
-            if (!isKilled && isTimerRunning && !isBound) {
+            if (!isKilled && !isBound) {
                 // Only do something if timer is running and service in foreground
                 workout?.let { wo ->
                     val notification = currentNotificationBuilder
@@ -453,9 +452,6 @@ class TestService : LifecycleService(), TextToSpeech.OnInitListener{
         currentNotificationBuilder = baseNotificationBuilder
             .addAction(R.drawable.ic_alarm, notificationActionText, pendingIntent)
             .addAction(R.drawable.ic_alarm, "Cancel", cancelActionPendingIntent)
-        if(!isBound){
-            /*Only notify if service is in foreground*/
-            notificationManager.notify(Constants.NOTIFICATION_ID, currentNotificationBuilder.build())
-        }
+        notificationManager.notify(Constants.NOTIFICATION_ID, currentNotificationBuilder.build())
     }
 }

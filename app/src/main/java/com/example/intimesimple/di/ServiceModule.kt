@@ -9,6 +9,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import com.example.intimesimple.MainActivity
 import com.example.intimesimple.R
+import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.services.TestService
 import com.example.intimesimple.services.TimerService
 import com.example.intimesimple.utils.Constants.ACTION_CANCEL
 import com.example.intimesimple.utils.Constants.ACTION_PAUSE
@@ -50,7 +52,7 @@ object ServiceModule {
     ): PendingIntent = PendingIntent.getService(
             app,
             1,
-            Intent(app, TimerService::class.java).also {
+            Intent(app, TestService::class.java).also {
                 it.action = ACTION_CANCEL
             },
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -65,7 +67,7 @@ object ServiceModule {
     ): PendingIntent = PendingIntent.getService(
             app,
             2,
-            Intent(app, TimerService::class.java).also {
+            Intent(app, TestService::class.java).also {
                 it.action = ACTION_RESUME
             },
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -80,7 +82,7 @@ object ServiceModule {
     ): PendingIntent = PendingIntent.getService(
             app,
             3,
-            Intent(app, TimerService::class.java).also {
+            Intent(app, TestService::class.java).also {
                 it.action = ACTION_PAUSE
             },
             PendingIntent.FLAG_UPDATE_CURRENT
@@ -112,4 +114,13 @@ object ServiceModule {
         @ApplicationContext app: Context
     ): NotificationManager = app.getSystemService(Context.NOTIFICATION_SERVICE)
             as NotificationManager
+
+    @ServiceScoped
+    @Provides
+    fun provideDummyWorkout() = Workout(
+        name= "",
+        exerciseTime = -1L,
+        pauseTime = -1L,
+        repetitions = -1
+    )
 }
