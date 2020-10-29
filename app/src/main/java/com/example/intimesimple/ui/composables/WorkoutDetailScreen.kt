@@ -14,6 +14,7 @@ import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.utils.Constants
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.ConfigurationAmbient
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import com.example.intimesimple.data.local.Workout
 import com.example.intimesimple.data.local.WorkoutState
@@ -32,50 +33,32 @@ fun WorkoutDetailScreen(
 ) {
     val workout by workoutDetailViewModel.workout.observeAsState()
 
-//    onActive(callback = {
-//        // Do once on composition
-//        workoutDetailViewModel.setCurrentWorkout(workoutId)
-//    })
-
     Timber.d("WorkoutId: $workoutId - Workout: ${workout?.name ?: "null"}")
     Scaffold(
             modifier.fillMaxSize(),
             topBar = {
-                workout?.let {
-                    DetailScreenTopBar(
-                            title = it.name,
-                            navController = navController,
-                            sendCommand = sendServiceCommand,
-                            workoutDetailViewModel = workoutDetailViewModel
-                    )
-                }
-
+                DetailScreenTopBar(
+                    title = workout?.name ?: "",
+                    navController = navController,
+                    sendCommand = sendServiceCommand,
+                    workoutDetailViewModel = workoutDetailViewModel
+                )
             },
             bodyContent = { paddingValues ->
-                workout?.let {
-                    WorkoutDetailScreenContent(
-                            modifier = modifier.padding(paddingValues),
-                            sendCommand = sendServiceCommand,
-                            workout = it,
-                            workoutDetailViewModel = workoutDetailViewModel
-                    )
-                }
+                WorkoutDetailScreenContent(
+                    modifier = modifier.padding(paddingValues),
+                    sendCommand = sendServiceCommand,
+                    workoutDetailViewModel = workoutDetailViewModel
+                )
             }
     )
-
-//    onDispose(callback = {
-//        // Reset viewModel workout state when disposing composable
-//        workoutDetailViewModel.resetCurrentWorkout()
-//    })
 }
 
 
-// TODO: Refactor - state hoisting when possible
 @Composable
 fun WorkoutDetailScreenContent(
         modifier: Modifier = Modifier,
         sendCommand: (String) -> Unit,
-        workout: Workout,
         workoutDetailViewModel: WorkoutDetailViewModel
 ) {
     val timerState by workoutDetailViewModel.timerState.observeAsState(TimerState.EXPIRED)
@@ -97,7 +80,6 @@ fun WorkoutDetailScreenContent(
         } else landscapeConstraints()
 
         ConstraintLayout(modifier = modifier, constraintSet = constraints) {
-            val buttonModifier = Modifier.width(buttonWidth.dp)
 
             TimerCircleComponent(
                 modifier = Modifier.layoutId("progCircle"),
@@ -110,60 +92,72 @@ fun WorkoutDetailScreenContent(
                 totalTime = totalTime
             )
 
-            Row(
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .layoutId("buttonRow"),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                timerState.let {
-                    when (it) {
-                        TimerState.EXPIRED -> {
-                            Button(
-                                    onClick = {
-                                        sendCommand(Constants.ACTION_START)
-                                    },
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = buttonModifier
-                            ) {
-                                Text("Start")
-                            }
-                        }
-                        TimerState.RUNNING -> {
-                            Button(
-                                    onClick = { sendCommand(Constants.ACTION_PAUSE) },
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = buttonModifier
-                            ) {
-                                Text("Pause")
-                            }
+            ButtonRow(
+                modifier = Modifier.layoutId("buttonRow"),
+                state = timerState,
+                buttonWidth = buttonWidth.dp,
+                sendCommand = sendCommand
+            )
+        }
+    }
+}
 
-                            Button(
-                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = buttonModifier
-                            ) {
-                                Text("Cancel")
-                            }
-                        }
-                        TimerState.PAUSED -> {
-                            Button(
-                                    onClick = { sendCommand(Constants.ACTION_RESUME) },
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = buttonModifier
-                            ) {
-                                Text("Resume")
-                            }
+@Composable
+fun ButtonRow(
+    modifier: Modifier = Modifier,
+    state: TimerState,
+    buttonWidth: Dp,
+    sendCommand: (String) -> Unit
+){
+    val buttonModifier = Modifier.width(buttonWidth)
+    Row(
+        modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ){
+        when (state) {
+            TimerState.EXPIRED -> {
+                Button(
+                    onClick = {
+                        sendCommand(Constants.ACTION_START)
+                    },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = buttonModifier
+                ) {
+                    Text("Start")
+                }
+            }
+            TimerState.RUNNING -> {
+                Button(
+                    onClick = { sendCommand(Constants.ACTION_PAUSE) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = buttonModifier
+                ) {
+                    Text("Pause")
+                }
 
-                            Button(
-                                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
-                                    shape = MaterialTheme.shapes.medium,
-                                    modifier = buttonModifier
-                            ) {
-                                Text("Cancel")
-                            }
-                        }
-                    }
+                Button(
+                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = buttonModifier
+                ) {
+                    Text("Cancel")
+                }
+            }
+            TimerState.PAUSED -> {
+                Button(
+                    onClick = { sendCommand(Constants.ACTION_RESUME) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = buttonModifier
+                ) {
+                    Text("Resume")
+                }
+
+                Button(
+                    onClick = { sendCommand(Constants.ACTION_CANCEL) },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = buttonModifier
+                ) {
+                    Text("Cancel")
                 }
             }
         }
