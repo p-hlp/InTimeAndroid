@@ -114,6 +114,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener{
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         // Handle action from the activity
         intent?.let{
             when(it.action){
@@ -169,7 +170,7 @@ class TimerService : LifecycleService(), TextToSpeech.OnInitListener{
                 }
             }
         }
-        return super.onStartCommand(intent, flags, startId)
+        return START_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder? {
