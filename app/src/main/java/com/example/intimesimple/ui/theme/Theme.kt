@@ -69,7 +69,7 @@ fun INTimeTheme(content: @Composable() () -> Unit) {
                     letterSpacing = 3.sp
             ),
             subtitle2 = TextStyle(
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.W500,
                     fontSize = 16.sp,
                     letterSpacing = 0.1.em
             ),

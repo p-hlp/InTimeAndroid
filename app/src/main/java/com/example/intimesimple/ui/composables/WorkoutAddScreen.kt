@@ -88,7 +88,7 @@ fun WorkoutAddScreenContent(
     val configuration = androidx.compose.ui.platform.ConfigurationAmbient.current
     val screenWidth = configuration.screenWidthDp
     val buttonWidth = 0.3f * screenWidth
-    val rowWidth = .7f * screenWidth
+    val rowWidth = .75f * screenWidth
 
     ConstraintLayout(
             modifier = modifier
@@ -103,7 +103,7 @@ fun WorkoutAddScreenContent(
 
         OutlinedTextField(
                 modifier = Modifier.width(rowWidth.dp).constrainAs(textFieldRow) {
-                    top.linkTo(parent.top, 64.dp)
+                    top.linkTo(parent.top, 32.dp)
                     centerHorizontallyTo(parent)
                 },
                 value = nameField,
@@ -121,7 +121,7 @@ fun WorkoutAddScreenContent(
 
         clickInputField(
                 modifier = Modifier.width(rowWidth.dp).constrainAs(workRow){
-                    top.linkTo(textFieldRow.bottom, 32.dp)
+                    top.linkTo(textFieldRow.bottom, 16.dp)
                     centerHorizontallyTo(parent)
                 },
                 label = "Work",
@@ -140,7 +140,7 @@ fun WorkoutAddScreenContent(
 
         clickInputField(
                 modifier = Modifier.width(rowWidth.dp).constrainAs(pauseRow){
-                    top.linkTo(workRow.bottom, 32.dp)
+                    top.linkTo(workRow.bottom, 16.dp)
                     centerHorizontallyTo(parent)
                 },
                 label = "Pause",
@@ -159,7 +159,7 @@ fun WorkoutAddScreenContent(
 
         clickInputField(
                 modifier = Modifier.width(rowWidth.dp).constrainAs(repsRow){
-                    top.linkTo(pauseRow.bottom, 32.dp)
+                    top.linkTo(pauseRow.bottom, 16.dp)
                     centerHorizontallyTo(parent)
                 },
                 label = "Reps",
@@ -178,7 +178,7 @@ fun WorkoutAddScreenContent(
         Row(
                 modifier = Modifier.constrainAs(buttonRow){
                     centerHorizontallyTo(parent)
-                    bottom.linkTo(parent.bottom, 64.dp)
+                    bottom.linkTo(parent.bottom, 32.dp)
                 }.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
@@ -242,8 +242,9 @@ fun clickInputField(
 
         ProvideEmphasis(emphasisLevels.disabled){
             Text(
-                    text = label,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 4.dp)
+                text = label,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 2.dp),
+                style = typography.subtitle2
             )
         }
 
