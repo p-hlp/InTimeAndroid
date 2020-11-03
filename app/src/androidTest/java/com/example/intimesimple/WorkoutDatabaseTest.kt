@@ -10,6 +10,8 @@ import com.example.intimesimple.data.local.WorkoutDao
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -23,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 import java.lang.Exception
+import java.util.concurrent.CountDownLatch
 
 @RunWith(AndroidJUnit4::class)
 class WorkoutDatabaseTest {
@@ -54,14 +57,17 @@ class WorkoutDatabaseTest {
 
     @Test
     fun basicFlowTest() = testScope.runBlockingTest {
-        val workouts = async {
-            workoutDao.getAllWorkouts().take(2).toList()
+        val workouts = async(testDispatcher) {
+            workoutDao.getAllWorkouts().collect {
+                assertThat(it).isEqualTo(listOf(TestUtil.WORKOUT_1,
+                    TestUtil.WORKOUT_2,
+                    TestUtil.WORKOUT_3)
+                )
+            }
         }
+
         workoutDao.insertWorkout(TestUtil.WORKOUT_1)
         workoutDao.insertWorkout(TestUtil.WORKOUT_2)
         workoutDao.insertWorkout(TestUtil.WORKOUT_3)
-
-        assertThat(workouts.await())
-            .contains(listOf(TestUtil.WORKOUT_1, TestUtil.WORKOUT_2, TestUtil.WORKOUT_3))
     }
 }
