@@ -56,6 +56,8 @@ android {
     }
 
     packagingOptions {
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
         exclude "META-INF/ui-util_release.kotlin_module"
         exclude "META-INF/ui-text-android_release.kotlin_module"
         exclude "META-INF/ui-graphics_release.kotlin_module"
@@ -111,9 +113,14 @@ dependencies {
     implementation deps.datastore_preferences
 
     testImplementation test_deps.junit
+    testImplementation test_deps.google_truth
+
     androidTestImplementation test_deps.androidx_junit
     androidTestImplementation test_deps.espresso_core
     androidTestImplementation test_deps.navigation_testing
+    androidTestImplementation test_deps.google_truth
+    androidTestImplementation test_deps.arch_core_testing
+    androidTestImplementation test_deps.coroutines_test
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {

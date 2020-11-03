@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 @Dao
 abstract class WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertWorkout(workout: Workout)
+    abstract suspend fun insertWorkout(workout: Workout): Long
 
     suspend fun insertWithTimestamp(workout: Workout){
         insertWorkout(workout.apply {
