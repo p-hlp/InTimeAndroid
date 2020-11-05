@@ -1,24 +1,34 @@
 package com.example.intimesimple.ui.composables
 
 import android.net.Uri
+import androidx.compose.animation.transition
+import androidx.compose.foundation.Canvas
 import androidx.navigation.compose.*
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.imageFromResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
+import com.example.intimesimple.ui.animations.AnimationDefinitions
+import com.example.intimesimple.ui.animations.AnimationDefinitions.colorState
+import com.example.intimesimple.ui.animations.AnimationDefinitions.sizeState
 import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
@@ -41,44 +51,61 @@ fun WorkoutListScreen(
 
     // build screen layout with scaffold
     Scaffold(
-            modifier = modifier,
-            topBar = {
-                TopAppBar(
-                        title = {
-                            Text(
-                                    text = stringResource(id = R.string.app_name).toUpperCase()
-                            )
-                        }
-                )
-            },
-            bodyContent = { paddingValues ->
-                WorkoutListContent(
-                        modifier = modifier.padding(paddingValues),
-                        innerPadding = PaddingValues(4.dp),
-                        items = workouts,
-                        onSwipe = {
-                            workoutListViewModel.deleteWorkout(it)
-                        },
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.app_name).toUpperCase()
+                    )
+                }
+            )
+        },
+        bodyContent = { paddingValues ->
+            WorkoutListContent(
+                modifier = modifier.padding(paddingValues),
+                innerPadding = PaddingValues(4.dp),
+                items = workouts,
+                onSwipe = {
+                    workoutListViewModel.deleteWorkout(it)
+                },
+                onClick = {
+                    navController.navigate(
+                        Uri.parse(WORKOUT_DETAIL_URI + "${it.id}")
+                    )
+                    sendServiceCommand(ACTION_INITIALIZE_DATA)
+                }
+            )
+        },
+        floatingActionButton = {
+            var animateFab by remember { mutableStateOf(false) }
+
+            val state = transition(
+                definition = AnimationDefinitions.explodeTransitionDefinition,
+                initState = AnimationDefinitions.FabState.Idle,
+                toState = if (!animateFab) AnimationDefinitions.FabState.Idle
+                else AnimationDefinitions.FabState.Exploded,
+                onStateChangeFinished = {
+                    navController.navigate(Screen.WorkoutAddScreen.route)
+                    animateFab = false
+                }
+            )
+
+            Canvas(
+                modifier = Modifier.padding(16.dp)
+                    .clickable(
                         onClick = {
-                            navController.navigate(
-                                Uri.parse(WORKOUT_DETAIL_URI + "${it.id}")
-                            )
-                            sendServiceCommand(ACTION_INITIALIZE_DATA)
-                        }
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                        onClick = {
-                            navController.navigate(Screen.WorkoutAddScreen.route)
-                        },
-                        icon = {
-                            Icon(Icons.Filled.Add)
-                        },
-                        backgroundColor = Green500
-                )
-            },
-            floatingActionButtonPosition = FabPosition.End
+                            animateFab = true
+                        }, indication = RippleIndication(
+                            radius = 26.dp,
+                            bounded = false
+                        )
+                    ),
+            ) {
+                drawCircle(state[colorState], state[sizeState])
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
     )
 }
 
