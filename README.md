@@ -16,6 +16,8 @@ The purpose of this project is to learn and implement new android technologies a
  - [Room](https://developer.android.com/topic/libraries/architecture/room) 
  - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore)
 
+<br/>
+<br/>
 
 ## Architecture
 This application uses the MVVM (Model View ViewModel) architecture and unidirectional data flow.
