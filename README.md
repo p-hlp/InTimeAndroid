@@ -1,5 +1,5 @@
 
-<img src="https://github.com/TakuSemba/JetHub/blob/master/screenshots/placeholder.gif" align="right" width="280">
+<img src="https://github.com/p-hlp/INTimeSimple/blob/master/screenshots/placeholder.gif" align="right" width="280">
 ## What's InTime? :hourglass_flowing_sand:
 
 InTime is a sample interval timer application using android jetpack components and a long running service.
