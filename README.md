@@ -1,10 +1,13 @@
 
 <img src="https://github.com/p-hlp/INTimeSimple/blob/master/screenshots/placeholder.gif" align="right" width="280">
+
 ## What's InTime? :hourglass_flowing_sand:
 
 InTime is a sample interval timer application using android jetpack components and a long running service.
 
 The purpose of this project is to learn and implement new android technologies and libraries.
+
+<br/>
 
 ## Used Libraries
  - [Compose](https://developer.android.com/jetpack/compose) 
@@ -18,7 +21,8 @@ The purpose of this project is to learn and implement new android technologies a
 
 <br/>
 <br/>
-
+<br/>
+<br/>
 ## Architecture
 This application uses the MVVM (Model View ViewModel) architecture and unidirectional data flow.
 
