@@ -28,6 +28,8 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         it?.let{ VolumeButtonState.valueOf(it)} ?: VolumeButtonState.MUTE
     }
 
+    /*TODO: Add abstraction through repository*/
+
     // Get immutable LiveData from TimerService singleton
     val timerState: LiveData<TimerState>
         get() = TimerService.currentTimerState
