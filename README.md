@@ -23,6 +23,7 @@ The purpose of this project is to learn and implement new android technologies a
 <br/>
 <br/>
 <br/>
+
 ## Architecture
 This application uses the MVVM (Model View ViewModel) architecture and unidirectional data flow.
 
