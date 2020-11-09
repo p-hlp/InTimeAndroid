@@ -17,15 +17,13 @@ The purpose of this project is to learn and implement new android technologies a
  - [Room](https://developer.android.com/topic/libraries/architecture/room) 
  - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore)
 
-<br/>
-<br/>
-
-<img src="https://developer.android.com/topic/libraries/architecture/images/final-architecture.png" align="right width="380">
 
 ## Architecture
 This application uses the MVVM (Model View ViewModel) architecture and unidirectional data flow.
 
-<img src="https://developer.android.com/images/jetpack/compose/state-unidirectional-flow.png" align="left" width="380">
-
 Furthermore it is a single-activity application with compose navigation handling the navigation 
 graph.
+
+## :construction: Jetpack Compose/Navigation still in development :construction:
+Since compose and compose navigation are still in alpha and under development the
+API is likely to change and this project subject to change.
