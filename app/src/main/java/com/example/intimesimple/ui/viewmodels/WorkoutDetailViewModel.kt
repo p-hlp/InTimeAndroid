@@ -28,23 +28,20 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         it?.let{ VolumeButtonState.valueOf(it)} ?: VolumeButtonState.MUTE
     }
 
-    /*TODO: Add abstraction through repository*/
-
-    // Get immutable LiveData from TimerService singleton
     val timerState: LiveData<TimerState>
-        get() = TimerService.currentTimerState
+        get() = workoutRepository.getTimerServiceTimerState()
 
     val workoutState: LiveData<WorkoutState>
-        get() = TimerService.currentWorkoutState
+        get() = workoutRepository.getTimerServiceWorkoutState()
 
     val repString: LiveData<String>
-        get() = TimerService.currentRepetition.map {
+        get() = workoutRepository.getTimerServiceRepetition().map {
             if(workout.value != null && it != -1) "$it/${workout.value?.repetitions}"
             else ""
         }
 
     val timeString: LiveData<String>
-        get() = TimerService.elapsedTimeInMillisEverySecond.map {
+        get() = workoutRepository.getTimerServiceElapsedTimeMillisESeconds().map {
             if(workout.value != null){
                 if(timerState.value != TimerState.EXPIRED)
                     getFormattedStopWatchTime(it)
@@ -54,7 +51,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         }
 
     val elapsedTime: LiveData<Long>
-        get() = TimerService.elapsedTimeInMillis.map {
+        get() = workoutRepository.getTimerServiceElapsedTimeMillis().map {
             //Timber.i("elapsedTime: $it")
             if(timerState.value != TimerState.EXPIRED)
                 it
@@ -63,7 +60,7 @@ class WorkoutDetailViewModel @ViewModelInject constructor(
         }
 
     val totalTime: LiveData<Long>
-        get() = TimerService.currentWorkoutState.map {
+        get() = workoutRepository.getTimerServiceWorkoutState().map {
             Timber.i("totalTime: ${it.stateName}")
             if (timerState.value == TimerState.EXPIRED)
                 TIMER_STARTING_IN_TIME
