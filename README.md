@@ -7,8 +7,6 @@ InTime is a sample interval timer application using android jetpack components a
 
 The purpose of this project is to learn and implement new android technologies and libraries.
 
-<br/>
-
 ## Used Libraries
  - [Compose](https://developer.android.com/jetpack/compose) 
  - [Compose Navigation](https://developer.android.com/jetpack/compose/navigation)
@@ -21,10 +19,13 @@ The purpose of this project is to learn and implement new android technologies a
 
 <br/>
 <br/>
-<br/>
+
+<img src="https://developer.android.com/topic/libraries/architecture/images/final-architecture.png" align="right width="380">
 
 ## Architecture
 This application uses the MVVM (Model View ViewModel) architecture and unidirectional data flow.
+
+<img src="https://developer.android.com/images/jetpack/compose/state-unidirectional-flow.png" align="left" width="380">
 
 Furthermore it is a single-activity application with compose navigation handling the navigation 
 graph.
