@@ -27,11 +27,13 @@ object AnimationDefinitions{
         state(FabState.Idle){
             this[sizeState] = 60f
             this[colorState] = Green500
+            this[alphaState] = 1f
         }
 
         state(FabState.Exploded){
             this[sizeState] = 4000f
             this[colorState] = DarkBlue900
+            this[alphaState] = 0f
         }
 
         transition(fromState = FabState.Idle, toState = FabState.Exploded){
@@ -41,7 +43,8 @@ object AnimationDefinitions{
                 30f at 120
                 4000f at 700
             }
-            colorState using tween(durationMillis = 300)
+            colorState using tween(durationMillis = 120)
+            alphaState using tween(durationMillis = 1500)
         }
     }
 }

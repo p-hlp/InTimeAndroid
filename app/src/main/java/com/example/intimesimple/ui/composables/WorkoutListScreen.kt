@@ -1,28 +1,24 @@
 package com.example.intimesimple.ui.composables
 
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Canvas
-import androidx.navigation.compose.*
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.ripple.RippleIndication
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.imageFromResource
+import androidx.compose.ui.draw.drawOpacity
+
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
+import androidx.navigation.compose.*
 import androidx.navigation.NavController
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
@@ -30,12 +26,11 @@ import com.example.intimesimple.ui.animations.AnimationDefinitions
 import com.example.intimesimple.ui.animations.AnimationDefinitions.colorState
 import com.example.intimesimple.ui.animations.AnimationDefinitions.sizeState
 import com.example.intimesimple.ui.composables.navigation.Screen
-import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
-import com.example.intimesimple.utils.Constants.EXTRA_WORKOUT_ID
 import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
-import timber.log.Timber
+import java.util.*
+import kotlin.concurrent.schedule
 
 
 @ExperimentalMaterialApi
@@ -48,6 +43,7 @@ fun WorkoutListScreen(
 ){
     // get workout list as observable state
     val workouts by workoutListViewModel.workouts.observeAsState(listOf())
+    var animateFab by remember { mutableStateOf(false) }
 
     // build screen layout with scaffold
     Scaffold(
@@ -78,8 +74,6 @@ fun WorkoutListScreen(
             )
         },
         floatingActionButton = {
-            var animateFab by remember { mutableStateOf(false) }
-
             val state = transition(
                 definition = AnimationDefinitions.explodeTransitionDefinition,
                 initState = AnimationDefinitions.FabState.Idle,
@@ -87,23 +81,26 @@ fun WorkoutListScreen(
                 else AnimationDefinitions.FabState.Exploded,
                 onStateChangeFinished = {
                     navController.navigate(Screen.WorkoutAddScreen.route)
-                    animateFab = false
                 }
             )
-
-            Canvas(
-                modifier = Modifier.padding(16.dp)
-                    .clickable(
-                        onClick = {
-                            animateFab = true
-                        }, indication = RippleIndication(
-                            radius = 26.dp,
-                            bounded = false
-                        )
-                    ),
-            ) {
-                drawCircle(state[colorState], state[sizeState])
-            }
+            FloatingActionButton(
+                modifier = Modifier.size(state[sizeState].dp).drawOpacity(1f),
+                onClick = {
+                    animateFab = true
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        animateFab = false
+                        navController.navigate(Screen.WorkoutAddScreen.route)
+                    }, 300)
+                },
+                icon = {
+                    if(!animateFab){
+                        Icon(Icons.Filled.Add)
+                    }else return@FloatingActionButton
+                },
+                backgroundColor = state[colorState],
+                elevation = if(!animateFab) FloatingActionButtonConstants.defaultElevation()
+                            else FloatingActionButtonConstants.defaultElevation(0.dp, 0.dp)
+            )
         },
         floatingActionButtonPosition = FabPosition.End
     )
