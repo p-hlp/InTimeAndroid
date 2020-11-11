@@ -34,6 +34,7 @@ This application uses the MVVM (Model View ViewModel) architecture and unidirect
 <br/>
 <br/>
 
+## Navigation
 Furthermore it is a single-activity application with compose-navigation handling the 
 [navigation graph](https://github.com/p-hlp/InTimeAndroid/blob/master/app/src/main/java/com/example/intimesimple/ui/composables/navigation/Navigation.kt).
 ```kt
