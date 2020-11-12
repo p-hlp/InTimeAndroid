@@ -26,6 +26,7 @@ import com.example.intimesimple.ui.animations.AnimationDefinitions
 import com.example.intimesimple.ui.animations.AnimationDefinitions.colorState
 import com.example.intimesimple.ui.animations.AnimationDefinitions.sizeState
 import com.example.intimesimple.ui.composables.navigation.Screen
+import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
 import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
@@ -74,32 +75,14 @@ fun WorkoutListScreen(
             )
         },
         floatingActionButton = {
-            val state = transition(
-                definition = AnimationDefinitions.explodeTransitionDefinition,
-                initState = AnimationDefinitions.FabState.Idle,
-                toState = if (!animateFab) AnimationDefinitions.FabState.Idle
-                else AnimationDefinitions.FabState.Exploded,
-                onStateChangeFinished = {
-                    navController.navigate(Screen.WorkoutAddScreen.route)
-                }
-            )
             FloatingActionButton(
-                modifier = Modifier.size(state[sizeState].dp).drawOpacity(1f),
                 onClick = {
-                    animateFab = true
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        animateFab = false
-                        navController.navigate(Screen.WorkoutAddScreen.route)
-                    }, 300)
+                    navController.navigate(Screen.WorkoutAddScreen.route)
                 },
                 icon = {
-                    if(!animateFab){
-                        Icon(Icons.Filled.Add)
-                    }else return@FloatingActionButton
+                    Icon(Icons.Filled.Add)
                 },
-                backgroundColor = state[colorState],
-                elevation = if(!animateFab) FloatingActionButtonConstants.defaultElevation()
-                            else FloatingActionButtonConstants.defaultElevation(0.dp, 0.dp)
+                backgroundColor = Green500,
             )
         },
         floatingActionButtonPosition = FabPosition.End
