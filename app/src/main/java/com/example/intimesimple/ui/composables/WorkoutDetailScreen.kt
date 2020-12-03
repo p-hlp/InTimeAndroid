@@ -8,7 +8,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.WithConstraints
+import androidx.compose.ui.layout.WithConstraints
 import androidx.compose.ui.unit.dp
 import com.example.intimesimple.data.local.TimerState
 import com.example.intimesimple.utils.Constants

@@ -39,7 +39,7 @@ fun DetailScreenTopBar(
                     // send command cancel
                     sendCommand(ACTION_CANCEL_AND_RESET)
                 },
-                icon = {
+                content = {
                     Icon(Icons.Filled.ArrowBack)
                 }
             )
@@ -54,7 +54,7 @@ fun DetailScreenTopBar(
                     }
 
                 },
-                icon = {
+                content = {
                     buttonState?.let {
                         Icon(it.asset)
                     }

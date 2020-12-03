@@ -1,15 +1,10 @@
 package com.example.intimesimple.utils
 
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
+
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.speech.tts.TextToSpeech
-import androidx.compose.ui.graphics.vector.VectorAsset
-import com.example.intimesimple.MainActivity
 import com.example.intimesimple.data.local.AudioState
 import com.example.intimesimple.data.local.VolumeButtonState
 import com.example.intimesimple.data.local.Workout
@@ -18,8 +13,6 @@ import com.example.intimesimple.utils.Constants.ACTION_MUTE
 import com.example.intimesimple.utils.Constants.ACTION_SOUND
 import com.example.intimesimple.utils.Constants.ACTION_VIBRATE
 import com.example.intimesimple.utils.Constants.ONE_SECOND
-import com.example.intimesimple.utils.Constants.TIMER_STARTING_IN_TIME
-import timber.log.Timber
 import java.text.DateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit

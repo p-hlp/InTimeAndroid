@@ -58,7 +58,7 @@ fun WorkoutAddScreen(
                                         // navigate back
                                         navController.popBackStack()
                                     },
-                                    icon = {
+                                    content = {
                                         Icon(Icons.Filled.ArrowBack)
                                     }
                             )
@@ -261,7 +261,7 @@ fun clickInputField(
                             centerVerticallyTo(parent)
                         },
                         onClick = {onMinusClicked()},
-                        icon = {Icon(Icons.Filled.Remove)}
+                        content = {Icon(Icons.Filled.Remove)}
                 )
 
                 Box(
@@ -279,7 +279,7 @@ fun clickInputField(
                             centerVerticallyTo(parent)
                         },
                         onClick = {onPlusClicked()},
-                        icon = {Icon(Icons.Filled.Add)}
+                    content = {Icon(Icons.Filled.Add)}
                 )
             }
         }

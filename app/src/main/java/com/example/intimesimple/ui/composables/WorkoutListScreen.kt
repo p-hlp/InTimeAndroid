@@ -79,7 +79,7 @@ fun WorkoutListScreen(
                 onClick = {
                     navController.navigate(Screen.WorkoutAddScreen.route)
                 },
-                icon = {
+                content = {
                     Icon(Icons.Filled.Add)
                 },
                 backgroundColor = Green500,
