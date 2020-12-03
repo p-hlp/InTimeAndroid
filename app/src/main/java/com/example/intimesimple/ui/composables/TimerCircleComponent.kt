@@ -2,10 +2,9 @@ package com.example.intimesimple.ui.composables
 
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue

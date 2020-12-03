@@ -1,10 +1,6 @@
 package com.example.intimesimple.ui.composables
 
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import androidx.compose.animation.transition
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumnFor
 import androidx.compose.material.*
@@ -14,24 +10,18 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
-
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import androidx.navigation.NavController
 import com.example.intimesimple.R
 import com.example.intimesimple.data.local.Workout
-import com.example.intimesimple.ui.animations.AnimationDefinitions
-import com.example.intimesimple.ui.animations.AnimationDefinitions.colorState
-import com.example.intimesimple.ui.animations.AnimationDefinitions.sizeState
 import com.example.intimesimple.ui.composables.navigation.Screen
 import com.example.intimesimple.ui.theme.Green500
 import com.example.intimesimple.ui.viewmodels.WorkoutListViewModel
 import com.example.intimesimple.utils.Constants.ACTION_INITIALIZE_DATA
 import com.example.intimesimple.utils.Constants.WORKOUT_DETAIL_URI
-import java.util.*
-import kotlin.concurrent.schedule
+
 
 
 @ExperimentalMaterialApi

@@ -1,8 +1,8 @@
 package com.example.intimesimple.ui.composables
 
-import androidx.compose.foundation.Text
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -30,7 +30,7 @@ fun DetailScreenTopBar(
         .observeAsState()
 
     TopAppBar(
-        title = { Text(title) },
+        title = { Text(text = title) },
         navigationIcon = {
             IconButton(
                 onClick = {
