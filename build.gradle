@@ -22,10 +22,10 @@ buildscript {
         junit_version = "4.13"
         legacy_support_version = "1.0.0"
         preference_version = "1.1.1"
-        compose_version = "1.0.0-alpha06"
-        compose_nav_version = "1.0.0-alpha01"
+        compose_version = "1.0.0-alpha08"
+        compose_nav_version = "1.0.0-alpha03"
         assistedInject_version = '0.5.2'
-        datastore_version = "1.0.0-alpha02"
+        datastore_version = "1.0.0-alpha05"
 
         deps = [
                 kotlin_stdlib: "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version",
